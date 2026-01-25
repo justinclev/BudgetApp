@@ -10,9 +10,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -41,9 +38,6 @@ type GroupingMethod = 'Daily' | 'Weekly' | 'Monthly' | 'Annually';
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatExpansionModule,
     FormsModule,
     MatDialogModule,
     MatMenuModule,
@@ -55,6 +49,7 @@ export class ViewTransactionsComponent implements OnInit {
   isLoading = true;
   allTransactions: Transaction[] = [];
   groupedTransactions: TransactionGroup[] = [];
+  expandedGroups = new Set<string>();
 
   // Cache for recalculations
   debts: Debt[] = [];
@@ -197,6 +192,25 @@ export class ViewTransactionsComponent implements OnInit {
     this.groupedTransactions = Array.from(groups.values()).sort(
       (a, b) => a.date.getTime() - b.date.getTime(),
     );
+    
+    // Auto-expand the most recent group
+    if (this.groupedTransactions.length > 0 && this.expandedGroups.size === 0) {
+      const lastGroup = this.groupedTransactions[this.groupedTransactions.length - 1];
+      this.expandedGroups.add(lastGroup.id);
+    }
+  }
+
+  // --- Group Expand/Collapse ---
+  toggleGroup(groupId: string): void {
+    if (this.expandedGroups.has(groupId)) {
+      this.expandedGroups.delete(groupId);
+    } else {
+      this.expandedGroups.add(groupId);
+    }
+  }
+
+  trackByGroupId(index: number, group: TransactionGroup): string {
+    return group.id;
   }
 
   // --- Actions ---

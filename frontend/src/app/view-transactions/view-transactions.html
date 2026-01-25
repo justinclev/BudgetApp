@@ -1,92 +1,107 @@
-<div class="transactions-view">
-  <div class="header-controls">
-    <h2>Transaction History</h2>
-    
-    <div class="controls">
-      <mat-form-field appearance="outline" class="grouping-select">
-        <mat-label>Group By</mat-label>
-        <mat-select [(ngModel)]="selectedGrouping" (selectionChange)="updateGrouping()">
-          <mat-option *ngFor="let option of groupingOptions" [value]="option">
-            {{ option }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <button mat-icon-button (click)="loadTransactions()" class="refresh-btn">
-        <mat-icon>refresh</mat-icon>
+<div class="transactions-container">
+  <!-- Sticky Header -->
+  <header class="sticky-header">
+    <div class="header-top">
+      <h1>Transactions</h1>
+      <button class="icon-btn refresh" (click)="loadTransactions()" [class.spinning]="isLoading">
+        <mat-icon>sync</mat-icon>
       </button>
+    </div>
+    
+    <!-- Pill Selector -->
+    <div class="grouping-pills">
+      <button 
+        *ngFor="let option of groupingOptions" 
+        class="pill"
+        [class.active]="selectedGrouping === option"
+        (click)="selectedGrouping = option; updateGrouping()">
+        {{ option }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="skeleton-group" *ngFor="let i of [1,2,3]">
+      <div class="skeleton-header"></div>
+      <div class="skeleton-item"></div>
+      <div class="skeleton-item"></div>
     </div>
   </div>
 
-  <div *ngIf="isLoading" class="loading-container">
-    <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
-  </div>
-
+  <!-- Empty State -->
   <div *ngIf="!isLoading && groupedTransactions.length === 0" class="empty-state">
-    <mat-icon>receipt_long</mat-icon>
-    <p>No transactions found.</p>
-    <p class="sub-text">Generate transactions to see them here.</p>
+    <div class="empty-icon">
+      <mat-icon>account_balance_wallet</mat-icon>
+    </div>
+    <h3>No Transactions Yet</h3>
+    <p>Your transaction history will appear here once you generate some transactions.</p>
   </div>
 
-  <div *ngIf="!isLoading && groupedTransactions.length > 0" class="accordion-container">
-    <mat-accordion multi>
-      <mat-expansion-panel *ngFor="let group of groupedTransactions" class="group-panel">
-        <mat-expansion-panel-header>
-          <div class="panel-header-content">
-            <div class="header-main">
-              <span class="group-label">{{ group.label }}</span>
-              <span class="group-count">{{ group.count }} Transactions</span>
-            </div>
-            
-            <div class="header-stats">
-              <div class="stat-row">
-                <span class="stat-label">Start:</span>
-                <span class="stat-value">{{ group.startBalance | currency }}</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">End:</span>
-                <span class="stat-value" [class.negative]="(group.endBalance || 0) < 0">{{ group.endBalance | currency }}</span>
-              </div>
-            </div>
-          </div>
-        </mat-expansion-panel-header>
-
-        <div class="transaction-list">
-          <div *ngFor="let t of group.transactions" class="transaction-item">
-            <div class="item-main">
-              <div class="t-date">{{ t.date | date:'MMM d' }}</div>
-              <div class="t-info">
-                <div class="t-name">{{ t.name }}</div>
-                <div class="t-desc" *ngIf="t.description && t.description !== t.name">{{ t.description }}</div>
-              </div>
-            </div>
-            
-            <div class="item-values">
-              <div class="t-amount" [class.expense]="t.amount > 0">
-                -{{ t.amount | currency }}
-              </div>
-              <div class="t-balance">
-                Bal: {{ t.balances?.BalanceAfter | currency }}
-              </div>
-            </div>
-
-            <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="openEditDialog(t)">
-                <mat-icon>edit</mat-icon>
-                <span>Edit</span>
-              </button>
-              <button mat-menu-item (click)="deleteTransaction(t)">
-                <mat-icon>delete</mat-icon>
-                <span>Delete</span>
-              </button>
-            </mat-menu>
-          </div>
+  <!-- Transaction Groups -->
+  <div *ngIf="!isLoading && groupedTransactions.length > 0" class="groups-container">
+    <section *ngFor="let group of groupedTransactions; trackBy: trackByGroupId" class="transaction-group">
+      <!-- Group Header -->
+      <div class="group-header" (click)="toggleGroup(group.id)">
+        <div class="group-title">
+          <span class="label">{{ group.label }}</span>
+          <span class="count">{{ group.count }} item{{ group.count !== 1 ? 's' : '' }}</span>
         </div>
+        <div class="group-summary">
+          <div class="balance-change">
+            <span class="start">{{ group.startBalance | currency:'USD':'symbol':'1.0-0' }}</span>
+            <mat-icon class="arrow">arrow_forward</mat-icon>
+            <span class="end" [class.negative]="(group.endBalance || 0) < 0">
+              {{ group.endBalance | currency:'USD':'symbol':'1.0-0' }}
+            </span>
+          </div>
+          <mat-icon class="chevron" [class.expanded]="expandedGroups.has(group.id)">expand_more</mat-icon>
+        </div>
+      </div>
 
-      </mat-expansion-panel>
-    </mat-accordion>
+      <!-- Transactions List -->
+      <div class="transactions-list" [class.expanded]="expandedGroups.has(group.id)">
+        <article 
+          *ngFor="let t of group.transactions" 
+          class="transaction-card"
+          (click)="openEditDialog(t)">
+          
+          <div class="transaction-left">
+            <div class="date-badge">
+              <span class="day">{{ t.date | date:'d' }}</span>
+              <span class="month">{{ t.date | date:'MMM' }}</span>
+            </div>
+            <div class="transaction-info">
+              <span class="name">{{ t.name }}</span>
+              <span class="description" *ngIf="t.description && t.description !== t.name">
+                {{ t.description }}
+              </span>
+            </div>
+          </div>
+
+          <div class="transaction-right">
+            <span class="amount" [class.expense]="t.amount > 0" [class.income]="t.amount < 0">
+              {{ t.amount > 0 ? '-' : '+' }}{{ (t.amount < 0 ? -t.amount : t.amount) | currency:'USD':'symbol':'1.2-2' }}
+            </span>
+            <span class="balance">{{ t.balances?.BalanceAfter | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+
+          <button class="action-btn" [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+            <mat-icon>more_horiz</mat-icon>
+          </button>
+          
+          <mat-menu #menu="matMenu" class="transaction-menu">
+            <button mat-menu-item (click)="openEditDialog(t)">
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+            <button mat-menu-item class="delete-action" (click)="deleteTransaction(t)">
+              <mat-icon>delete_outline</mat-icon>
+              <span>Delete</span>
+            </button>
+          </mat-menu>
+        </article>
+      </div>
+    </section>
   </div>
 </div>
