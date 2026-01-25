@@ -21,6 +21,14 @@
         <div class="hero-icon green">
           <mat-icon>autorenew</mat-icon>
         </div>
+        
+        <div class="type-toggle-wrapper" style="margin-bottom: 12px;">
+            <mat-button-toggle-group formControlName="type" aria-label="Transaction Type" class="type-toggle">
+                <mat-button-toggle value="income">Income</mat-button-toggle>
+                <mat-button-toggle value="expense">Expense</mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
+
         <label class="hero-label">Recurring Amount</label>
         <div class="hero-input-wrapper">
           <span class="currency-symbol">$</span>

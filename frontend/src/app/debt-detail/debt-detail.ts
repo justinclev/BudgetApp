@@ -148,6 +148,7 @@ export class DebtDetailComponent {
                 startingDate: debtData.paymentDate,
                 frequency: debtData.frequency,
                 linkedDebtId: savedDebt._id,
+                type: 'expense'
               };
 
               // Attempt to find existing transaction to update, or create new

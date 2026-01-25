@@ -88,13 +88,10 @@
           </div>
 
           <div class="transaction-right">
-            <span class="amount" [class.expense]="t.amount > 0" [class.income]="t.amount < 0">
-              {{ t.amount > 0 ? '-' : '+'
-              }}{{ (t.amount < 0 ? -t.amount : t.amount) | currency: 'USD' : 'symbol' : '1.2-2' }}
+            <span class="amount" [class.income]="t.type === 'Income'" [class.expense]="t.type !== 'Income'">
+              {{ t.type === 'Income' ? '+' : '-' }}{{ t.amount | currency }}
             </span>
-            <span class="balance">{{
-              t.balances?.BalanceAfter | currency: 'USD' : 'symbol' : '1.0-0'
-            }}</span>
+            <span class="balance">Bal: {{ t.balances?.BalanceAfter | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
           </div>
         </article>
       </div>

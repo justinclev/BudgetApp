@@ -11,9 +11,9 @@ export class TransactionGenerator {
   private transactionService: TransactionService;
 
   constructor(
-    recurringTransactions: RecurringTransaction[], 
+    recurringTransactions: RecurringTransaction[],
     debts: Debt[],
-    transactionService: TransactionService
+    transactionService: TransactionService,
   ) {
     this.recurringTransactions = recurringTransactions;
     this.debts = debts;
@@ -21,14 +21,14 @@ export class TransactionGenerator {
   }
 
   async Generate(startDate: Date, endDate: Date, currentBalance: number): Promise<void> {
-    this.transactions = []; 
-    
+    this.transactions = [];
+
     // Fetch existing transactions
     const existingTransactions = await firstValueFrom(this.transactionService.getTransactions());
-    
+
     // Generate new transactions based on rules
     const generatedTransactions: Transaction[] = [];
-    
+
     // Normalize dates to start of day
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
@@ -40,20 +40,20 @@ export class TransactionGenerator {
       const d = new Date(rt.startingDate);
       currentDate = new Date(d);
       currentDate.setHours(0, 0, 0, 0);
-      
+
       if (currentDate > end) continue;
 
       while (currentDate <= end) {
         if (currentDate >= start) {
-            const newTransaction: Transaction = {
-                name: rt.name,
-                description: rt.description,
-                amount: rt.amount,
-                date: new Date(currentDate),
-                type: 'Recurring',
-                referenceId: rt._id
-            };
-            generatedTransactions.push(newTransaction);
+          const newTransaction: Transaction = {
+            name: rt.name,
+            description: rt.description,
+            amount: rt.amount,
+            date: new Date(currentDate),
+            type: rt.type === 'income' ? 'Income' : 'Recurring',
+            referenceId: rt._id,
+          };
+          generatedTransactions.push(newTransaction);
         }
         currentDate = this.getNextDate(currentDate, rt.frequency);
       }
@@ -67,29 +67,29 @@ export class TransactionGenerator {
 
     // Add all existing transactions first (they take precedence)
     for (const t of existingTransactions) {
-        // Fix date string to object if coming from JSON
-        t.date = new Date(t.date);
-        finalTransactions.push(t);
-        
-        if (t.referenceId) {
-            const dateStr = t.date.toISOString().split('T')[0]; // YYYY-MM-DD
-            const key = `${t.referenceId}-${dateStr}`;
-            transactionMap.set(key, t);
-        }
+      // Fix date string to object if coming from JSON
+      t.date = new Date(t.date);
+      finalTransactions.push(t);
+
+      if (t.referenceId) {
+        const dateStr = t.date.toISOString().split('T')[0]; // YYYY-MM-DD
+        const key = `${t.referenceId}-${dateStr}`;
+        transactionMap.set(key, t);
+      }
     }
 
     // Add generated transactions if they don't exist in the map
     for (const t of generatedTransactions) {
-        if (t.referenceId) {
-            const dateStr = t.date.toISOString().split('T')[0];
-            const key = `${t.referenceId}-${dateStr}`;
-            if (!transactionMap.has(key)) {
-                finalTransactions.push(t);
-            }
-        } else {
-            // Should not happen for generated recurring transactions, but strictly:
-            finalTransactions.push(t);
+      if (t.referenceId) {
+        const dateStr = t.date.toISOString().split('T')[0];
+        const key = `${t.referenceId}-${dateStr}`;
+        if (!transactionMap.has(key)) {
+          finalTransactions.push(t);
         }
+      } else {
+        // Should not happen for generated recurring transactions, but strictly:
+        finalTransactions.push(t);
+      }
     }
 
     this.transactions = finalTransactions;
@@ -107,7 +107,6 @@ export class TransactionGenerator {
   }
 
   private calculateBalances(initialBalance: number) {
-
     let runningBalance = initialBalance;
     const debtBalances = new Map<string, number>();
 
@@ -123,9 +122,11 @@ export class TransactionGenerator {
     for (const t of this.transactions) {
       const balancePrior = runningBalance;
 
-      // For now, assume all Recurring transactions are expenses (withdrawals)
-      // In the future, we could have a 'type' or 'category' on RecurringTransaction
-      runningBalance -= t.amount;
+      if (t.type === 'Income') {
+        runningBalance += t.amount;
+      } else {
+        runningBalance -= t.amount;
+      }
 
       const balanceAfter = runningBalance;
 
@@ -146,8 +147,6 @@ export class TransactionGenerator {
       t.balances = {
         BalancePrior: balancePrior,
         BalanceAfter: balanceAfter,
-        DebtId: t.referenceId ? rtMap.get(t.referenceId)?.linkedDebtId : undefined,
-        DebtName: t.referenceId ? rtMap.get(t.referenceId)?.name : undefined,
         DebtBalancePrior: debtPrior,
         DebtBalanceAfter: debtAfter,
       };

@@ -17,6 +17,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
@@ -29,6 +30,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
     MatNativeDateModule,
     MatButtonModule,
     MatIconModule,
+    MatButtonToggleModule
   ],
   templateUrl: './recurring-transaction-detail.html',
   styleUrls: ['./recurring-transaction-detail.scss'],
@@ -60,6 +62,7 @@ export class RecurringTransactionDetailComponent {
       ],
       frequency: [data?.frequency || '', Validators.required],
       startingDate: [data?.startingDate || '', Validators.required],
+      type: [data?.type || 'expense', Validators.required]
     });
   }
 

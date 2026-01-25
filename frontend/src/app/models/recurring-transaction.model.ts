@@ -5,7 +5,8 @@ export interface RecurringTransaction {
   name: string;
   description: string;
   amount: number;
-  frequency: Frequency;
+  frequency: string;
   startingDate: Date;
-  linkedDebtId?: string; // Reference to a Debt if this is a payment
+  linkedDebtId?: string;
+  type?: 'income' | 'expense';
 }

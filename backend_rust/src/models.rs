@@ -35,6 +35,12 @@ pub struct RecurringTransaction {
     pub starting_date: chrono::DateTime<chrono::Utc>,
     #[serde(rename = "linkedDebtId", skip_serializing_if = "Option::is_none", serialize_with = "serialize_oid_as_hex", deserialize_with = "deserialize_oid_from_hex", default)]
     pub linked_debt_id: Option<ObjectId>,
+    #[serde(rename = "type", default = "default_recurring_type")]
+    pub transaction_type: String,
+}
+
+fn default_recurring_type() -> String {
+    "expense".to_string()
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
