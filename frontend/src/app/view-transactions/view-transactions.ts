@@ -15,6 +15,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
+import { TransactionDetailComponent } from '../transaction-detail/transaction-detail';
 
 interface TransactionGroup {
   id: string; // unique key for trackBy
@@ -42,6 +45,8 @@ type GroupingMethod = 'Daily' | 'Weekly' | 'Monthly' | 'Annually';
     MatFormFieldModule,
     MatExpansionModule,
     FormsModule,
+    MatDialogModule,
+    MatMenuModule,
   ],
   templateUrl: './view-transactions.html',
   styleUrls: ['./view-transactions.scss'],
@@ -51,6 +56,10 @@ export class ViewTransactionsComponent implements OnInit {
   allTransactions: Transaction[] = [];
   groupedTransactions: TransactionGroup[] = [];
 
+  // Cache for recalculations
+  debts: Debt[] = [];
+  recurringTransactions: RecurringTransaction[] = [];
+
   groupingOptions: GroupingMethod[] = ['Daily', 'Weekly', 'Monthly', 'Annually'];
   selectedGrouping: GroupingMethod = 'Monthly';
 
@@ -58,6 +67,7 @@ export class ViewTransactionsComponent implements OnInit {
     private transactionService: TransactionService,
     private debtService: DebtService,
     private recurringTransactionService: RecurringTransactionService,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -73,19 +83,18 @@ export class ViewTransactionsComponent implements OnInit {
       recurring: this.recurringTransactionService.getTransactions(),
     }).subscribe({
       next: ({ transactions, debts, recurring }) => {
+        this.debts = debts;
+        this.recurringTransactions = recurring;
+
         // Ensure dates are Date objects and sort ascending for balance calculation
-        const sorted = transactions
+        this.allTransactions = transactions
           .map((t) => ({
             ...t,
             date: new Date(t.date),
           }))
           .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-        // Calculate balances (using 5000 as default starting balance)
-        this.calculateBalances(sorted, debts, recurring, 5000);
-
-        this.allTransactions = sorted;
-        this.updateGrouping();
+        this.recalculateAndGroup();
         this.isLoading = false;
       },
       error: (err) => {
@@ -93,6 +102,11 @@ export class ViewTransactionsComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  recalculateAndGroup(): void {
+    this.calculateBalances(this.allTransactions, this.debts, this.recurringTransactions, 5000);
+    this.updateGrouping();
   }
 
   private calculateBalances(
@@ -185,6 +199,53 @@ export class ViewTransactionsComponent implements OnInit {
     );
   }
 
+  // --- Actions ---
+
+  openEditDialog(transaction: Transaction): void {
+    const dialogRef = this.dialog.open(TransactionDetailComponent, {
+      width: '500px',
+      data: transaction,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Update local list
+        const index = this.allTransactions.findIndex((t) => t === transaction); // Reference check should work since we pass the object
+        // If strict, check by some ID or fallback
+        if (index !== -1) {
+          this.allTransactions[index] = result;
+          // Sort again in case date changed
+          this.allTransactions.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+          this.recalculateAndGroup();
+          this.saveChanges();
+        }
+      }
+    });
+  }
+
+  deleteTransaction(transaction: Transaction): void {
+    if (confirm(`Delete transaction "${transaction.name}"?`)) {
+      this.allTransactions = this.allTransactions.filter((t) => t !== transaction);
+      this.recalculateAndGroup();
+      this.saveChanges();
+    }
+  }
+
+  saveChanges(): void {
+    // Save entire list
+    this.transactionService.saveTransactions(this.allTransactions).subscribe({
+      next: () => {
+        // Optionally show snackbar
+      },
+      error: (err) => {
+        alert('Failed to save changes!');
+        console.error(err);
+      },
+    });
+  }
+
+  // --- Grouping Helpers ---
   private getGroupKey(date: Date, method: GroupingMethod): string {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -195,7 +256,6 @@ export class ViewTransactionsComponent implements OnInit {
       case 'Daily':
         return `${year}-${month}-${day}`;
       case 'Weekly':
-        // Get start of week (Sunday)
         const dayOfWeek = d.getDay();
         const diff = d.getDate() - dayOfWeek;
         const sunday = new Date(d.setDate(diff));
@@ -208,7 +268,6 @@ export class ViewTransactionsComponent implements OnInit {
   }
 
   private getGroupLabel(date: Date, method: GroupingMethod): string {
-    const options: Intl.DateTimeFormatOptions = {};
     switch (method) {
       case 'Daily':
         return date.toLocaleDateString(undefined, {
@@ -222,7 +281,6 @@ export class ViewTransactionsComponent implements OnInit {
         const dayOfWeek = d.getDay();
         const startDiff = d.getDate() - dayOfWeek;
         const startOfWeek = new Date(d.getFullYear(), d.getMonth(), startDiff);
-        const endOfWeek = new Date(d.getFullYear(), d.getMonth(), startDiff + 6);
         return `Week of ${startOfWeek.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
       case 'Monthly':
         return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
@@ -232,7 +290,6 @@ export class ViewTransactionsComponent implements OnInit {
   }
 
   private getGroupDate(date: Date, method: GroupingMethod): Date {
-    // Return a Date object representing the start of the group for sorting
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
 
@@ -248,9 +305,5 @@ export class ViewTransactionsComponent implements OnInit {
       case 'Annually':
         return new Date(d.getFullYear(), 0, 1);
     }
-  }
-
-  toggleGroup(group: any) {
-    // handled by mat-expansion-panel
   }
 }

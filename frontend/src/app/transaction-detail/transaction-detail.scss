@@ -1,0 +1,24 @@
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 300px;
+  padding-top: 8px;
+
+  @media (min-width: 600px) {
+      min-width: 450px;
+  }
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+
+  .half-width {
+    flex: 1;
+  }
+}
+
+textarea {
+    resize: none;
+}
