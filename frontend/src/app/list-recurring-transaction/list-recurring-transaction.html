@@ -1,0 +1,38 @@
+<div class="list-container">
+  <div class="header-actions">
+    <h3>Recurring Transactions</h3>
+  </div>
+
+  <div class="slim-list">
+    <div *ngFor="let transaction of transactions" class="transaction-item">
+      
+      <div class="item-left">
+        <div class="name">{{ transaction.name }}</div>
+        <div class="description" *ngIf="transaction.description">{{ transaction.description }}</div>
+        <div class="amount">
+          {{ transaction.amount | currency }}
+        </div>
+      </div>
+
+      <div class="item-right">
+        <div class="item-frequency">
+          <span class="frequency-tag">{{ transaction.frequency }}</span>
+        </div>
+
+        <div class="item-actions">
+          <button mat-icon-button color="primary" (click)="openTransactionDialog(transaction)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteTransaction(transaction._id!)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="transactions.length === 0" class="no-data-slim">
+      <mat-icon>info_outline</mat-icon>
+      <p>No recurring transactions found.</p>
+    </div>
+  </div>
+</div>

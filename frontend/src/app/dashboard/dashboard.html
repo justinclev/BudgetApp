@@ -1,0 +1,41 @@
+<mat-toolbar color="primary" class="dashboard-header">
+  <span>Budget App</span>
+  <span class="spacer"></span>
+  <button mat-button (click)="testGenerate()">
+    <mat-icon>play_arrow</mat-icon>
+    Test Generate
+  </button>
+  <button mat-icon-button (click)="logout()" aria-label="Logout">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<div class="page-container">
+  <div class="modern-card">
+    <div class="flex-between mb-2">
+      <h2>Dashboard</h2>
+    </div>
+    
+    <p class="text-secondary">Welcome to your budget dashboard! Your recurring transactions and overview will appear here.</p>
+    
+    <app-list-recurring-transaction></app-list-recurring-transaction>
+    
+    <app-list-debt></app-list-debt>
+  </div>
+</div>
+
+<!-- Floating Action Button -->
+<button mat-fab color="accent" class="fab-bottom-right" [matMenuTriggerFor]="fabMenu">
+  <mat-icon>add</mat-icon>
+</button>
+
+<mat-menu #fabMenu="matMenu" yPosition="above">
+  <button mat-menu-item (click)="openAddRecurringTransactionModal()">
+    <mat-icon>autorenew</mat-icon>
+    <span>Recurring Transaction</span>
+  </button>
+  <button mat-menu-item (click)="openAddDebtAccountModal()">
+    <mat-icon>account_balance</mat-icon>
+    <span>Debt Account</span>
+  </button>
+</mat-menu>

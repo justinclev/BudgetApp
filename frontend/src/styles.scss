@@ -1,0 +1,128 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+:root {
+  /* Color Palette - Soft & Professional */
+  --primary-color: #3f51b5;
+  --primary-light: #757de8;
+  --primary-dark: #002984;
+  --accent-color: #ff4081;
+  --background-color: #f5f7fa;
+  --surface-color: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --error-color: #f44336;
+  --success-color: #4caf50;
+
+  /* Spacing & Layout */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --border-radius: 12px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+body { 
+  margin: 0; 
+  font-family: 'Roboto', "Helvetica Neue", sans-serif; 
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  height: 100vh;
+}
+
+/* Global Reset/Utils */
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Modern Card Style - Use this for containers */
+.modern-card {
+  background: var(--surface-color);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.3s ease;
+}
+
+.modern-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Page Layout */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+/* Form Styling Enhancements */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* Make Angular Material Form Fields 100% width by default when in a column */
+mat-form-field {
+  width: 100%;
+}
+
+/* Button enhancements */
+button.mat-mdc-raised-button {
+  border-radius: 8px !important; /* Slightly softer corners */
+  padding: 0.5rem 1.5rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.5px;
+}
+
+/* Utility for Flexbox */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.mt-2 { margin-top: var(--spacing-lg); }
+.mb-2 { margin-bottom: var(--spacing-lg); }
+
+/* Alert Styles */
+.alert {
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.alert.success {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.alert.error {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: var(--error-color);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}

@@ -1,0 +1,38 @@
+<div class="list-container">
+  <div class="header-actions">
+    <h3>Debt Accounts</h3>
+  </div>
+
+  <div class="slim-list">
+    <div *ngFor="let debt of debts" class="debt-item">
+      <div class="item-left">
+        <div class="name">{{ debt.name }}</div>
+        <div class="spacer"></div>
+        <div class="amount">
+          {{ debt.amountOwed | currency }}
+          <span class="amount-label">owed</span>
+        </div>
+      </div>
+
+      <div class="item-right">
+        <div class="item-meta">
+          <span class="frequency-tag">{{ debt.frequency }}</span>
+        </div>
+
+        <div class="item-actions">
+          <button mat-icon-button color="primary" (click)="openDebtDialog(debt)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteDebt(debt._id!)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="debts.length === 0" class="no-data-slim">
+      <mat-icon>info_outline</mat-icon>
+      <p>No debt accounts found.</p>
+    </div>
+  </div>
+</div>

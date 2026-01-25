@@ -1,0 +1,19 @@
+.dashboard-header {
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.fab-bottom-right {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}

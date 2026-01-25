@@ -1,0 +1,12 @@
+import { TransactionBalances } from './transaction-balances.model';
+
+export interface Transaction {
+  _id?: string;
+  name: string;
+  description: string;
+  amount: number;
+  date: Date;
+  type: 'Recurring' | 'Debt' | 'One-Time' | 'Income';
+  referenceId?: string; // ID of the related recurring transaction, Income, or Debt, if applicable, Determined by Type
+  balances?: TransactionBalances; // Optional balance info for display purposes, not stored in DB
+}

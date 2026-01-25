@@ -1,0 +1,138 @@
+.list-container {
+  margin-top: 0.5rem;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+}
+
+.slim-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  background: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .item-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+
+    .name {
+      font-weight: 500;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .description {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .amount {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--primary-dark);
+      margin-top: 2px;
+    }
+  }
+
+  .item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    padding-left: 1rem;
+
+    .item-frequency {
+      .frequency-tag {
+        font-size: 0.7rem;
+        padding: 2px 10px;
+        background: #f0f2f5;
+        color: var(--text-secondary);
+        border-radius: 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 0;
+
+      button {
+        transform: scale(0.8);
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        
+        .mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+  }
+}
+
+.no-data-slim {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1px dashed #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.3;
+  }
+
+  p {
+    margin: 0;
+    font-weight: 500;
+  }
+}
