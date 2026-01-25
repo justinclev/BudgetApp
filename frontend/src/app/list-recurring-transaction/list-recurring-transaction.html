@@ -4,7 +4,7 @@
   </div>
 
   <div class="slim-list">
-    <div *ngFor="let transaction of transactions" class="transaction-item">
+    <div *ngFor="let transaction of transactions" class="transaction-item" (click)="openTransactionDialog(transaction)">
       
       <div class="item-left">
         <div class="name">{{ transaction.name }}</div>
@@ -18,15 +18,7 @@
         <div class="item-frequency">
           <span class="frequency-tag">{{ transaction.frequency }}</span>
         </div>
-
-        <div class="item-actions">
-          <button mat-icon-button color="primary" (click)="openTransactionDialog(transaction)" matTooltip="Edit">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteTransaction(transaction._id!)" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
+        <mat-icon class="chevron">chevron_right</mat-icon>
       </div>
     </div>
 

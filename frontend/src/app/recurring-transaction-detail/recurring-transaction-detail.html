@@ -4,18 +4,24 @@
     <button class="header-btn" type="button" (click)="onCancel()">
       <mat-icon>close</mat-icon>
     </button>
-    <h2>{{ isEditMode ? 'Edit Transaction' : 'New Transaction' }}</h2>
+    <h2>{{ isEditMode ? 'Edit Recurring' : 'New Recurring' }}</h2>
     <div class="header-spacer"></div>
   </header>
 
   <div class="form-content">
+    <!-- Error Alert -->
+    <div *ngIf="submissionError" class="error-alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ submissionError }}</span>
+    </div>
+
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
       <!-- Hero Section - Amount -->
       <div class="hero-section">
-        <div class="hero-icon blue">
-          <mat-icon>payments</mat-icon>
+        <div class="hero-icon green">
+          <mat-icon>autorenew</mat-icon>
         </div>
-        <label class="hero-label">Amount</label>
+        <label class="hero-label">Recurring Amount</label>
         <div class="hero-input-wrapper">
           <span class="currency-symbol">$</span>
           <input
@@ -27,7 +33,7 @@
             step="0.01"
           />
         </div>
-        <div class="field-error" *ngIf="transactionForm.get('amount')?.touched && transactionForm.get('amount')?.invalid">
+        <div class="field-error" *ngIf="f['amount'].touched && f['amount'].invalid">
           Enter a valid amount
         </div>
       </div>
@@ -36,7 +42,7 @@
       <div class="form-section">
         <div class="section-title">
           <mat-icon>description</mat-icon>
-          Details
+          Transaction Details
         </div>
 
         <div class="form-fields">
@@ -46,24 +52,31 @@
             <input
               type="text"
               formControlName="name"
-              placeholder="e.g. Grocery shopping"
+              placeholder="e.g. Netflix, Rent, Utilities"
               class="text-input"
-              [class.has-error]="transactionForm.get('name')?.touched && transactionForm.get('name')?.invalid"
+              [class.has-error]="f['name'].touched && f['name'].invalid"
             />
-            <div class="field-error" *ngIf="transactionForm.get('name')?.touched && transactionForm.get('name')?.hasError('required')">
+            <div class="field-error" *ngIf="f['name'].touched && f['name'].hasError('required')">
               Name is required
+            </div>
+            <div class="field-error" *ngIf="f['name'].hasError('nameTaken')">
+              This name is already taken
             </div>
           </div>
 
           <!-- Description -->
           <div class="field-group">
-            <label class="field-label">Description <span class="optional">(optional)</span></label>
+            <label class="field-label">Description <span class="required">*</span></label>
             <textarea
               formControlName="description"
               rows="2"
-              placeholder="Add a note..."
+              placeholder="Brief description of this transaction..."
               class="text-input textarea"
+              [class.has-error]="f['description'].touched && f['description'].invalid"
             ></textarea>
+            <div class="field-error" *ngIf="f['description'].touched && f['description'].hasError('required')">
+              Description is required
+            </div>
           </div>
         </div>
       </div>
@@ -71,33 +84,39 @@
       <!-- Schedule Section -->
       <div class="form-section">
         <div class="section-title">
-          <mat-icon>event</mat-icon>
-          When & Type
+          <mat-icon>schedule</mat-icon>
+          Schedule
         </div>
 
         <div class="form-fields">
-          <!-- Date & Type Row -->
+          <!-- Frequency & Date Row -->
           <div class="field-row">
             <div class="field-group">
-              <label class="field-label">Date <span class="required">*</span></label>
+              <label class="field-label">Frequency <span class="required">*</span></label>
+              <select 
+                formControlName="frequency" 
+                class="text-input select-input"
+                [class.has-error]="f['frequency'].touched && f['frequency'].invalid"
+              >
+                <option value="" disabled>Select...</option>
+                <option *ngFor="let freq of frequencies" [value]="freq">{{ freq }}</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Start Date <span class="required">*</span></label>
               <div class="date-input-wrapper">
                 <input
                   [matDatepicker]="picker"
-                  formControlName="date"
+                  formControlName="startingDate"
                   class="text-input date-input"
                   placeholder="Select date"
                   readonly
+                  [class.has-error]="f['startingDate'].touched && f['startingDate'].invalid"
                 />
                 <mat-datepicker-toggle [for]="picker" class="date-toggle"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
               </div>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">Type</label>
-              <select formControlName="type" class="text-input select-input">
-                <option *ngFor="let t of types" [value]="t">{{ t }}</option>
-              </select>
             </div>
           </div>
         </div>
@@ -111,16 +130,20 @@
       Cancel
     </button>
     
-    <button *ngIf="isEditMode" type="button" class="btn btn-delete" (click)="onDelete()">
+    <button
+      *ngIf="isEditMode"
+      type="button"
+      class="btn btn-delete"
+      (click)="onDelete()">
       <mat-icon>delete_outline</mat-icon>
     </button>
 
     <button
       type="submit"
-      class="btn btn-primary"
-      [disabled]="transactionForm.invalid"
+      class="btn btn-success"
+      [disabled]="transactionForm.invalid || transactionForm.pending"
       (click)="onSubmit()">
-      {{ isEditMode ? 'Save Changes' : 'Create' }}
+      {{ isEditMode ? 'Save Changes' : 'Add Recurring' }}
     </button>
   </div>
 </div>

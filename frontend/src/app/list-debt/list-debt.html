@@ -4,7 +4,7 @@
   </div>
 
   <div class="slim-list">
-    <div *ngFor="let debt of debts" class="debt-item">
+    <div *ngFor="let debt of debts" class="debt-item" (click)="openDebtDialog(debt)">
       <div class="item-left">
         <div class="name">{{ debt.name }}</div>
         <div class="spacer"></div>
@@ -18,15 +18,7 @@
         <div class="item-meta">
           <span class="frequency-tag">{{ debt.frequency }}</span>
         </div>
-
-        <div class="item-actions">
-          <button mat-icon-button color="primary" (click)="openDebtDialog(debt)" matTooltip="Edit">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteDebt(debt._id!)" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
+        <mat-icon class="chevron">chevron_right</mat-icon>
       </div>
     </div>
 

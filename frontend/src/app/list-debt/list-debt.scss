@@ -31,12 +31,20 @@
   padding: 1rem 1.25rem;
   border-radius: 12px;
   border: 1px solid #eee;
-  transition: all 0.2s ease;
-  min-height: 100px; /* Ensure there is enough height to see the top/bottom split */
+  transition: all 0.15s ease;
+  min-height: 100px;
+  cursor: pointer;
 
-  &:hover {
-    border-color: var(--error-color);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  &:active {
+    transform: scale(0.98);
+    background: #f8f8f8;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: #9c27b0;
+      box-shadow: 0 4px 12px rgba(156, 39, 176, 0.15);
+    }
   }
 
   .item-left {
@@ -116,22 +124,12 @@
       }
     }
 
-    .item-actions {
-      display: flex;
-      gap: 0;
-
-      button {
-        transform: scale(0.85);
-        width: 36px;
-        height: 36px;
-        line-height: 36px;
-        
-        .mat-icon {
-          font-size: 22px;
-          width: 22px;
-          height: 22px;
-        }
-      }
+    .chevron {
+      color: #ccc;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      margin-top: 8px;
     }
   }
 }

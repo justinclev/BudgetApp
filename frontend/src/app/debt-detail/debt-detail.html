@@ -1,0 +1,175 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <header class="dialog-header">
+    <button class="header-btn" type="button" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+    <h2>{{ isEditMode ? 'Edit Debt' : 'New Debt Account' }}</h2>
+    <div class="header-spacer"></div>
+  </header>
+
+  <!-- Error Alert -->
+  <div class="form-content">
+    <div *ngIf="submissionError" class="error-alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ submissionError }}</span>
+    </div>
+
+    <form [formGroup]="debtForm" (ngSubmit)="onSubmit()">
+      <!-- Hero Section - Amount Owed -->
+      <div class="hero-section">
+        <div class="hero-icon purple">
+          <mat-icon>account_balance</mat-icon>
+        </div>
+        <label class="hero-label">Amount Owed</label>
+        <div class="hero-input-wrapper">
+          <span class="currency-symbol">$</span>
+          <input
+            type="number"
+            formControlName="amountOwed"
+            placeholder="0.00"
+            class="hero-input"
+            inputmode="decimal"
+            step="0.01"
+          />
+        </div>
+        <div class="field-error" *ngIf="f['amountOwed'].touched && f['amountOwed'].invalid">
+          Enter a valid amount
+        </div>
+      </div>
+
+      <!-- Basic Info Section -->
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>info</mat-icon>
+          Account Details
+        </div>
+        
+        <div class="form-fields">
+          <!-- Name -->
+          <div class="field-group">
+            <label class="field-label">Account Name <span class="required">*</span></label>
+            <input
+              type="text"
+              formControlName="name"
+              placeholder="e.g. Credit Card, Car Loan"
+              class="text-input"
+              [class.has-error]="f['name'].touched && f['name'].invalid"
+            />
+            <div class="field-error" *ngIf="f['name'].touched && f['name'].hasError('required')">
+              Name is required
+            </div>
+            <div class="field-error" *ngIf="f['name'].hasError('nameTaken')">
+              This name is already taken
+            </div>
+          </div>
+
+          <!-- Interest Rate -->
+          <div class="field-group">
+            <label class="field-label">Interest Rate (%) <span class="required">*</span></label>
+            <input
+              type="number"
+              formControlName="interestRate"
+              placeholder="0.00"
+              class="text-input"
+              step="0.01"
+              inputmode="decimal"
+              [class.has-error]="f['interestRate'].touched && f['interestRate'].invalid"
+            />
+            <div class="field-error" *ngIf="f['interestRate'].touched && f['interestRate'].invalid">
+              Enter a rate between 0 and 100
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recurring Payment Toggle -->
+      <div class="form-section">
+        <label class="toggle-group">
+          <div class="toggle-icon">
+            <mat-icon>autorenew</mat-icon>
+          </div>
+          <div class="toggle-content">
+            <div class="toggle-label">Create Recurring Payment</div>
+            <div class="toggle-hint">Auto-generate monthly transactions</div>
+          </div>
+          <mat-checkbox formControlName="createRecurring" (click)="$event.stopPropagation()"></mat-checkbox>
+        </label>
+
+        <!-- Recurring Payment Details -->
+        <div *ngIf="f['createRecurring'].value" class="collapsible-section">
+          <div class="form-fields">
+            <!-- Minimum Payment -->
+            <div class="field-group">
+              <label class="field-label">Minimum Payment <span class="required">*</span></label>
+              <div class="hero-input-wrapper" style="justify-content: flex-start; gap: 8px;">
+                <span class="currency-symbol" style="font-size: 18px;">$</span>
+                <input
+                  type="number"
+                  formControlName="minimumPayment"
+                  placeholder="0.00"
+                  class="text-input"
+                  style="max-width: 150px;"
+                  step="0.01"
+                  inputmode="decimal"
+                />
+              </div>
+              <div class="field-error" *ngIf="f['minimumPayment'].touched && f['minimumPayment'].invalid">
+                Payment amount is required
+              </div>
+            </div>
+
+            <!-- Frequency & Date Row -->
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">Frequency</label>
+                <select formControlName="frequency" class="text-input select-input">
+                  <option value="" disabled>Select...</option>
+                  <option *ngFor="let freq of frequencies" [value]="freq">{{ freq }}</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Start Date</label>
+                <div class="date-input-wrapper">
+                  <input
+                    [matDatepicker]="picker"
+                    formControlName="paymentDate"
+                    class="text-input date-input"
+                    placeholder="Select date"
+                    readonly
+                  />
+                  <mat-datepicker-toggle [for]="picker" class="date-toggle"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="dialog-actions">
+    <button type="button" class="btn btn-cancel" (click)="onCancel()">
+      Cancel
+    </button>
+    
+    <button
+      *ngIf="isEditMode"
+      type="button"
+      class="btn btn-delete"
+      (click)="onDelete()">
+      <mat-icon>delete_outline</mat-icon>
+    </button>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="debtForm.invalid || debtForm.pending"
+      (click)="onSubmit()">
+      {{ isEditMode ? 'Save Changes' : 'Add Debt' }}
+    </button>
+  </div>
+</div>

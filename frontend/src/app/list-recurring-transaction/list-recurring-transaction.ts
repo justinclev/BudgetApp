@@ -7,7 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RecurringTransactionService } from '../services/recurring-transaction.service';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
-import { CreateRecurringTransactionComponent } from '../create-recurring-transaction/create-recurring-transaction';
+import { RecurringTransactionDetailComponent } from '../recurring-transaction-detail/recurring-transaction-detail';
 
 @Component({
   selector: 'app-list-recurring-transaction',
@@ -43,9 +43,9 @@ export class ListRecurringTransactionComponent implements OnInit {
   }
 
   openTransactionDialog(transaction?: RecurringTransaction): void {
-    const dialogRef = this.dialog.open(CreateRecurringTransactionComponent, {
+    const dialogRef = this.dialog.open(RecurringTransactionDetailComponent, {
       width: '600px',
-      data: transaction // Pass transaction for edit mode, or null for add
+      data: transaction
     });
 
     dialogRef.afterClosed().subscribe(result => {

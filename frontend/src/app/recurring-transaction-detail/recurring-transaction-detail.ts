@@ -5,31 +5,27 @@ import { RecurringTransactionService } from '../services/recurring-transaction.s
 import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { FREQUENCIES } from '../models/frequency.model';
 import { Observable, map, catchError, of, timer, switchMap } from 'rxjs';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-create-recurring-transaction',
+  selector: 'app-recurring-transaction-detail',
   standalone: true,
   imports: [
     CommonModule, 
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule
   ],
-  templateUrl: './create-recurring-transaction.html',
-  styleUrls: ['./create-recurring-transaction.scss']
+  templateUrl: './recurring-transaction-detail.html',
+  styleUrls: ['./recurring-transaction-detail.scss']
 })
-export class CreateRecurringTransactionComponent {
+export class RecurringTransactionDetailComponent {
   transactionForm: FormGroup;
   frequencies = FREQUENCIES;
   submissionError: string | null = null;
@@ -39,7 +35,7 @@ export class CreateRecurringTransactionComponent {
   constructor(
     private fb: FormBuilder,
     private transactionService: RecurringTransactionService,
-    private dialogRef: MatDialogRef<CreateRecurringTransactionComponent>,
+    private dialogRef: MatDialogRef<RecurringTransactionDetailComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: RecurringTransaction
   ) {
     this.isEditMode = !!data;
@@ -50,7 +46,7 @@ export class CreateRecurringTransactionComponent {
     this.transactionForm = this.fb.group({
       name: [data?.name || '', [Validators.required], [this.nameUniqueValidator()]],
       description: [data?.description || '', Validators.required],
-      amount: [data?.amount || null, [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]], // Numeric check
+      amount: [data?.amount || null, [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
       frequency: [data?.frequency || '', Validators.required],
       startingDate: [data?.startingDate || '', Validators.required]
     });
@@ -61,15 +57,14 @@ export class CreateRecurringTransactionComponent {
       if (!control.value) {
         return of(null);
       }
-      // If editing and name hasn't changed, it's valid
       if (this.isEditMode && control.value === this.data.name) {
         return of(null);
       }
 
-      return timer(500).pipe( // Debounce
+      return timer(500).pipe(
         switchMap(() => this.transactionService.checkNameExists(control.value, this.editingId || undefined)),
         map(response => (response.exists ? { nameTaken: true } : null)),
-        catchError(() => of(null)) // Handle error gracefully
+        catchError(() => of(null))
       );
     };
   }
@@ -100,6 +95,22 @@ export class CreateRecurringTransactionComponent {
     }
   }
 
-  // Helper for template access
+  onCancel(): void {
+    this.dialogRef.close(null);
+  }
+
+  onDelete(): void {
+    if (confirm(`Delete "${this.data?.name}"?`)) {
+      if (this.editingId) {
+        this.transactionService.deleteTransaction(this.editingId).subscribe({
+          next: () => this.dialogRef.close('deleted'),
+          error: (err) => {
+            this.submissionError = err.error?.message || 'Failed to delete transaction.';
+          }
+        });
+      }
+    }
+  }
+
   get f() { return this.transactionForm.controls; }
 }

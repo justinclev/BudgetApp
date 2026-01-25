@@ -7,8 +7,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { ListRecurringTransactionComponent } from '../list-recurring-transaction/list-recurring-transaction';
-import { CreateRecurringTransactionComponent } from '../create-recurring-transaction/create-recurring-transaction';
-import { CreateDebtAccountComponent } from '../create-debt-account/create-debt-account';
+import { RecurringTransactionDetailComponent } from '../recurring-transaction-detail/recurring-transaction-detail';
+import { DebtDetailComponent } from '../debt-detail/debt-detail';
 import { ListDebtComponent } from '../list-debt/list-debt';
 import { ViewTransactionsComponent } from '../view-transactions/view-transactions';
 import { RecurringTransactionService } from '../services/recurring-transaction.service';
@@ -81,7 +81,7 @@ export class DashboardComponent {
   }
 
   openAddRecurringTransactionModal() {
-    const dialogRef = this.dialog.open(CreateRecurringTransactionComponent, {
+    const dialogRef = this.dialog.open(RecurringTransactionDetailComponent, {
       width: '600px',
       disableClose: false,
     });
@@ -94,7 +94,7 @@ export class DashboardComponent {
   }
 
   openAddDebtAccountModal() {
-    const dialogRef = this.dialog.open(CreateDebtAccountComponent, {
+    const dialogRef = this.dialog.open(DebtDetailComponent, {
       width: '600px',
       disableClose: false,
     });

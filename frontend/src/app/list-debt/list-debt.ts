@@ -6,7 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DebtService } from '../services/debt.service';
 import { Debt } from '../models/debt.model';
-import { CreateDebtAccountComponent } from '../create-debt-account/create-debt-account';
+import { DebtDetailComponent } from '../debt-detail/debt-detail';
 
 @Component({
   selector: 'app-list-debt',
@@ -41,7 +41,7 @@ export class ListDebtComponent implements OnInit {
   }
 
   openDebtDialog(debt?: Debt): void {
-    const dialogRef = this.dialog.open(CreateDebtAccountComponent, {
+    const dialogRef = this.dialog.open(DebtDetailComponent, {
       width: '600px',
       data: debt
     });

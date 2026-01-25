@@ -15,33 +15,29 @@ import { RecurringTransactionService } from '../services/recurring-transaction.s
 import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { FREQUENCIES } from '../models/frequency.model';
 import { Observable, map, catchError, of, timer, switchMap } from 'rxjs';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-create-debt-account',
+  selector: 'app-debt-detail',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
     MatCheckboxModule,
+    MatIconModule,
   ],
-  templateUrl: './create-debt-account.html',
-  styleUrls: ['./create-debt-account.scss'],
+  templateUrl: './debt-detail.html',
+  styleUrls: ['./debt-detail.scss'],
 })
-export class CreateDebtAccountComponent {
+export class DebtDetailComponent {
   debtForm: FormGroup;
   frequencies = FREQUENCIES;
   submissionError: string | null = null;
@@ -52,7 +48,7 @@ export class CreateDebtAccountComponent {
     private fb: FormBuilder,
     private debtService: DebtService,
     private recurringTransactionService: RecurringTransactionService,
-    private dialogRef: MatDialogRef<CreateDebtAccountComponent>,
+    private dialogRef: MatDialogRef<DebtDetailComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: Debt,
   ) {
     this.isEditMode = !!data;
@@ -186,6 +182,23 @@ export class CreateDebtAccountComponent {
         });
     } else {
       this.debtForm.markAllAsTouched();
+    }
+  }
+
+  onCancel(): void {
+    this.dialogRef.close(null);
+  }
+
+  onDelete(): void {
+    if (confirm(`Delete "${this.data?.name}"?`)) {
+      if (this.editingId) {
+        this.debtService.deleteDebt(this.editingId).subscribe({
+          next: () => this.dialogRef.close('deleted'),
+          error: (err) => {
+            this.submissionError = err.error?.message || 'Failed to delete debt.';
+          }
+        });
+      }
     }
   }
 
