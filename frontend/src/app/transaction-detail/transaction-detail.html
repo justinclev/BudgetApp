@@ -27,7 +27,10 @@
             step="0.01"
           />
         </div>
-        <div class="field-error" *ngIf="transactionForm.get('amount')?.touched && transactionForm.get('amount')?.invalid">
+        <div
+          class="field-error"
+          *ngIf="transactionForm.get('amount')?.touched && transactionForm.get('amount')?.invalid"
+        >
           Enter a valid amount
         </div>
       </div>
@@ -48,9 +51,17 @@
               formControlName="name"
               placeholder="e.g. Grocery shopping"
               class="text-input"
-              [class.has-error]="transactionForm.get('name')?.touched && transactionForm.get('name')?.invalid"
+              [class.has-error]="
+                transactionForm.get('name')?.touched && transactionForm.get('name')?.invalid
+              "
             />
-            <div class="field-error" *ngIf="transactionForm.get('name')?.touched && transactionForm.get('name')?.hasError('required')">
+            <div
+              class="field-error"
+              *ngIf="
+                transactionForm.get('name')?.touched &&
+                transactionForm.get('name')?.hasError('required')
+              "
+            >
               Name is required
             </div>
           </div>
@@ -107,10 +118,8 @@
 
   <!-- Action Buttons -->
   <div class="dialog-actions">
-    <button type="button" class="btn btn-cancel" (click)="onCancel()">
-      Cancel
-    </button>
-    
+    <button type="button" class="btn btn-cancel" (click)="onCancel()">Cancel</button>
+
     <button *ngIf="isEditMode" type="button" class="btn btn-delete" (click)="onDelete()">
       <mat-icon>delete_outline</mat-icon>
     </button>
@@ -119,7 +128,8 @@
       type="submit"
       class="btn btn-primary"
       [disabled]="transactionForm.invalid"
-      (click)="onSubmit()">
+      (click)="onSubmit()"
+    >
       {{ isEditMode ? 'Save Changes' : 'Create' }}
     </button>
   </div>

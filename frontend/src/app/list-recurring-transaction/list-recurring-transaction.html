@@ -4,8 +4,11 @@
   </div>
 
   <div class="slim-list">
-    <div *ngFor="let transaction of transactions" class="transaction-item" (click)="openTransactionDialog(transaction)">
-      
+    <div
+      *ngFor="let transaction of transactions"
+      class="transaction-item"
+      (click)="openTransactionDialog(transaction)"
+    >
       <div class="item-left">
         <div class="name">{{ transaction.name }}</div>
         <div class="description" *ngIf="transaction.description">{{ transaction.description }}</div>

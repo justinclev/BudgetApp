@@ -74,7 +74,10 @@
               class="text-input textarea"
               [class.has-error]="f['description'].touched && f['description'].invalid"
             ></textarea>
-            <div class="field-error" *ngIf="f['description'].touched && f['description'].hasError('required')">
+            <div
+              class="field-error"
+              *ngIf="f['description'].touched && f['description'].hasError('required')"
+            >
               Description is required
             </div>
           </div>
@@ -93,8 +96,8 @@
           <div class="field-row">
             <div class="field-group">
               <label class="field-label">Frequency <span class="required">*</span></label>
-              <select 
-                formControlName="frequency" 
+              <select
+                formControlName="frequency"
                 class="text-input select-input"
                 [class.has-error]="f['frequency'].touched && f['frequency'].invalid"
               >
@@ -126,15 +129,9 @@
 
   <!-- Action Buttons -->
   <div class="dialog-actions">
-    <button type="button" class="btn btn-cancel" (click)="onCancel()">
-      Cancel
-    </button>
-    
-    <button
-      *ngIf="isEditMode"
-      type="button"
-      class="btn btn-delete"
-      (click)="onDelete()">
+    <button type="button" class="btn btn-cancel" (click)="onCancel()">Cancel</button>
+
+    <button *ngIf="isEditMode" type="button" class="btn btn-delete" (click)="onDelete()">
       <mat-icon>delete_outline</mat-icon>
     </button>
 
@@ -142,7 +139,8 @@
       type="submit"
       class="btn btn-success"
       [disabled]="transactionForm.invalid || transactionForm.pending"
-      (click)="onSubmit()">
+      (click)="onSubmit()"
+    >
       {{ isEditMode ? 'Save Changes' : 'Add Recurring' }}
     </button>
   </div>

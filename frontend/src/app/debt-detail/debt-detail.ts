@@ -196,7 +196,7 @@ export class DebtDetailComponent {
           next: () => this.dialogRef.close('deleted'),
           error: (err) => {
             this.submissionError = err.error?.message || 'Failed to delete debt.';
-          }
+          },
         });
       }
     }

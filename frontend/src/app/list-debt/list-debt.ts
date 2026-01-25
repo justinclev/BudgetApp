@@ -11,22 +11,16 @@ import { DebtDetailComponent } from '../debt-detail/debt-detail';
 @Component({
   selector: 'app-list-debt',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
-    MatTooltipModule
-  ],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatTooltipModule],
   templateUrl: './list-debt.html',
-  styleUrls: ['./list-debt.scss']
+  styleUrls: ['./list-debt.scss'],
 })
 export class ListDebtComponent implements OnInit {
   debts: Debt[] = [];
 
   constructor(
     private debtService: DebtService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -35,18 +29,18 @@ export class ListDebtComponent implements OnInit {
 
   loadDebts(): void {
     this.debtService.getDebts().subscribe({
-      next: (data) => this.debts = data,
-      error: (err) => console.error('Error fetching debts', err)
+      next: (data) => (this.debts = data),
+      error: (err) => console.error('Error fetching debts', err),
     });
   }
 
   openDebtDialog(debt?: Debt): void {
     const dialogRef = this.dialog.open(DebtDetailComponent, {
       width: '600px',
-      data: debt
+      data: debt,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.loadDebts();
       }
@@ -57,7 +51,7 @@ export class ListDebtComponent implements OnInit {
     if (confirm('Are you sure you want to delete this debt account?')) {
       this.debtService.deleteDebt(id).subscribe({
         next: () => this.loadDebts(),
-        error: (err) => alert('Failed to delete debt')
+        error: (err) => alert('Failed to delete debt'),
       });
     }
   }

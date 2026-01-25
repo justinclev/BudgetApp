@@ -44,7 +44,7 @@
           <mat-icon>info</mat-icon>
           Account Details
         </div>
-        
+
         <div class="form-fields">
           <!-- Name -->
           <div class="field-group">
@@ -93,7 +93,10 @@
             <div class="toggle-label">Create Recurring Payment</div>
             <div class="toggle-hint">Auto-generate monthly transactions</div>
           </div>
-          <mat-checkbox formControlName="createRecurring" (click)="$event.stopPropagation()"></mat-checkbox>
+          <mat-checkbox
+            formControlName="createRecurring"
+            (click)="$event.stopPropagation()"
+          ></mat-checkbox>
         </label>
 
         <!-- Recurring Payment Details -->
@@ -102,19 +105,22 @@
             <!-- Minimum Payment -->
             <div class="field-group">
               <label class="field-label">Minimum Payment <span class="required">*</span></label>
-              <div class="hero-input-wrapper" style="justify-content: flex-start; gap: 8px;">
-                <span class="currency-symbol" style="font-size: 18px;">$</span>
+              <div class="hero-input-wrapper" style="justify-content: flex-start; gap: 8px">
+                <span class="currency-symbol" style="font-size: 18px">$</span>
                 <input
                   type="number"
                   formControlName="minimumPayment"
                   placeholder="0.00"
                   class="text-input"
-                  style="max-width: 150px;"
+                  style="max-width: 150px"
                   step="0.01"
                   inputmode="decimal"
                 />
               </div>
-              <div class="field-error" *ngIf="f['minimumPayment'].touched && f['minimumPayment'].invalid">
+              <div
+                class="field-error"
+                *ngIf="f['minimumPayment'].touched && f['minimumPayment'].invalid"
+              >
                 Payment amount is required
               </div>
             </div>
@@ -152,15 +158,9 @@
 
   <!-- Action Buttons -->
   <div class="dialog-actions">
-    <button type="button" class="btn btn-cancel" (click)="onCancel()">
-      Cancel
-    </button>
-    
-    <button
-      *ngIf="isEditMode"
-      type="button"
-      class="btn btn-delete"
-      (click)="onDelete()">
+    <button type="button" class="btn btn-cancel" (click)="onCancel()">Cancel</button>
+
+    <button *ngIf="isEditMode" type="button" class="btn btn-delete" (click)="onDelete()">
       <mat-icon>delete_outline</mat-icon>
     </button>
 
@@ -168,7 +168,8 @@
       type="submit"
       class="btn btn-primary"
       [disabled]="debtForm.invalid || debtForm.pending"
-      (click)="onSubmit()">
+      (click)="onSubmit()"
+    >
       {{ isEditMode ? 'Save Changes' : 'Add Debt' }}
     </button>
   </div>

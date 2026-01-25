@@ -18,17 +18,17 @@ import { RecurringTransactionDetailComponent } from '../recurring-transaction-de
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    MatDialogModule
+    MatDialogModule,
   ],
   templateUrl: './list-recurring-transaction.html',
-  styleUrls: ['./list-recurring-transaction.scss']
+  styleUrls: ['./list-recurring-transaction.scss'],
 })
 export class ListRecurringTransactionComponent implements OnInit {
   transactions: RecurringTransaction[] = [];
 
   constructor(
     private transactionService: RecurringTransactionService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -37,18 +37,18 @@ export class ListRecurringTransactionComponent implements OnInit {
 
   loadTransactions(): void {
     this.transactionService.getTransactions().subscribe({
-      next: (data) => this.transactions = data,
-      error: (err) => console.error('Error fetching transactions', err)
+      next: (data) => (this.transactions = data),
+      error: (err) => console.error('Error fetching transactions', err),
     });
   }
 
   openTransactionDialog(transaction?: RecurringTransaction): void {
     const dialogRef = this.dialog.open(RecurringTransactionDetailComponent, {
       width: '600px',
-      data: transaction
+      data: transaction,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.loadTransactions(); // Refresh list if changed
       }
@@ -59,7 +59,7 @@ export class ListRecurringTransactionComponent implements OnInit {
     if (confirm('Are you sure you want to delete this transaction?')) {
       this.transactionService.deleteTransaction(id).subscribe({
         next: () => this.loadTransactions(),
-        error: (err) => alert('Failed to delete transaction')
+        error: (err) => alert('Failed to delete transaction'),
       });
     }
   }

@@ -131,17 +131,23 @@ $bg-input: #f1f5f9;
 
     &.purple {
       background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-      mat-icon { color: #6366f1; }
+      mat-icon {
+        color: #6366f1;
+      }
     }
 
     &.green {
       background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-      mat-icon { color: #10b981; }
+      mat-icon {
+        color: #10b981;
+      }
     }
 
     &.blue {
       background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-      mat-icon { color: #3b82f6; }
+      mat-icon {
+        color: #3b82f6;
+      }
     }
 
     mat-icon {
@@ -190,8 +196,13 @@ $bg-input: #f1f5f9;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 // ===== FORM FIELDS =====

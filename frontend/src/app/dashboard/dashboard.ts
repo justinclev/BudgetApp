@@ -31,7 +31,7 @@ import { forkJoin } from 'rxjs';
     MatDividerModule,
     ListRecurringTransactionComponent,
     ListDebtComponent,
-    ViewTransactionsComponent
+    ViewTransactionsComponent,
   ],
 })
 export class DashboardComponent {

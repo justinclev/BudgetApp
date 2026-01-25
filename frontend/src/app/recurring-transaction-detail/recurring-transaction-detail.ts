@@ -1,6 +1,14 @@
 import { Component, Inject, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  AsyncValidatorFn,
+} from '@angular/forms';
 import { RecurringTransactionService } from '../services/recurring-transaction.service';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { FREQUENCIES } from '../models/frequency.model';
@@ -15,15 +23,15 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'app-recurring-transaction-detail',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     ReactiveFormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './recurring-transaction-detail.html',
-  styleUrls: ['./recurring-transaction-detail.scss']
+  styleUrls: ['./recurring-transaction-detail.scss'],
 })
 export class RecurringTransactionDetailComponent {
   transactionForm: FormGroup;
@@ -36,7 +44,7 @@ export class RecurringTransactionDetailComponent {
     private fb: FormBuilder,
     private transactionService: RecurringTransactionService,
     private dialogRef: MatDialogRef<RecurringTransactionDetailComponent>,
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: RecurringTransaction
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: RecurringTransaction,
   ) {
     this.isEditMode = !!data;
     if (this.isEditMode) {
@@ -46,9 +54,12 @@ export class RecurringTransactionDetailComponent {
     this.transactionForm = this.fb.group({
       name: [data?.name || '', [Validators.required], [this.nameUniqueValidator()]],
       description: [data?.description || '', Validators.required],
-      amount: [data?.amount || null, [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+      amount: [
+        data?.amount || null,
+        [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)],
+      ],
       frequency: [data?.frequency || '', Validators.required],
-      startingDate: [data?.startingDate || '', Validators.required]
+      startingDate: [data?.startingDate || '', Validators.required],
     });
   }
 
@@ -62,9 +73,11 @@ export class RecurringTransactionDetailComponent {
       }
 
       return timer(500).pipe(
-        switchMap(() => this.transactionService.checkNameExists(control.value, this.editingId || undefined)),
-        map(response => (response.exists ? { nameTaken: true } : null)),
-        catchError(() => of(null))
+        switchMap(() =>
+          this.transactionService.checkNameExists(control.value, this.editingId || undefined),
+        ),
+        map((response) => (response.exists ? { nameTaken: true } : null)),
+        catchError(() => of(null)),
       );
     };
   }
@@ -87,8 +100,9 @@ export class RecurringTransactionDetailComponent {
           this.dialogRef.close(true);
         },
         error: (err) => {
-          this.submissionError = err.error?.message || 'An error occurred while saving the transaction.';
-        }
+          this.submissionError =
+            err.error?.message || 'An error occurred while saving the transaction.';
+        },
       });
     } else {
       this.transactionForm.markAllAsTouched();
@@ -106,11 +120,13 @@ export class RecurringTransactionDetailComponent {
           next: () => this.dialogRef.close('deleted'),
           error: (err) => {
             this.submissionError = err.error?.message || 'Failed to delete transaction.';
-          }
+          },
         });
       }
     }
   }
 
-  get f() { return this.transactionForm.controls; }
+  get f() {
+    return this.transactionForm.controls;
+  }
 }
