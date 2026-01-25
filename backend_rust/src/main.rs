@@ -8,7 +8,7 @@ use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 
-use handlers::{debt_handler, transaction_handler, health_handler};
+use handlers::{debt_handler, transaction_handler, health_handler, generated_transaction_handler};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -38,12 +38,15 @@ async fn main() -> std::io::Result<()> {
             .route("/api/debts/{id}", web::put().to(debt_handler::update_debt))
             .route("/api/debts/{id}", web::delete().to(debt_handler::delete_debt))
             .route("/api/debts/check-name/{name}", web::get().to(debt_handler::check_debt_name))
-            // Transaction Routes
+            // Recurring Transaction Routes
             .route("/api/recurring-transactions", web::get().to(transaction_handler::get_transactions))
             .route("/api/recurring-transactions", web::post().to(transaction_handler::create_transaction))
             .route("/api/recurring-transactions/{id}", web::put().to(transaction_handler::update_transaction))
             .route("/api/recurring-transactions/{id}", web::delete().to(transaction_handler::delete_transaction))
             .route("/api/recurring-transactions/check-name/{name}", web::get().to(transaction_handler::check_transaction_name))
+            // Generated Transaction Routes
+            .route("/api/transactions", web::get().to(generated_transaction_handler::get_generated_transactions))
+            .route("/api/transactions", web::post().to(generated_transaction_handler::save_generated_transactions))
     })
     .bind(format!("0.0.0.0:{}", port))?
     .run()

@@ -1,0 +1,213 @@
+.transactions-view {
+  padding: 16px;
+  max-width: 800px; // Increased width for better panel layout
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.header-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .grouping-select {
+        width: 140px;
+        font-size: 0.9rem;
+        
+        // Remove bottom padding from form field wrapper to align better
+        ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+        }
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+  
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+}
+
+// Custom Expansion Panel Styles
+.group-panel {
+  margin-bottom: 12px;
+  border-radius: 8px !important; // Override material default
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  
+  // Header Layout
+  .panel-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-right: 8px; // Space from expand icon
+    
+    @media (max-width: 450px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+  }
+
+  .header-main {
+    display: flex;
+    flex-direction: column;
+
+    .group-label {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .group-count {
+        font-size: 0.8rem;
+        color: #777;
+    }
+  }
+
+  .header-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.9rem;
+    
+    @media (max-width: 450px) {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        border-top: 1px solid #f0f0f0;
+        padding-top: 8px;
+    }
+
+    .stat-row {
+        display: flex;
+        gap: 8px;
+        
+        .stat-label {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        
+        .stat-value {
+            font-weight: 500;
+            
+            &.negative {
+                color: #d32f2f;
+            }
+        }
+    }
+  }
+}
+
+// List inside panel
+.transaction-list {
+  padding-top: 8px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .item-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    overflow: hidden;
+
+    .t-date {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #555;
+        min-width: 50px; // Align names roughly
+        text-align: center;
+        background: #f5f5f5;
+        padding: 4px;
+        border-radius: 4px;
+    }
+
+    .t-info {
+        flex: 1;
+        overflow: hidden;
+        
+        .t-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .t-desc {
+            font-size: 0.8rem;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+  }
+
+  .item-values {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: 12px;
+
+    .t-amount {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #333;
+        
+        &.expense {
+             // Maybe color red? usually expense is standard, income green. 
+             // keeping neutral or standard black for now, relying on negative sign if present.
+             // But usually generated transactions are withdrawals, so just standard.
+        }
+    }
+
+    .t-balance {
+        font-size: 0.75rem;
+        color: #888;
+    }
+  }
+}

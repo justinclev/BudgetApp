@@ -37,6 +37,29 @@ pub struct RecurringTransaction {
     pub linked_debt_id: Option<ObjectId>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Transaction {
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none", serialize_with = "serialize_oid_as_hex", deserialize_with = "deserialize_oid_from_hex", default)]
+    pub id: Option<ObjectId>,
+    pub name: String,
+    pub description: String,
+    #[serde(deserialize_with = "deserialize_f64_from_bson_number")]
+    pub amount: f64,
+    pub date: chrono::DateTime<chrono::Utc>,
+    #[serde(rename = "type")]
+    pub transaction_type: String,
+    #[serde(rename = "referenceId", skip_serializing_if = "Option::is_none")]
+    pub reference_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserTransactions {
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none", serialize_with = "serialize_oid_as_hex", deserialize_with = "deserialize_oid_from_hex", default)]
+    pub id: Option<ObjectId>,
+    pub user: String,
+    pub transactions: Vec<Transaction>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct CheckNameResponse {
     pub exists: bool,

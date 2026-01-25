@@ -1,64 +1,113 @@
 import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { Transaction } from '../models/transaction.model';
 import { Debt } from '../models/debt.model';
+import { TransactionService } from '../services/transaction.service';
+import { firstValueFrom } from 'rxjs';
 
 export class TransactionGenerator {
   transactions: Transaction[] = [];
   private recurringTransactions: RecurringTransaction[];
   private debts: Debt[];
+  private transactionService: TransactionService;
 
-  constructor(recurringTransactions: RecurringTransaction[], debts: Debt[]) {
+  constructor(
+    recurringTransactions: RecurringTransaction[], 
+    debts: Debt[],
+    transactionService: TransactionService
+  ) {
     this.recurringTransactions = recurringTransactions;
     this.debts = debts;
+    this.transactionService = transactionService;
   }
 
-  Generate(startDate: Date, endDate: Date, currentBalance: number): void {
-    this.transactions = []; // Reset transactions
-
-    // Normalize dates to start of day to avoid time discrepancies
+  async Generate(startDate: Date, endDate: Date, currentBalance: number): Promise<void> {
+    this.transactions = []; 
+    
+    // Fetch existing transactions
+    const existingTransactions = await firstValueFrom(this.transactionService.getTransactions());
+    
+    // Generate new transactions based on rules
+    const generatedTransactions: Transaction[] = [];
+    
+    // Normalize dates to start of day
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
     for (const rt of this.recurringTransactions) {
-      // Parse startingDate ensuring we preserve the calendar day
       let currentDate: Date;
       const d = new Date(rt.startingDate);
       currentDate = new Date(d);
       currentDate.setHours(0, 0, 0, 0);
-
-      // If the recurring transaction starts after the end date, skip it
+      
       if (currentDate > end) continue;
 
-      // Loop to generate transactions
       while (currentDate <= end) {
         if (currentDate >= start) {
-          // Create a new Transaction object
-          const newTransaction: Transaction = {
-            name: rt.name,
-            description: rt.description,
-            amount: rt.amount,
-            date: new Date(currentDate), // Copy date
-            type: 'Recurring',
-            referenceId: rt._id,
-          };
-          this.transactions.push(newTransaction);
+            const newTransaction: Transaction = {
+                name: rt.name,
+                description: rt.description,
+                amount: rt.amount,
+                date: new Date(currentDate),
+                type: 'Recurring',
+                referenceId: rt._id
+            };
+            generatedTransactions.push(newTransaction);
         }
-
-        // Advance date based on frequency
         currentDate = this.getNextDate(currentDate, rt.frequency);
       }
     }
+
+    // Merge Logic
+    // Index existing transactions by a unique key (ReferenceID + Date)
+    // If ReferenceID is missing (manual transaction), we just keep it.
+    const transactionMap = new Map<string, Transaction>();
+    const finalTransactions: Transaction[] = [];
+
+    // Add all existing transactions first (they take precedence)
+    for (const t of existingTransactions) {
+        // Fix date string to object if coming from JSON
+        t.date = new Date(t.date);
+        finalTransactions.push(t);
+        
+        if (t.referenceId) {
+            const dateStr = t.date.toISOString().split('T')[0]; // YYYY-MM-DD
+            const key = `${t.referenceId}-${dateStr}`;
+            transactionMap.set(key, t);
+        }
+    }
+
+    // Add generated transactions if they don't exist in the map
+    for (const t of generatedTransactions) {
+        if (t.referenceId) {
+            const dateStr = t.date.toISOString().split('T')[0];
+            const key = `${t.referenceId}-${dateStr}`;
+            if (!transactionMap.has(key)) {
+                finalTransactions.push(t);
+            }
+        } else {
+            // Should not happen for generated recurring transactions, but strictly:
+            finalTransactions.push(t);
+        }
+    }
+
+    this.transactions = finalTransactions;
 
     // Sort transactions by date
     this.transactions.sort((a, b) => a.date.getTime() - b.date.getTime());
 
     // Calculate running balances
     this.calculateBalances(currentBalance);
+
+    // Save to DB (Fire and forget or await? Prompt implies retrieval is part of generate, saving is likely expected too)
+    // The prompt says "I want all the transactions saved into one document".
+    // We should save the result.
+    await firstValueFrom(this.transactionService.saveTransactions(this.transactions));
   }
 
   private calculateBalances(initialBalance: number) {
+
     let runningBalance = initialBalance;
     const debtBalances = new Map<string, number>();
 

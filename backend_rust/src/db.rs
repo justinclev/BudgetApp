@@ -1,11 +1,12 @@
 use mongodb::{Client, Collection, options::ClientOptions, bson::doc};
-use crate::models::{Debt, RecurringTransaction};
+use crate::models::{Debt, RecurringTransaction, UserTransactions};
 use std::env;
 
 #[derive(Clone)]
 pub struct AppState {
     pub debts_collection: Collection<Debt>,
     pub transactions_collection: Collection<RecurringTransaction>,
+    pub generated_transactions_collection: Collection<UserTransactions>,
 }
 
 pub async fn init_db() -> AppState {
@@ -18,6 +19,7 @@ pub async fn init_db() -> AppState {
 
     let debts_collection = db.collection::<Debt>("debts");
     let transactions_collection = db.collection::<RecurringTransaction>("recurringtransactions");
+    let generated_transactions_collection = db.collection::<UserTransactions>("transactions");
 
     // Ensure unique indexes
     let index_model = mongodb::IndexModel::builder()
@@ -31,5 +33,6 @@ pub async fn init_db() -> AppState {
     AppState {
         debts_collection,
         transactions_collection,
+        generated_transactions_collection,
     }
 }

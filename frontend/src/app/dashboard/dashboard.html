@@ -20,7 +20,17 @@
     
     <app-list-recurring-transaction></app-list-recurring-transaction>
     
-    <app-list-debt></app-list-debt>
+  <app-list-debt></app-list-debt>
+
+  <mat-divider style="margin: 20px 0;"></mat-divider>
+
+  <app-view-transactions></app-view-transactions>
+
+  <div class="test-actions" style="margin-top: 40px; text-align: center;">
+    <button mat-stroked-button color="accent" (click)="testGenerate()">
+      <mat-icon>autorenew</mat-icon>
+      Test Generate (Next 3 Months)
+    </button>
   </div>
 </div>
 
