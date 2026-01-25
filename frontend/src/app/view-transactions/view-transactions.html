@@ -7,14 +7,15 @@
         <mat-icon>sync</mat-icon>
       </button>
     </div>
-    
+
     <!-- Pill Selector -->
     <div class="grouping-pills">
-      <button 
-        *ngFor="let option of groupingOptions" 
+      <button
+        *ngFor="let option of groupingOptions"
         class="pill"
         [class.active]="selectedGrouping === option"
-        (click)="selectedGrouping = option; updateGrouping()">
+        (click)="selectedGrouping = option; updateGrouping()"
+      >
         {{ option }}
       </button>
     </div>
@@ -22,7 +23,7 @@
 
   <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-state">
-    <div class="skeleton-group" *ngFor="let i of [1,2,3]">
+    <div class="skeleton-group" *ngFor="let i of [1, 2, 3]">
       <div class="skeleton-header"></div>
       <div class="skeleton-item"></div>
       <div class="skeleton-item"></div>
@@ -40,7 +41,10 @@
 
   <!-- Transaction Groups -->
   <div *ngIf="!isLoading && groupedTransactions.length > 0" class="groups-container">
-    <section *ngFor="let group of groupedTransactions; trackBy: trackByGroupId" class="transaction-group">
+    <section
+      *ngFor="let group of groupedTransactions; trackBy: trackByGroupId"
+      class="transaction-group"
+    >
       <!-- Group Header -->
       <div class="group-header" (click)="toggleGroup(group.id)">
         <div class="group-title">
@@ -49,27 +53,31 @@
         </div>
         <div class="group-summary">
           <div class="balance-change">
-            <span class="start">{{ group.startBalance | currency:'USD':'symbol':'1.0-0' }}</span>
+            <span class="start">{{
+              group.startBalance | currency: 'USD' : 'symbol' : '1.0-0'
+            }}</span>
             <mat-icon class="arrow">arrow_forward</mat-icon>
             <span class="end" [class.negative]="(group.endBalance || 0) < 0">
-              {{ group.endBalance | currency:'USD':'symbol':'1.0-0' }}
+              {{ group.endBalance | currency: 'USD' : 'symbol' : '1.0-0' }}
             </span>
           </div>
-          <mat-icon class="chevron" [class.expanded]="expandedGroups.has(group.id)">expand_more</mat-icon>
+          <mat-icon class="chevron" [class.expanded]="expandedGroups.has(group.id)"
+            >expand_more</mat-icon
+          >
         </div>
       </div>
 
       <!-- Transactions List -->
       <div class="transactions-list" [class.expanded]="expandedGroups.has(group.id)">
-        <article 
-          *ngFor="let t of group.transactions" 
+        <article
+          *ngFor="let t of group.transactions"
           class="transaction-card"
-          (click)="openEditDialog(t)">
-          
+          (click)="openEditDialog(t)"
+        >
           <div class="transaction-left">
             <div class="date-badge">
-              <span class="day">{{ t.date | date:'d' }}</span>
-              <span class="month">{{ t.date | date:'MMM' }}</span>
+              <span class="day">{{ t.date | date: 'd' }}</span>
+              <span class="month">{{ t.date | date: 'MMM' }}</span>
             </div>
             <div class="transaction-info">
               <span class="name">{{ t.name }}</span>
@@ -81,25 +89,13 @@
 
           <div class="transaction-right">
             <span class="amount" [class.expense]="t.amount > 0" [class.income]="t.amount < 0">
-              {{ t.amount > 0 ? '-' : '+' }}{{ (t.amount < 0 ? -t.amount : t.amount) | currency:'USD':'symbol':'1.2-2' }}
+              {{ t.amount > 0 ? '-' : '+'
+              }}{{ (t.amount < 0 ? -t.amount : t.amount) | currency: 'USD' : 'symbol' : '1.2-2' }}
             </span>
-            <span class="balance">{{ t.balances?.BalanceAfter | currency:'USD':'symbol':'1.0-0' }}</span>
+            <span class="balance">{{
+              t.balances?.BalanceAfter | currency: 'USD' : 'symbol' : '1.0-0'
+            }}</span>
           </div>
-
-          <button class="action-btn" [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
-            <mat-icon>more_horiz</mat-icon>
-          </button>
-          
-          <mat-menu #menu="matMenu" class="transaction-menu">
-            <button mat-menu-item (click)="openEditDialog(t)">
-              <mat-icon>edit</mat-icon>
-              <span>Edit</span>
-            </button>
-            <button mat-menu-item class="delete-action" (click)="deleteTransaction(t)">
-              <mat-icon>delete_outline</mat-icon>
-              <span>Delete</span>
-            </button>
-          </mat-menu>
         </article>
       </div>
     </section>

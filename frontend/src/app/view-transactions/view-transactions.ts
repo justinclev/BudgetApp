@@ -13,7 +13,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatMenuModule } from '@angular/material/menu';
 import { TransactionDetailComponent } from '../transaction-detail/transaction-detail';
 
 interface TransactionGroup {
@@ -40,7 +39,6 @@ type GroupingMethod = 'Daily' | 'Weekly' | 'Monthly' | 'Annually';
     MatProgressSpinnerModule,
     FormsModule,
     MatDialogModule,
-    MatMenuModule,
   ],
   templateUrl: './view-transactions.html',
   styleUrls: ['./view-transactions.scss'],
@@ -192,7 +190,7 @@ export class ViewTransactionsComponent implements OnInit {
     this.groupedTransactions = Array.from(groups.values()).sort(
       (a, b) => a.date.getTime() - b.date.getTime(),
     );
-    
+
     // Auto-expand the most recent group
     if (this.groupedTransactions.length > 0 && this.expandedGroups.size === 0) {
       const lastGroup = this.groupedTransactions[this.groupedTransactions.length - 1];
@@ -222,15 +220,17 @@ export class ViewTransactionsComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+      if (result === 'deleted') {
+        // Handle deletion from dialog
+        this.allTransactions = this.allTransactions.filter((t) => t !== transaction);
+        this.recalculateAndGroup();
+        this.saveChanges();
+      } else if (result) {
         // Update local list
-        const index = this.allTransactions.findIndex((t) => t === transaction); // Reference check should work since we pass the object
-        // If strict, check by some ID or fallback
+        const index = this.allTransactions.findIndex((t) => t === transaction);
         if (index !== -1) {
           this.allTransactions[index] = result;
-          // Sort again in case date changed
           this.allTransactions.sort((a, b) => a.date.getTime() - b.date.getTime());
-
           this.recalculateAndGroup();
           this.saveChanges();
         }

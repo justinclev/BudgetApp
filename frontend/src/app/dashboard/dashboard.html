@@ -10,28 +10,19 @@
   </button>
 </mat-toolbar>
 
-<div class="page-container">
-  <div class="modern-card">
-    <div class="flex-between mb-2">
-      <h2>Dashboard</h2>
-    </div>
-    
-    <p class="text-secondary">Welcome to your budget dashboard! Your recurring transactions and overview will appear here.</p>
-    
-    <app-list-recurring-transaction></app-list-recurring-transaction>
-    
-  <app-list-debt></app-list-debt>
+<app-list-recurring-transaction></app-list-recurring-transaction>
 
-  <mat-divider style="margin: 20px 0;"></mat-divider>
+<app-list-debt></app-list-debt>
 
-  <app-view-transactions></app-view-transactions>
+<mat-divider style="margin: 20px 0"></mat-divider>
 
-  <div class="test-actions" style="margin-top: 40px; text-align: center;">
-    <button mat-stroked-button color="accent" (click)="testGenerate()">
-      <mat-icon>autorenew</mat-icon>
-      Test Generate (Next 3 Months)
-    </button>
-  </div>
+<app-view-transactions></app-view-transactions>
+
+<div class="test-actions" style="margin-top: 40px; text-align: center">
+  <button mat-stroked-button color="accent" (click)="testGenerate()">
+    <mat-icon>autorenew</mat-icon>
+    Test Generate (Next 3 Months)
+  </button>
 </div>
 
 <!-- Floating Action Button -->

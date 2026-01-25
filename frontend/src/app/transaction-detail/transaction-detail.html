@@ -1,60 +1,110 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Edit Transaction' : 'New Transaction' }}</h2>
+<div class="dialog-container">
+  <!-- Header -->
+  <header class="dialog-header">
+    <button class="close-btn" type="button" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+    <h2>{{ isEditMode ? 'Edit Transaction' : 'New Transaction' }}</h2>
+    <div class="header-spacer"></div>
+  </header>
 
-<form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
-  <mat-dialog-content>
-    <div class="form-container">
-      <mat-form-field appearance="outline">
-        <mat-label>Name</mat-label>
-        <input matInput formControlName="name" placeholder="E.g. Grocery Run">
-        <mat-error *ngIf="transactionForm.get('name')?.hasError('required')">
-          Name is required
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Description</mat-label>
-        <textarea matInput formControlName="description" rows="2" placeholder="Optional details..."></textarea>
-      </mat-form-field>
-
-      <div class="row">
-        <mat-form-field appearance="outline" class="half-width">
-          <mat-label>Amount</mat-label>
-          <span matPrefix>$&nbsp;</span>
-          <input matInput type="number" formControlName="amount" placeholder="0.00">
-          <mat-error *ngIf="transactionForm.get('amount')?.hasError('required')">
-            Amount is required
-          </mat-error>
-          <mat-error *ngIf="transactionForm.get('amount')?.hasError('min')">
-            Amount must be greater than 0
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Type</mat-label>
-            <mat-select formControlName="type">
-                <mat-option *ngFor="let t of types" [value]="t">
-                    {{t}}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+  <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+    <div class="form-content">
+      <!-- Amount Section (Prominent) -->
+      <div class="amount-section">
+        <label class="amount-label">Amount</label>
+        <div class="amount-input-wrapper">
+          <span class="currency-symbol">$</span>
+          <input
+            type="number"
+            formControlName="amount"
+            placeholder="0.00"
+            class="amount-input"
+            inputmode="decimal"
+          />
+        </div>
+        <div
+          class="field-error"
+          *ngIf="transactionForm.get('amount')?.touched && transactionForm.get('amount')?.invalid"
+        >
+          Enter a valid amount
+        </div>
       </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Date</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="date">
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-        <mat-error *ngIf="transactionForm.get('date')?.hasError('required')">
-          Date is required
-        </mat-error>
-      </mat-form-field>
-    </div>
-  </mat-dialog-content>
+      <!-- Form Fields -->
+      <div class="form-fields">
+        <!-- Name -->
+        <div class="field-group">
+          <label class="field-label">Name</label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="e.g. Grocery shopping"
+            class="text-input"
+          />
+          <div
+            class="field-error"
+            *ngIf="
+              transactionForm.get('name')?.touched &&
+              transactionForm.get('name')?.hasError('required')
+            "
+          >
+            Name is required
+          </div>
+        </div>
 
-  <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()">Cancel</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="transactionForm.invalid">
-      {{ isEditMode ? 'Update' : 'Create' }}
-    </button>
-  </mat-dialog-actions>
-</form>
+        <!-- Description -->
+        <div class="field-group">
+          <label class="field-label">Description <span class="optional">(optional)</span></label>
+          <textarea
+            formControlName="description"
+            rows="2"
+            placeholder="Add a note..."
+            class="text-input textarea"
+          ></textarea>
+        </div>
+
+        <!-- Date & Type Row -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Date</label>
+            <div class="date-input-wrapper">
+              <input
+                [matDatepicker]="picker"
+                formControlName="date"
+                class="text-input date-input"
+                readonly
+              />
+              <mat-datepicker-toggle [for]="picker" class="date-toggle"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Type</label>
+            <select formControlName="type" class="text-input select-input">
+              <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="dialog-actions">
+      <button *ngIf="isEditMode" type="button" class="delete-btn" (click)="onDelete()">
+        <mat-icon>delete_outline</mat-icon>
+        Delete
+      </button>
+
+      <button
+        type="submit"
+        class="save-btn"
+        [disabled]="transactionForm.invalid"
+        [class.full-width]="!isEditMode"
+      >
+        {{ isEditMode ? 'Save Changes' : 'Create Transaction' }}
+      </button>
+    </div>
+  </form>
+</div>

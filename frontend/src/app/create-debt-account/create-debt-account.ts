@@ -126,7 +126,7 @@ export class CreateDebtAccountComponent {
     if (this.debtForm.valid) {
       const debtData = this.debtForm.value;
       const createRecurring = this.debtForm.get('createRecurring')?.value;
-      
+
       let request: Observable<Debt>;
 
       if (this.isEditMode && this.editingId) {
@@ -135,36 +135,48 @@ export class CreateDebtAccountComponent {
         request = this.debtService.createDebt(debtData);
       }
 
-      request.pipe(
-        switchMap((savedDebt) => {
-          if (createRecurring && debtData.minimumPayment && debtData.paymentDate && debtData.frequency) {
-            const transactionName = `Payment for ${savedDebt.name}`;
-            const transaction: RecurringTransaction = {
-              name: transactionName,
-              description: `Recurring payment for ${savedDebt.name}`,
-              amount: debtData.minimumPayment,
-              startingDate: debtData.paymentDate,
-              frequency: debtData.frequency,
-              linkedDebtId: savedDebt._id
-            };
+      request
+        .pipe(
+          switchMap((savedDebt) => {
+            if (
+              createRecurring &&
+              debtData.minimumPayment &&
+              debtData.paymentDate &&
+              debtData.frequency
+            ) {
+              const transactionName = `${savedDebt.name}`;
+              const transaction: RecurringTransaction = {
+                name: transactionName,
+                description: `${savedDebt.name} (Minimum Payment)`,
+                amount: debtData.minimumPayment,
+                startingDate: debtData.paymentDate,
+                frequency: debtData.frequency,
+                linkedDebtId: savedDebt._id,
+              };
 
-            // Attempt to find existing transaction to update, or create new
-            return this.recurringTransactionService.getTransactions().pipe(
-              switchMap(transactions => {
-                const existing = transactions.find(t => t.name === transactionName || t.linkedDebtId === savedDebt._id);
-                if (existing && existing._id) {
-                  return this.recurringTransactionService.updateTransaction(existing._id, transaction);
-                } else {
-                  return this.recurringTransactionService.createTransaction(transaction);
-                }
-              }),
-              map(() => savedDebt)
-            );
-          } else {
-            return of(savedDebt);
-          }
-        })
-      ).subscribe({
+              // Attempt to find existing transaction to update, or create new
+              return this.recurringTransactionService.getTransactions().pipe(
+                switchMap((transactions) => {
+                  const existing = transactions.find(
+                    (t) => t.name === transactionName || t.linkedDebtId === savedDebt._id,
+                  );
+                  if (existing && existing._id) {
+                    return this.recurringTransactionService.updateTransaction(
+                      existing._id,
+                      transaction,
+                    );
+                  } else {
+                    return this.recurringTransactionService.createTransaction(transaction);
+                  }
+                }),
+                map(() => savedDebt),
+              );
+            } else {
+              return of(savedDebt);
+            }
+          }),
+        )
+        .subscribe({
           next: () => {
             this.dialogRef.close(true);
           },
