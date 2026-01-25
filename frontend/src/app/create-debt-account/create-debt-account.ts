@@ -127,11 +127,6 @@ export class CreateDebtAccountComponent {
       const debtData = this.debtForm.value;
       const createRecurring = this.debtForm.get('createRecurring')?.value;
       
-      // For new debts, set currentBalance to amountOwed if not present
-      if (!this.isEditMode) {
-        debtData.currentBalance = debtData.amountOwed;
-      }
-      
       let request: Observable<Debt>;
 
       if (this.isEditMode && this.editingId) {

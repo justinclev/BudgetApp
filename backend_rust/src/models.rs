@@ -12,8 +12,6 @@ pub struct Debt {
     pub name: String,
     #[serde(rename = "amountOwed", deserialize_with = "deserialize_f64_from_bson_number")]
     pub amount_owed: f64,
-    #[serde(rename = "currentBalance", deserialize_with = "deserialize_f64_from_bson_number")]
-    pub current_balance: f64,
     #[serde(rename = "interestRate", deserialize_with = "deserialize_f64_from_bson_number")]
     pub interest_rate: f64,
     #[serde(rename = "minimumPayment", skip_serializing_if = "Option::is_none", deserialize_with = "deserialize_option_f64_from_bson_number", default)]

@@ -3,6 +3,8 @@ export interface TransactionBalances {
   BalancePrior: number;
   BalanceAfter: number;
 
+  DebtId?: string;
+  DebtName?: string;
   DebtBalancePrior?: number;
   DebtBalanceAfter?: number;
 }
