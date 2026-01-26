@@ -74,7 +74,9 @@
   background: linear-gradient(180deg, #f0f9ff 0%, #f5f3ff 50%);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   .tab-btn {
     flex-shrink: 0;
@@ -224,22 +226,30 @@
 
       &.income-stat {
         border-left: 4px solid #10b981;
-        mat-icon { color: #10b981; }
+        mat-icon {
+          color: #10b981;
+        }
       }
 
       &.expense-stat {
         border-left: 4px solid #ef4444;
-        mat-icon { color: #ef4444; }
+        mat-icon {
+          color: #ef4444;
+        }
       }
 
       &.debt-stat {
         border-left: 4px solid #f59e0b;
-        mat-icon { color: #f59e0b; }
+        mat-icon {
+          color: #f59e0b;
+        }
       }
 
       &.payments-stat {
         border-left: 4px solid #3b82f6;
-        mat-icon { color: #3b82f6; }
+        mat-icon {
+          color: #3b82f6;
+        }
       }
     }
   }
@@ -277,8 +287,12 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .quick-actions-section {
@@ -463,6 +477,10 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

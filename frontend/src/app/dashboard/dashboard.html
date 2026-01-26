@@ -10,7 +10,12 @@
         </div>
       </div>
       <div class="header-actions">
-        <button mat-icon-button (click)="loadDashboardData()" matTooltip="Refresh" class="refresh-btn">
+        <button
+          mat-icon-button
+          (click)="loadDashboardData()"
+          matTooltip="Refresh"
+          class="refresh-btn"
+        >
           <mat-icon>refresh</mat-icon>
         </button>
         <button mat-icon-button (click)="logout()" matTooltip="Logout" class="logout-btn">
@@ -37,7 +42,11 @@
         </div>
         <div class="balance-footer">
           <span class="month-label">This Month:</span>
-          <span class="month-savings" [class.positive]="metrics.monthlySavings >= 0" [class.negative]="metrics.monthlySavings < 0">
+          <span
+            class="month-savings"
+            [class.positive]="metrics.monthlySavings >= 0"
+            [class.negative]="metrics.monthlySavings < 0"
+          >
             {{ metrics.monthlySavings | currency }}
           </span>
         </div>
@@ -94,7 +103,11 @@
     <section class="quick-actions-section">
       <h2 class="section-title">Quick Actions</h2>
       <div class="action-buttons">
-        <button mat-raised-button class="action-btn income-btn" (click)="openAddRecurringTransactionModal()">
+        <button
+          mat-raised-button
+          class="action-btn income-btn"
+          (click)="openAddRecurringTransactionModal()"
+        >
           <mat-icon>add_circle</mat-icon>
           <span>Add Recurring</span>
         </button>
@@ -147,7 +160,9 @@
     <div class="sheet-content">
       <app-view-transactions *ngIf="activeSection === 'transactions'"></app-view-transactions>
       <app-list-debt *ngIf="activeSection === 'debt'"></app-list-debt>
-      <app-list-recurring-transaction *ngIf="activeSection === 'recurring'"></app-list-recurring-transaction>
+      <app-list-recurring-transaction
+        *ngIf="activeSection === 'recurring'"
+      ></app-list-recurring-transaction>
     </div>
   </div>
 
