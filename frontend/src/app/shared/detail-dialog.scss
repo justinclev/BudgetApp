@@ -19,16 +19,14 @@ $bg-input: #f1f5f9;
 // ===== DIALOG CONTAINER =====
 .dialog-container {
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  width: 100vw;
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 
   @media (min-width: 500px) {
-    width: 440px;
     height: auto;
-    min-height: auto;
-    max-height: 90vh;
+    max-height: 100vh;
     border-radius: 24px;
   }
 }
@@ -88,7 +86,8 @@ $bg-input: #f1f5f9;
   flex: 1;
   padding: 24px 20px;
   overflow-y: auto;
-  min-height: 0; // Important for flex overflow
+  min-height: 0;
+  width: 100%;
 }
 
 // ===== HERO SECTION (Amount/Value) =====
