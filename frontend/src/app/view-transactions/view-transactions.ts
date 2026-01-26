@@ -126,14 +126,14 @@ export class ViewTransactionsComponent implements OnInit {
       if (rt._id) rtMap.set(rt._id, rt);
     });
 
-        for (const t of transactions) {
-            const balancePrior = runningBalance;
-            if (t.type === 'Income') {
-                 runningBalance += t.amount;
-            } else {
-                 runningBalance -= t.amount;
-            }
-            const balanceAfter = runningBalance;
+    for (const t of transactions) {
+      const balancePrior = runningBalance;
+      if (t.type === 'Income') {
+        runningBalance += t.amount;
+      } else {
+        runningBalance -= t.amount;
+      }
+      const balanceAfter = runningBalance;
       let debtPrior: number | undefined;
       let debtAfter: number | undefined;
 

@@ -78,7 +78,11 @@
             <span class="metric-label">Expenses</span>
             <span class="metric-value">-{{ group.groupExpenses | currency }}</span>
           </div>
-          <div class="metric-item savings" [class.positive]="group.groupSavings >= 0" [class.negative]="group.groupSavings < 0">
+          <div
+            class="metric-item savings"
+            [class.positive]="group.groupSavings >= 0"
+            [class.negative]="group.groupSavings < 0"
+          >
             <span class="metric-label">Period Savings</span>
             <span class="metric-value">{{ group.groupSavings | currency }}</span>
           </div>
@@ -106,7 +110,11 @@
               <span class="description" *ngIf="t.description && t.description !== t.name">
                 {{ t.description }}
               </span>
-              <span class="transaction-type" [class.income]="t.type === 'Income'" [class.expense]="t.type !== 'Income'">
+              <span
+                class="transaction-type"
+                [class.income]="t.type === 'Income'"
+                [class.expense]="t.type !== 'Income'"
+              >
                 {{ t.type }}
               </span>
             </div>
@@ -127,7 +135,9 @@
             </div>
             <div class="debt-info" *ngIf="t.balances?.DebtBalanceAfter !== undefined">
               <span class="debt-label">Debt:</span>
-              <span class="debt-amount">{{ t.balances?.DebtBalanceAfter | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+              <span class="debt-amount">{{
+                t.balances?.DebtBalanceAfter | currency: 'USD' : 'symbol' : '1.0-0'
+              }}</span>
             </div>
           </div>
         </article>
