@@ -1,13 +1,6 @@
 <div class="transactions-container">
   <!-- Sticky Header -->
   <header class="sticky-header">
-    <div class="header-top">
-      <h1>Transactions</h1>
-      <button class="icon-btn refresh" (click)="loadTransactions()" [class.spinning]="isLoading">
-        <mat-icon>sync</mat-icon>
-      </button>
-    </div>
-
     <!-- Pill Selector -->
     <div class="grouping-pills">
       <button
@@ -17,6 +10,9 @@
         (click)="selectedGrouping = option; updateGrouping()"
       >
         {{ option }}
+      </button>
+      <button class="icon-btn refresh" (click)="loadTransactions()" [class.spinning]="isLoading" title="Refresh">
+        <mat-icon>sync</mat-icon>
       </button>
     </div>
   </header>

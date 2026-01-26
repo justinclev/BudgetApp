@@ -1,64 +1,42 @@
 // Modern Dashboard - Mobile First
 .dashboard-wrapper {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f0f9ff 0%, #f5f3ff 50%, #fef3c7 100%);
+  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 50%, #f0f4ff 100%);
   display: flex;
   flex-direction: column;
   position: relative;
 }
 
-.dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 16px 20px;
-  color: white;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+// Minimal Top Bar
+.top-bar {
+  background: white;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   position: sticky;
   top: 0;
   z-index: 100;
 
-  .header-content {
+  .top-bar-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
   }
 
-  .header-branding {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-
-    .logo-icon {
-      font-size: 32px;
-      line-height: 1;
-    }
-
-    .header-text {
-      .app-title {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-      }
-
-      .app-subtitle {
-        margin: 2px 0 0;
-        font-size: 12px;
-        opacity: 0.9;
-      }
-    }
+  .top-bar-branding {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
   }
 
-  .header-actions {
+  .top-bar-actions {
     display: flex;
-    gap: 8px;
+    gap: 4px;
 
     button {
-      color: white;
+      color: #64748b;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.04);
       }
     }
   }
@@ -71,7 +49,7 @@
   padding: 8px 8px 0;
   overflow-x: auto;
   scrollbar-width: none;
-  background: linear-gradient(180deg, #f0f9ff 0%, #f5f3ff 50%);
+  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 50%);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
   &::-webkit-scrollbar {
@@ -122,23 +100,24 @@
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 20px;
+  padding: 0;
 }
 
 .overview-section {
-  padding: 20px;
+  padding: 16px;
   padding-bottom: 40px;
 }
 
 .hero-section {
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  padding: 20px 16px 24px;
 
   .main-balance-card {
-    background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%);
+    background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
     border-radius: 24px;
     padding: 28px 24px;
     margin-bottom: 20px;
-    box-shadow: 0 12px 32px rgba(255, 193, 7, 0.15);
+    box-shadow: 0 12px 32px rgba(0, 212, 255, 0.2);
 
     .balance-header {
       display: flex;
@@ -148,19 +127,20 @@
       .balance-label {
         font-size: 12px;
         font-weight: 600;
-        color: #b8860b;
+        color: #ffffff;
         text-transform: uppercase;
+        opacity: 0.9;
       }
     }
 
     .balance-value {
       font-size: 44px;
       font-weight: 800;
-      color: #1a1a1a;
+      color: #ffffff;
       margin-bottom: 16px;
 
       &.negative {
-        color: #ef4444;
+        color: #ff6b6b;
       }
     }
 
@@ -168,14 +148,14 @@
       display: flex;
       justify-content: space-between;
       padding-top: 12px;
-      border-top: 2px solid rgba(184, 134, 11, 0.2);
+      border-top: 2px solid rgba(255, 255, 255, 0.2);
 
       .month-savings {
         font-weight: 700;
-        color: #10b981;
+        color: #ffffff;
 
         &.negative {
-          color: #ef4444;
+          color: #ff6b6b;
         }
       }
     }
@@ -256,7 +236,7 @@
 }
 
 .loading-skeleton {
-  padding: 24px 20px;
+  padding: 20px 16px;
 
   .skeleton-card {
     height: 180px;
@@ -296,7 +276,7 @@
 }
 
 .quick-actions-section {
-  padding: 24px 20px;
+  padding: 20px 16px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 
   .section-title {
@@ -348,7 +328,7 @@
 }
 
 .view-all-section {
-  padding: 24px 20px;
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
