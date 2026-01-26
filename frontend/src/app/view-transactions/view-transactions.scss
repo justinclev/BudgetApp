@@ -281,6 +281,99 @@
   }
 }
 
+// ===== GROUP METRICS =====
+.group-metrics {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fafbfc;
+  border-top: 1px solid #f1f5f9;
+
+  &.expanded {
+    max-height: 500px;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+
+    @media (min-width: 600px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+      background: white;
+      border-radius: 12px;
+      border-left: 3px solid #cbd5e1;
+
+      .metric-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .metric-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+        word-break: break-word;
+      }
+
+      &.income {
+        border-left-color: #10b981;
+
+        .metric-value {
+          color: #10b981;
+        }
+      }
+
+      &.expense {
+        border-left-color: #ef4444;
+
+        .metric-value {
+          color: #ef4444;
+        }
+      }
+
+      &.savings {
+        border-left-color: #3b82f6;
+
+        .metric-value {
+          color: #3b82f6;
+        }
+
+        &.positive {
+          .metric-value {
+            color: #10b981;
+          }
+        }
+
+        &.negative {
+          .metric-value {
+            color: #ef4444;
+          }
+        }
+      }
+
+      &.debt {
+        border-left-color: #f59e0b;
+
+        .metric-value {
+          color: #f59e0b;
+        }
+      }
+    }
+  }
+}
+
 // ===== TRANSACTIONS LIST =====
 .transactions-list {
   max-height: 0;
@@ -341,8 +434,9 @@
     .transaction-info {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
       min-width: 0;
+      flex: 1;
 
       .name {
         font-size: 15px;
@@ -360,6 +454,28 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
+      .transaction-type {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        width: fit-content;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: #f1f5f9;
+        color: #64748b;
+
+        &.income {
+          background: rgba(16, 185, 129, 0.1);
+          color: #10b981;
+        }
+
+        &.expense {
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+        }
+      }
     }
   }
 
@@ -367,27 +483,55 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 2px;
-    margin-right: 8px;
+    gap: 8px;
+    margin-left: 12px;
 
-    .amount {
-      font-size: 15px;
-      font-weight: 600;
-      color: #0f172a;
+    .amount-column {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
 
-      &.expense {
-        color: #ef4444;
+      .amount {
+        font-size: 15px;
+        font-weight: 600;
+        color: #0f172a;
+
+        &.expense {
+          color: #ef4444;
+        }
+
+        &.income {
+          color: #10b981;
+        }
       }
 
-      &.income {
-        color: #10b981;
+      .balance {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 500;
       }
     }
 
-    .balance {
+    .debt-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
       font-size: 12px;
-      color: #94a3b8;
-      font-weight: 500;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 6px;
+
+      .debt-label {
+        color: #94a3b8;
+        font-weight: 500;
+        font-size: 11px;
+      }
+
+      .debt-amount {
+        font-weight: 600;
+        color: #f59e0b;
+      }
     }
   }
 

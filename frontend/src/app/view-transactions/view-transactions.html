@@ -67,6 +67,28 @@
         </div>
       </div>
 
+      <!-- Group Metrics (Expanded) -->
+      <div class="group-metrics" [class.expanded]="expandedGroups.has(group.id)">
+        <div class="metrics-grid">
+          <div class="metric-item income">
+            <span class="metric-label">Income</span>
+            <span class="metric-value">+{{ group.groupIncome | currency }}</span>
+          </div>
+          <div class="metric-item expense">
+            <span class="metric-label">Expenses</span>
+            <span class="metric-value">-{{ group.groupExpenses | currency }}</span>
+          </div>
+          <div class="metric-item savings" [class.positive]="group.groupSavings >= 0" [class.negative]="group.groupSavings < 0">
+            <span class="metric-label">Period Savings</span>
+            <span class="metric-value">{{ group.groupSavings | currency }}</span>
+          </div>
+          <div class="metric-item debt" *ngIf="group.debtPaymentCount > 0">
+            <span class="metric-label">Debt Paid</span>
+            <span class="metric-value">{{ group.debtPayments | currency }}</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Transactions List -->
       <div class="transactions-list" [class.expanded]="expandedGroups.has(group.id)">
         <article
@@ -84,14 +106,29 @@
               <span class="description" *ngIf="t.description && t.description !== t.name">
                 {{ t.description }}
               </span>
+              <span class="transaction-type" [class.income]="t.type === 'Income'" [class.expense]="t.type !== 'Income'">
+                {{ t.type }}
+              </span>
             </div>
           </div>
 
           <div class="transaction-right">
-            <span class="amount" [class.income]="t.type === 'Income'" [class.expense]="t.type !== 'Income'">
-              {{ t.type === 'Income' ? '+' : '-' }}{{ t.amount | currency }}
-            </span>
-            <span class="balance">Bal: {{ t.balances?.BalanceAfter | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+            <div class="amount-column">
+              <span
+                class="amount"
+                [class.income]="t.type === 'Income'"
+                [class.expense]="t.type !== 'Income'"
+              >
+                {{ t.type === 'Income' ? '+' : '-' }}{{ t.amount | currency }}
+              </span>
+              <span class="balance">
+                Bal: {{ t.balances?.BalanceAfter | currency: 'USD' : 'symbol' : '1.0-0' }}
+              </span>
+            </div>
+            <div class="debt-info" *ngIf="t.balances?.DebtBalanceAfter !== undefined">
+              <span class="debt-label">Debt:</span>
+              <span class="debt-amount">{{ t.balances?.DebtBalanceAfter | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+            </div>
           </div>
         </article>
       </div>

@@ -24,6 +24,12 @@ interface TransactionGroup {
   totalAmount: number;
   startBalance: number | null;
   endBalance: number | null;
+  // Group-level metrics
+  groupIncome: number;
+  groupExpenses: number;
+  groupSavings: number;
+  debtPayments: number;
+  debtPaymentCount: number;
 }
 
 type GroupingMethod = 'Daily' | 'Weekly' | 'Monthly' | 'Annually';
@@ -158,6 +164,10 @@ export class ViewTransactionsComponent implements OnInit {
     }
 
     const groups = new Map<string, TransactionGroup>();
+    const rtMap = new Map<string, RecurringTransaction>();
+    this.recurringTransactions.forEach((rt) => {
+      if (rt._id) rtMap.set(rt._id, rt);
+    });
 
     this.allTransactions.forEach((t) => {
       const key = this.getGroupKey(t.date, this.selectedGrouping);
@@ -173,6 +183,11 @@ export class ViewTransactionsComponent implements OnInit {
           totalAmount: 0,
           startBalance: null,
           endBalance: null,
+          groupIncome: 0,
+          groupExpenses: 0,
+          groupSavings: 0,
+          debtPayments: 0,
+          debtPaymentCount: 0,
         });
       }
 
@@ -181,6 +196,22 @@ export class ViewTransactionsComponent implements OnInit {
       group.count++;
       group.totalAmount += t.amount;
 
+      // Calculate income/expenses for the group
+      if (t.type === 'Income') {
+        group.groupIncome += t.amount;
+      } else {
+        group.groupExpenses += t.amount;
+      }
+
+      // Check if this is a debt payment
+      if (t.referenceId) {
+        const rt = rtMap.get(t.referenceId);
+        if (rt?.linkedDebtId) {
+          group.debtPayments += t.amount;
+          group.debtPaymentCount++;
+        }
+      }
+
       if (group.startBalance === null && t.balances) {
         group.startBalance = t.balances.BalancePrior;
       }
@@ -188,6 +219,11 @@ export class ViewTransactionsComponent implements OnInit {
       if (t.balances) {
         group.endBalance = t.balances.BalanceAfter;
       }
+    });
+
+    // Calculate group savings
+    groups.forEach((group) => {
+      group.groupSavings = group.groupIncome - group.groupExpenses;
     });
 
     this.groupedTransactions = Array.from(groups.values()).sort(
