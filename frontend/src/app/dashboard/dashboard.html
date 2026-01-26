@@ -1,42 +1,156 @@
-<mat-toolbar color="primary" class="dashboard-header">
-  <span>Budget App</span>
-  <span class="spacer"></span>
-  <button mat-button (click)="testGenerate()">
-    <mat-icon>play_arrow</mat-icon>
-    Test Generate
-  </button>
-  <button mat-icon-button (click)="logout()" aria-label="Logout">
-    <mat-icon>logout</mat-icon>
-  </button>
-</mat-toolbar>
+<div class="dashboard-wrapper">
+  <!-- Modern Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-branding">
+        <div class="logo-icon">💰</div>
+        <div class="header-text">
+          <h1 class="app-title">BudgetFlow</h1>
+          <p class="app-subtitle">Smart Financial Management</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button mat-icon-button (click)="loadDashboardData()" matTooltip="Refresh" class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+        </button>
+        <button mat-icon-button (click)="logout()" matTooltip="Logout" class="logout-btn">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </div>
+  </header>
 
-<app-list-recurring-transaction></app-list-recurring-transaction>
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Hero Metrics Section -->
+    <section class="hero-section" *ngIf="!isLoading">
+      <!-- Main Balance Card -->
+      <div class="main-balance-card">
+        <div class="balance-header">
+          <span class="balance-label">Current Balance</span>
+          <button mat-icon-button (click)="loadDashboardData()" class="refresh-mini">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+        <div class="balance-value" [class.negative]="metrics.currentBalance < 0">
+          {{ metrics.currentBalance | currency }}
+        </div>
+        <div class="balance-footer">
+          <span class="month-label">This Month:</span>
+          <span class="month-savings" [class.positive]="metrics.monthlySavings >= 0" [class.negative]="metrics.monthlySavings < 0">
+            {{ metrics.monthlySavings | currency }}
+          </span>
+        </div>
+      </div>
 
-<app-list-debt></app-list-debt>
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="stat-card income-stat">
+          <mat-icon>trending_up</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Income</span>
+            <span class="stat-value">{{ metrics.monthlyIncome | currency }}</span>
+          </div>
+        </div>
 
-<mat-divider style="margin: 20px 0"></mat-divider>
+        <div class="stat-card expense-stat">
+          <mat-icon>trending_down</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Expenses</span>
+            <span class="stat-value">{{ metrics.monthlyExpenses | currency }}</span>
+          </div>
+        </div>
 
-<app-view-transactions></app-view-transactions>
+        <div class="stat-card debt-stat">
+          <mat-icon>credit_card</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Total Debt</span>
+            <span class="stat-value">{{ metrics.totalDebt | currency }}</span>
+          </div>
+        </div>
 
-<div class="test-actions" style="margin-top: 40px; text-align: center">
-  <button mat-stroked-button color="accent" (click)="testGenerate()">
-    <mat-icon>autorenew</mat-icon>
-    Test Generate (Next 3 Months)
-  </button>
+        <div class="stat-card payments-stat">
+          <mat-icon>calendar_today</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Recurring</span>
+            <span class="stat-value">{{ metrics.upcomingPaymentCount }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-skeleton">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-row">
+        <div class="skeleton-stat"></div>
+        <div class="skeleton-stat"></div>
+        <div class="skeleton-stat"></div>
+        <div class="skeleton-stat"></div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="action-buttons">
+        <button mat-raised-button class="action-btn income-btn" (click)="openAddRecurringTransactionModal()">
+          <mat-icon>add_circle</mat-icon>
+          <span>Add Recurring</span>
+        </button>
+        <button mat-raised-button class="action-btn debt-btn" (click)="openAddDebtAccountModal()">
+          <mat-icon>add_box</mat-icon>
+          <span>Add Debt</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- View All Sections -->
+    <section class="view-all-section">
+      <div class="view-all-card" (click)="openSection('transactions')">
+        <mat-icon>receipt_long</mat-icon>
+        <div class="card-content">
+          <h3>Transactions</h3>
+          <p>View all transaction history</p>
+        </div>
+        <mat-icon class="chevron">chevron_right</mat-icon>
+      </div>
+
+      <div class="view-all-card" (click)="openSection('debt')">
+        <mat-icon>credit_card</mat-icon>
+        <div class="card-content">
+          <h3>Debt Accounts</h3>
+          <p>Manage your debts</p>
+        </div>
+        <mat-icon class="chevron">chevron_right</mat-icon>
+      </div>
+
+      <div class="view-all-card" (click)="openSection('recurring')">
+        <mat-icon>autorenew</mat-icon>
+        <div class="card-content">
+          <h3>Recurring</h3>
+          <p>View recurring transactions</p>
+        </div>
+        <mat-icon class="chevron">chevron_right</mat-icon>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile Bottom Sheet Dialog -->
+  <div class="mobile-sheet" *ngIf="activeSection">
+    <div class="sheet-header">
+      <h2>{{ getSectionTitle(activeSection) }}</h2>
+      <button mat-icon-button (click)="closeSection()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="sheet-content">
+      <app-view-transactions *ngIf="activeSection === 'transactions'"></app-view-transactions>
+      <app-list-debt *ngIf="activeSection === 'debt'"></app-list-debt>
+      <app-list-recurring-transaction *ngIf="activeSection === 'recurring'"></app-list-recurring-transaction>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div class="sheet-overlay" *ngIf="activeSection" (click)="closeSection()"></div>
 </div>
-
-<!-- Floating Action Button -->
-<button mat-fab color="accent" class="fab-bottom-right" [matMenuTriggerFor]="fabMenu">
-  <mat-icon>add</mat-icon>
-</button>
-
-<mat-menu #fabMenu="matMenu" yPosition="above">
-  <button mat-menu-item (click)="openAddRecurringTransactionModal()">
-    <mat-icon>autorenew</mat-icon>
-    <span>Recurring Transaction</span>
-  </button>
-  <button mat-menu-item (click)="openAddDebtAccountModal()">
-    <mat-icon>account_balance</mat-icon>
-    <span>Debt Account</span>
-  </button>
-</mat-menu>

@@ -1,13 +1,9 @@
-// Modern Mobile-First Transaction View
-// Using CSS custom properties for theming
-
 .transactions-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   padding-bottom: 100px;
 }
 
-// ===== STICKY HEADER =====
 .sticky-header {
   position: sticky;
   top: 0;
@@ -17,62 +13,57 @@
   -webkit-backdrop-filter: blur(20px);
   padding: 16px 20px 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
 
-  .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 
-    h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-      color: #0f172a;
-      letter-spacing: -0.5px;
-    }
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+  }
+}
+
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.95);
+    background: #e2e8f0;
   }
 
-  .icon-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: none;
-    background: #f1f5f9;
-    color: #64748b;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
+  &.spinning mat-icon {
+    animation: spin 1s linear infinite;
+  }
 
-    &:active {
-      transform: scale(0.95);
-      background: #e2e8f0;
-    }
-
-    &.spinning mat-icon {
-      animation: spin 1s linear infinite;
-    }
-
-    mat-icon {
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
-    }
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
   }
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-// ===== GROUPING PILLS =====
 .grouping-pills {
   display: flex;
   gap: 8px;
@@ -81,9 +72,7 @@
   -ms-overflow-style: none;
   padding: 4px 0;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
 
   .pill {
     flex-shrink: 0;
@@ -98,9 +87,7 @@
     transition: all 0.2s ease;
     white-space: nowrap;
 
-    &:active {
-      transform: scale(0.97);
-    }
+    &:active { transform: scale(0.97); }
 
     &.active {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -110,7 +97,6 @@
   }
 }
 
-// ===== LOADING STATE =====
 .loading-state {
   padding: 20px;
 
@@ -119,37 +105,31 @@
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 16px;
-
-    .skeleton-header {
-      height: 24px;
-      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 8px;
-      margin-bottom: 16px;
-    }
-
-    .skeleton-item {
-      height: 60px;
-      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 12px;
-      margin-bottom: 8px;
-    }
   }
+
+  .skeleton-header,
+  .skeleton-item {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+
+  .skeleton-header {
+    height: 24px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+
+  .skeleton-item { height: 60px; }
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-// ===== EMPTY STATE =====
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -157,53 +137,48 @@
   justify-content: center;
   padding: 60px 40px;
   text-align: center;
+}
 
-  .empty-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 24px;
-    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 24px;
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
 
-    mat-icon {
-      font-size: 36px;
-      width: 36px;
-      height: 36px;
-      color: #4f46e5;
-    }
-  }
-
-  h3 {
-    margin: 0 0 8px;
-    font-size: 20px;
-    font-weight: 600;
-    color: #1e293b;
-  }
-
-  p {
-    margin: 0;
-    font-size: 15px;
-    color: #64748b;
-    line-height: 1.5;
-    max-width: 260px;
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: #4f46e5;
   }
 }
 
-// ===== TRANSACTION GROUPS =====
-.groups-container {
-  padding: 16px;
+.empty-state h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
 }
+
+.empty-state p {
+  margin: 0;
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.5;
+  max-width: 260px;
+}
+
+.groups-container { padding: 16px; }
 
 .transaction-group {
   background: white;
   border-radius: 20px;
   margin-bottom: 16px;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 4px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
   overflow: hidden;
 }
 
@@ -215,9 +190,7 @@
   cursor: pointer;
   transition: background 0.15s ease;
 
-  &:active {
-    background: #f8fafc;
-  }
+  &:active { background: #f8fafc; }
 
   .group-title {
     display: flex;
@@ -248,40 +221,33 @@
       gap: 6px;
       font-size: 13px;
       font-weight: 500;
-
-      .start {
-        color: #64748b;
-      }
-
-      .arrow {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
-        color: #cbd5e1;
-      }
-
-      .end {
-        color: #10b981;
-        font-weight: 600;
-
-        &.negative {
-          color: #ef4444;
-        }
-      }
     }
+
+    .start { color: #64748b; }
+
+    .arrow {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: #cbd5e1;
+    }
+
+    .end {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .end.negative { color: #ef4444; }
 
     .chevron {
       color: #94a3b8;
       transition: transform 0.3s ease;
-
-      &.expanded {
-        transform: rotate(180deg);
-      }
     }
+
+    .chevron.expanded { transform: rotate(180deg); }
   }
 }
 
-// ===== GROUP METRICS =====
 .group-metrics {
   max-height: 0;
   overflow: hidden;
@@ -289,9 +255,7 @@
   background: #fafbfc;
   border-top: 1px solid #f1f5f9;
 
-  &.expanded {
-    max-height: 500px;
-  }
+  &.expanded { max-height: 500px; }
 
   .metrics-grid {
     display: grid;
@@ -311,78 +275,59 @@
       background: white;
       border-radius: 12px;
       border-left: 3px solid #cbd5e1;
-
-      .metric-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .metric-value {
-        font-size: 16px;
-        font-weight: 700;
-        color: #1e293b;
-        word-break: break-word;
-      }
-
-      &.income {
-        border-left-color: #10b981;
-
-        .metric-value {
-          color: #10b981;
-        }
-      }
-
-      &.expense {
-        border-left-color: #ef4444;
-
-        .metric-value {
-          color: #ef4444;
-        }
-      }
-
-      &.savings {
-        border-left-color: #3b82f6;
-
-        .metric-value {
-          color: #3b82f6;
-        }
-
-        &.positive {
-          .metric-value {
-            color: #10b981;
-          }
-        }
-
-        &.negative {
-          .metric-value {
-            color: #ef4444;
-          }
-        }
-      }
-
-      &.debt {
-        border-left-color: #f59e0b;
-
-        .metric-value {
-          color: #f59e0b;
-        }
-      }
     }
+
+    .metric-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      word-break: break-word;
+    }
+
+    .metric-item.income {
+      border-left-color: #10b981;
+    }
+
+    .metric-item.income .metric-value { color: #10b981; }
+
+    .metric-item.expense {
+      border-left-color: #ef4444;
+    }
+
+    .metric-item.expense .metric-value { color: #ef4444; }
+
+    .metric-item.savings {
+      border-left-color: #3b82f6;
+    }
+
+    .metric-item.savings .metric-value { color: #3b82f6; }
+
+    .metric-item.savings.positive .metric-value { color: #10b981; }
+
+    .metric-item.savings.negative .metric-value { color: #ef4444; }
+
+    .metric-item.debt {
+      border-left-color: #f59e0b;
+    }
+
+    .metric-item.debt .metric-value { color: #f59e0b; }
   }
 }
 
-// ===== TRANSACTIONS LIST =====
 .transactions-list {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
-  &.expanded {
-    max-height: 2000px;
-  }
+  &.expanded { max-height: 2000px; }
 }
 
 .transaction-card {
@@ -393,9 +338,7 @@
   cursor: pointer;
   transition: background 0.15s ease;
 
-  &:active {
-    background: #f8fafc;
-  }
+  &:active { background: #f8fafc; }
 
   .transaction-left {
     display: flex;
@@ -414,21 +357,21 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+    }
 
-      .day {
-        font-size: 16px;
-        font-weight: 700;
-        color: #1e293b;
-        line-height: 1.1;
-      }
+    .day {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.1;
+    }
 
-      .month {
-        font-size: 10px;
-        font-weight: 600;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
+    .month {
+      font-size: 10px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .transaction-info {
@@ -437,45 +380,45 @@
       gap: 4px;
       min-width: 0;
       flex: 1;
+    }
 
-      .name {
-        font-size: 15px;
-        font-weight: 500;
-        color: #1e293b;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+    .name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      .description {
-        font-size: 13px;
-        color: #94a3b8;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+    .description {
+      font-size: 13px;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      .transaction-type {
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        width: fit-content;
-        padding: 2px 8px;
-        border-radius: 4px;
-        background: #f1f5f9;
-        color: #64748b;
+    .transaction-type {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: fit-content;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #64748b;
+    }
 
-        &.income {
-          background: rgba(16, 185, 129, 0.1);
-          color: #10b981;
-        }
+    .transaction-type.income {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+    }
 
-        &.expense {
-          background: rgba(239, 68, 68, 0.1);
-          color: #ef4444;
-        }
-      }
+    .transaction-type.expense {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
     }
   }
 
@@ -485,54 +428,50 @@
     align-items: flex-end;
     gap: 8px;
     margin-left: 12px;
+  }
 
-    .amount-column {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
+  .amount-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
 
-      .amount {
-        font-size: 15px;
-        font-weight: 600;
-        color: #0f172a;
+  .amount {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+  }
 
-        &.expense {
-          color: #ef4444;
-        }
+  .amount.expense { color: #ef4444; }
 
-        &.income {
-          color: #10b981;
-        }
-      }
+  .amount.income { color: #10b981; }
 
-      .balance {
-        font-size: 12px;
-        color: #94a3b8;
-        font-weight: 500;
-      }
-    }
+  .balance {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
 
-    .debt-info {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 1px;
-      font-size: 12px;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 6px;
+  .debt-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    font-size: 12px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 6px;
+  }
 
-      .debt-label {
-        color: #94a3b8;
-        font-weight: 500;
-        font-size: 11px;
-      }
+  .debt-label {
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 11px;
+  }
 
-      .debt-amount {
-        font-weight: 600;
-        color: #f59e0b;
-      }
-    }
+  .debt-amount {
+    font-weight: 600;
+    color: #f59e0b;
   }
 
   .chevron-icon {
