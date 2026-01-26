@@ -11,7 +11,12 @@
       >
         {{ option }}
       </button>
-      <button class="icon-btn refresh" (click)="loadTransactions()" [class.spinning]="isLoading" title="Refresh">
+      <button
+        class="icon-btn refresh"
+        (click)="loadTransactions()"
+        [class.spinning]="isLoading"
+        title="Refresh"
+      >
         <mat-icon>sync</mat-icon>
       </button>
     </div>
