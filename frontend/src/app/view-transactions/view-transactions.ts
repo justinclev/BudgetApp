@@ -252,6 +252,33 @@ export class ViewTransactionsComponent implements OnInit {
 
   // --- Actions ---
 
+  openCreateDialog(): void {
+    const newTransaction: Transaction = {
+      _id: '',
+      name: '',
+      date: new Date(),
+      amount: 0,
+      description: '',
+      type: 'One-Time',
+      referenceId: undefined,
+    };
+
+    const dialogRef = this.dialog.open(TransactionDetailComponent, {
+      width: '500px',
+      data: newTransaction,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Add new transaction to list
+        this.allTransactions.push(result);
+        this.allTransactions.sort((a, b) => a.date.getTime() - b.date.getTime());
+        this.recalculateAndGroup();
+        this.saveChanges();
+      }
+    });
+  }
+
   openEditDialog(transaction: Transaction): void {
     const dialogRef = this.dialog.open(TransactionDetailComponent, {
       width: '500px',

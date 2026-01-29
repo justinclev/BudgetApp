@@ -2,23 +2,30 @@
   <!-- Sticky Header -->
   <header class="sticky-header">
     <!-- Pill Selector -->
-    <div class="grouping-pills">
-      <button
-        *ngFor="let option of groupingOptions"
-        class="pill"
-        [class.active]="selectedGrouping === option"
-        (click)="selectedGrouping = option; updateGrouping()"
-      >
-        {{ option }}
-      </button>
-      <button
-        class="icon-btn refresh"
-        (click)="loadTransactions()"
-        [class.spinning]="isLoading"
-        title="Refresh"
-      >
-        <mat-icon>sync</mat-icon>
-      </button>
+    <div class="header-controls">
+      <div class="grouping-pills">
+        <button
+          *ngFor="let option of groupingOptions"
+          class="pill"
+          [class.active]="selectedGrouping === option"
+          (click)="selectedGrouping = option; updateGrouping()"
+        >
+          {{ option }}
+        </button>
+      </div>
+      <div class="action-buttons">
+        <button class="icon-btn add" (click)="openCreateDialog()" title="Add transaction">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button
+          class="icon-btn refresh"
+          (click)="loadTransactions()"
+          [class.spinning]="isLoading"
+          title="Refresh"
+        >
+          <mat-icon>sync</mat-icon>
+        </button>
+      </div>
     </div>
   </header>
 

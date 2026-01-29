@@ -15,6 +15,34 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+.header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.grouping-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 12px 0;
+  align-items: center;
+  flex: 1;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .icon-btn {
   width: 44px;
   height: 44px;
@@ -27,7 +55,6 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  margin-left: auto;
   flex-shrink: 0;
 
   &:active {
@@ -37,6 +64,15 @@
 
   &.spinning mat-icon {
     animation: spin 1s linear infinite;
+  }
+
+  &.add {
+    background: #10b981;
+    color: white;
+
+    &:active {
+      background: #059669;
+    }
   }
 
   mat-icon {
