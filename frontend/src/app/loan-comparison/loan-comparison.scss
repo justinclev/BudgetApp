@@ -1,0 +1,310 @@
+.loan-comparison-container {
+  padding: 16px;
+  max-width: 100%;
+
+  h2 {
+    margin: 0 0 16px 0;
+    color: #1976d2;
+  }
+
+  h3 {
+    margin: 16px 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.tab-content {
+  padding: 20px 16px;
+}
+
+.loan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .full-width {
+    width: 100%;
+  }
+}
+
+.divider-spacer {
+  margin: 20px 0;
+}
+
+.selected-count {
+  color: #666;
+  font-size: 13px;
+  margin: 0 0 12px 0;
+}
+
+.debts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .no-debts {
+    padding: 16px;
+    text-align: center;
+    color: #999;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+}
+
+.debt-item {
+  display: flex;
+  padding: 8px;
+
+  mat-checkbox {
+    width: 100%;
+  }
+
+  .debt-name {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .debt-details {
+    font-size: 12px;
+    color: #666;
+    display: block;
+  }
+}
+
+.error-message {
+  color: #d32f2f;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.compare-button {
+  width: 100%;
+  margin-top: 16px;
+}
+
+// Summary Card
+.summary-card {
+  background-color: #f5f5f5;
+  border-left: 4px solid #ffc107;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0 0 16px 0;
+    color: #1976d2;
+  }
+
+  &.positive-savings {
+    border-left-color: #4caf50;
+    background-color: #f1f8f4;
+  }
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+
+  .label {
+    color: #666;
+    font-weight: 500;
+  }
+
+  .value {
+    font-weight: 600;
+    color: #333;
+    font-size: 15px;
+  }
+
+  &.total-savings {
+    border-top: 1px solid #ddd;
+    padding: 12px 0;
+    margin-top: 8px;
+
+    .label {
+      font-weight: 600;
+      color: #1976d2;
+    }
+
+    .value {
+      font-size: 17px;
+    }
+
+    &.savings-positive {
+      color: #2e7d32;
+
+      .label,
+      .value {
+        color: #2e7d32;
+      }
+    }
+  }
+}
+
+// Details Grid
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+
+  .label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+
+  .value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1976d2;
+  }
+}
+
+// Debt Comparisons
+.debt-comparisons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.debt-comparison-card {
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+
+  h4 {
+    margin: 0 0 12px 0;
+    color: #1976d2;
+  }
+}
+
+.comparison-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 8px;
+    padding: 10px 8px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 13px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.header {
+      background-color: #f0f0f0;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .col {
+      display: flex;
+      align-items: center;
+
+      &.savings {
+        font-weight: 600;
+        color: #f44336;
+
+        &.savings-positive {
+          color: #4caf50;
+        }
+      }
+    }
+  }
+}
+
+.savings-positive {
+  color: #4caf50 !important;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+// Mobile responsive
+@media (max-width: 599px) {
+  .loan-comparison-container {
+    padding: 12px;
+  }
+
+  .tab-content {
+    padding: 12px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-table .table-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+
+    &:not(.header) {
+      display: grid;
+      grid-template-columns: 1fr;
+      background-color: #f9f9f9;
+      padding: 12px;
+      margin-bottom: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #666;
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .debts-list {
+    max-height: 400px;
+  }
+}

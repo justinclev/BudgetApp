@@ -1,0 +1,179 @@
+<div class="loan-comparison-container">
+  <h2>Loan Comparison Analyzer</h2>
+
+  <mat-tab-group>
+    <!-- Input Tab -->
+    <mat-tab label="Loan Details">
+      <div class="tab-content">
+        <form [formGroup]="loanForm" class="loan-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Loan Amount ($)</mat-label>
+            <input matInput type="number" formControlName="amount" placeholder="0.00" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Interest Rate (%)</mat-label>
+            <input matInput type="number" formControlName="interestRate" placeholder="0.00" step="0.01" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Loan Term (months)</mat-label>
+            <input matInput type="number" formControlName="term" placeholder="60" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Origination Fee (%)</mat-label>
+            <input matInput type="number" formControlName="originationFeePercent" placeholder="0" step="0.1" />
+          </mat-form-field>
+        </form>
+
+        <mat-divider class="divider-spacer"></mat-divider>
+
+        <h3>Select Debts to Pay Off</h3>
+        <p class="selected-count">{{ selectedDebtCount }} of {{ allDebts.length }} selected</p>
+
+        <div class="debts-list">
+          <div *ngIf="isLoading" class="loading">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+
+          <div *ngIf="!isLoading && allDebts.length === 0" class="no-debts">
+            No debts found. Add some debts first to run comparison.
+          </div>
+
+          <div *ngFor="let debt of allDebts" class="debt-item">
+            <mat-checkbox
+              [checked]="isDebtSelected(debt._id || '')"
+              (change)="toggleDebtSelection(debt._id || '')"
+            >
+              <span class="debt-name">{{ debt.name }}</span>
+              <span class="debt-details">
+                Balance: {{ formatCurrency(debt.amountOwed || 0) }} @ {{ formatPercent(debt.interestRate || 0) }}
+              </span>
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <div *ngIf="error" class="error-message">{{ error }}</div>
+
+        <button mat-raised-button color="primary" (click)="runComparison()" class="compare-button">
+          Compare Scenarios
+        </button>
+      </div>
+    </mat-tab>
+
+    <!-- Results Tab -->
+    <mat-tab label="Results" [disabled]="!comparisonResult">
+      <div class="tab-content" *ngIf="comparisonResult">
+        <!-- Summary Card -->
+        <div class="summary-card" [ngClass]="{ 'positive-savings': isSavingsPositive }">
+          <h3>Total Comparison</h3>
+
+          <div class="summary-row">
+            <span class="label">Current Scenario (Pay Minimums):</span>
+            <span class="value">{{ formatCurrency(totalCurrentCost) }}</span>
+          </div>
+
+          <div class="summary-row">
+            <span class="label">Loan Scenario (New Loan):</span>
+            <span class="value">{{ formatCurrency(totalLoanCost) }}</span>
+          </div>
+
+          <div class="summary-row total-savings" [ngClass]="{ 'savings-positive': isSavingsPositive }">
+            <span class="label">Total Savings:</span>
+            <span class="value">{{ formatCurrency(totalSavings) }}</span>
+          </div>
+
+          <div class="summary-row" *ngIf="comparisonResult.breakEvenMonths > 0">
+            <span class="label">Break-Even Point:</span>
+            <span class="value">{{ comparisonResult.breakEvenMonths }} months</span>
+          </div>
+        </div>
+
+        <mat-divider class="divider-spacer"></mat-divider>
+
+        <!-- Loan Details -->
+        <h3>Loan Details</h3>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="label">Loan Amount:</span>
+            <span class="value">{{ formatCurrency(comparisonResult.loan.amount) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Origination Fee:</span>
+            <span class="value">{{ formatCurrency(comparisonResult.originationFee) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Total Loan Amount:</span>
+            <span class="value">{{ formatCurrency(comparisonResult.totalLoanAmount) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Interest Rate:</span>
+            <span class="value">{{ formatPercent(comparisonResult.loan.interestRate) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Monthly Payment:</span>
+            <span class="value">{{ formatCurrency(comparisonResult.monthlyLoanPayment) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Total Interest:</span>
+            <span class="value">{{ formatCurrency(comparisonResult.totalLoanInterest) }}</span>
+          </div>
+        </div>
+
+        <mat-divider class="divider-spacer"></mat-divider>
+
+        <!-- Individual Debt Comparisons -->
+        <h3>Individual Debt Analysis</h3>
+        <div class="debt-comparisons">
+          <div *ngFor="let comparison of comparisonResult.selectedDebts" class="debt-comparison-card">
+            <h4>{{ comparison.debtName }}</h4>
+
+            <div class="comparison-table">
+              <div class="table-row header">
+                <div class="col">Metric</div>
+                <div class="col">Current Scenario</div>
+                <div class="col">Loan Scenario</div>
+                <div class="col">Difference</div>
+              </div>
+
+              <div class="table-row">
+                <div class="col">Total Interest</div>
+                <div class="col">{{ formatCurrency(comparison.currentTotalInterest) }}</div>
+                <div class="col">{{ formatCurrency(comparison.loanTotalInterest) }}</div>
+                <div class="col savings" [ngClass]="{ 'savings-positive': comparison.isSavingsPositive }">
+                  {{ formatCurrency(comparison.interestSavings) }}
+                </div>
+              </div>
+
+              <div class="table-row">
+                <div class="col">Monthly Payment</div>
+                <div class="col">{{ formatCurrency(comparison.currentMinimumPayment) }}</div>
+                <div class="col">{{ formatCurrency(comparison.loanMonthlyPayment) }}</div>
+                <div class="col">{{ formatCurrency(comparison.currentMinimumPayment - comparison.loanMonthlyPayment) }}</div>
+              </div>
+
+              <div class="table-row">
+                <div class="col">Payoff Time</div>
+                <div class="col">{{ comparison.currentMonthsToPayoff }} months</div>
+                <div class="col">{{ comparison.loanMonthsToPayoff }} months</div>
+                <div class="col">{{ comparison.currentMonthsToPayoff - comparison.loanMonthsToPayoff }} months</div>
+              </div>
+
+              <div class="table-row">
+                <div class="col">Total Paid</div>
+                <div class="col">{{ formatCurrency(comparison.currentTotalPaid) }}</div>
+                <div class="col">{{ formatCurrency(comparison.loanTotalPaid) }}</div>
+                <div class="col">{{ formatCurrency(comparison.currentTotalPaid - comparison.loanTotalPaid) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <div class="button-group">
+    <button mat-stroked-button (click)="close()">Close</button>
+  </div>
+</div>

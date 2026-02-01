@@ -16,6 +16,7 @@ import { RecurringTransactionDetailComponent } from '../recurring-transaction-de
 import { DebtDetailComponent } from '../debt-detail/debt-detail';
 import { ListDebtComponent } from '../list-debt/list-debt';
 import { ListTransactionsComponent } from '../list-transactions/list-transactions';
+import { LoanComparisonComponent } from '../loan-comparison/loan-comparison';
 import { RecurringTransactionService } from '../services/recurring-transaction.service';
 import { DebtService } from '../services/debt.service';
 import { TransactionService } from '../services/transaction.service';
@@ -184,6 +185,17 @@ export class DashboardComponent implements OnInit {
       if (result) {
         this.loadDashboardData();
       }
+    });
+  }
+
+  openLoanComparisonModal(): void {
+    const dialogRef = this.dialog.open(LoanComparisonComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      // Loan comparison doesn't modify data, just for analysis
     });
   }
 
