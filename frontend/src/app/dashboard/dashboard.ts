@@ -106,12 +106,22 @@ export class DashboardComponent implements OnInit {
   }
 
   private calculateMetrics(): void {
-    // Current balance (last transaction)
-    const sortedTransactions = this.transactions.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    // Current balance: use last transaction's BalanceAfter if available
+    const sortedByDate = this.transactions.sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     );
-    const lastTransaction = sortedTransactions[0];
-    this.metrics.currentBalance = lastTransaction?.balances?.BalanceAfter ?? 0;
+    const lastTransaction = sortedByDate[sortedByDate.length - 1];
+    
+    if (lastTransaction?.balances?.BalanceAfter !== undefined) {
+      this.metrics.currentBalance = lastTransaction.balances.BalanceAfter;
+    } else if (sortedByDate[0]?.startingBalance !== undefined) {
+      // If no transactions have balances calculated, use the first transaction's startingBalance
+      this.metrics.currentBalance = sortedByDate[0].startingBalance;
+    } else {
+      // Default to 5000 if no transactions exist
+      this.metrics.currentBalance = 5000;
+    }
+    
     this.previousBalance = this.metrics.currentBalance;
 
     // Total debt
