@@ -278,7 +278,10 @@ export class LoanComparisonService {
     }
 
     // 5. MONTHLY PAYMENT ANALYSIS
-    const totalCurrentPayments = result.selectedDebts.reduce((sum, d) => sum + d.currentMinimumPayment, 0);
+    const totalCurrentPayments = result.selectedDebts.reduce(
+      (sum, d) => sum + d.currentMinimumPayment,
+      0,
+    );
     const paymentIncrease = result.monthlyLoanPayment - totalCurrentPayments;
     if (paymentIncrease > totalCurrentPayments * 0.25) {
       redFlags.push({
@@ -342,19 +345,23 @@ export class LoanComparisonService {
       ratingExplanation = 'This loan costs more than current situation. Reject.';
     } else if (highImpactRedFlags >= 2) {
       overallRating = 'poor';
-      ratingExplanation = 'Multiple high-impact risks detected. This appears to be predatory lending.';
+      ratingExplanation =
+        'Multiple high-impact risks detected. This appears to be predatory lending.';
     } else if (highImpactRedFlags === 1) {
       overallRating = 'marginal';
       ratingExplanation = 'Significant risks exist. Proceed with extreme caution.';
     } else if (result.totalCostSavings < result.originationFee * 2) {
       overallRating = 'fair';
-      ratingExplanation = 'Minimal benefit after fees. Only proceed if rates/payments significantly improve your situation.';
+      ratingExplanation =
+        'Minimal benefit after fees. Only proceed if rates/payments significantly improve your situation.';
     } else if (result.totalCostSavings > result.currentScenarioTotalCost * 0.1) {
       overallRating = 'reasonable';
-      ratingExplanation = 'Solid savings opportunity with manageable risks. This could be a good refinancing option.';
+      ratingExplanation =
+        'Solid savings opportunity with manageable risks. This could be a good refinancing option.';
     } else {
       overallRating = 'good';
-      ratingExplanation = 'Strong savings with acceptable terms. This appears to be a legitimate refinancing opportunity.';
+      ratingExplanation =
+        'Strong savings with acceptable terms. This appears to be a legitimate refinancing opportunity.';
     }
 
     const executiveSummary = this.generateExecutiveSummary(result, overallRating);
@@ -376,13 +383,19 @@ export class LoanComparisonService {
   private generateExecutiveSummary(result: LoanComparisonResult, rating: string): string {
     const savings = result.totalCostSavings;
     const savingsPercent = ((savings / result.currentScenarioTotalCost) * 100).toFixed(1);
-    const payoff = result.selectedDebts.reduce((sum, d) => sum + d.currentMonthsToPayoff, 0) / result.selectedDebts.length;
+    const payoff =
+      result.selectedDebts.reduce((sum, d) => sum + d.currentMonthsToPayoff, 0) /
+      result.selectedDebts.length;
     const newPayoff = result.loan.term;
 
     return `${rating.toUpperCase()} DEAL: Taking this loan would ${savings > 0 ? 'save' : 'cost'} you ${this.formatCurrency(Math.abs(savings))} (${Math.abs(Number(savingsPercent))}% ${savings > 0 ? 'reduction' : 'increase'}) over the life of your debt. Current average payoff time: ${payoff.toFixed(0)} months. New payoff time: ${newPayoff} months. Origination fee: ${this.formatCurrency(result.originationFee)}.`;
   }
 
-  private generateRecommendation(result: LoanComparisonResult, rating: string, redFlags: AdvisoryInsight[]): string {
+  private generateRecommendation(
+    result: LoanComparisonResult,
+    rating: string,
+    redFlags: AdvisoryInsight[],
+  ): string {
     if (rating === 'poor') {
       return '❌ REJECT THIS LOAN. The costs exceed any benefits. This lender is trying to profit from your situation. Look for legitimate financial institutions or seek credit counseling.';
     }
@@ -424,4 +437,3 @@ export class LoanComparisonService {
     }).format(value);
   }
 }
-

@@ -51,7 +51,7 @@ type GroupingMethod = 'Daily' | 'Weekly' | 'Monthly' | 'Annually';
   styleUrls: ['./list-transactions.scss'],
 })
 export class ListTransactionsComponent implements OnInit {
-  @Input() currentBalance: number = 5000; // Default balance from dashboard
+  @Input() currentBalance: number = 0; // Default balance from dashboard
 
   isLoading = true;
   allTransactions: Transaction[] = [];

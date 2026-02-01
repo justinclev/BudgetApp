@@ -121,8 +121,8 @@ export class DashboardComponent implements OnInit {
       // If no transactions have balances calculated, use the first transaction's startingBalance
       this.metrics.currentBalance = sortedByDate[0].startingBalance;
     } else {
-      // Default to 5000 if no transactions exist
-      this.metrics.currentBalance = 5000;
+      // Default to 0 if no transactions exist
+      this.metrics.currentBalance = 0;
     }
 
     this.previousBalance = this.metrics.currentBalance;
@@ -197,6 +197,12 @@ export class DashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       // Loan comparison doesn't modify data, just for analysis
     });
+  }
+
+  openCreditAdviceModal(): void {
+    // TODO: Create and open CreditAdviceComponent
+    // This will provide educational guidance on building and maintaining credit
+    console.log('Credit Advice modal - to be implemented');
   }
 
   openSection(section: 'transactions' | 'debt' | 'recurring'): void {

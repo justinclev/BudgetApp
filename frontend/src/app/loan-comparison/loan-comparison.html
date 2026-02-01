@@ -115,7 +115,11 @@
               Red Flags ({{ advisory.redFlags.length }})
             </h3>
             <div class="insights-list">
-              <div *ngFor="let flag of advisory.redFlags" class="insight-item" [ngClass]="'impact-' + flag.impact">
+              <div
+                *ngFor="let flag of advisory.redFlags"
+                class="insight-item"
+                [ngClass]="'impact-' + flag.impact"
+              >
                 <div class="insight-header">
                   <strong>{{ flag.title }}</strong>
                   <span class="impact-badge">{{ flag.impact }}</span>
