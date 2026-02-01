@@ -31,7 +31,7 @@
             <mat-icon>refresh</mat-icon>
           </button>
         </div>
-        
+
         <div class="balance-value-wrapper">
           <span class="currency-symbol">$</span>
           <input
@@ -163,7 +163,10 @@
       </button>
     </div>
     <div class="sheet-content">
-      <app-list-transactions *ngIf="activeSection === 'transactions'" [currentBalance]="metrics.currentBalance"></app-list-transactions>
+      <app-list-transactions
+        *ngIf="activeSection === 'transactions'"
+        [currentBalance]="metrics.currentBalance"
+      ></app-list-transactions>
       <app-list-debt *ngIf="activeSection === 'debt'"></app-list-debt>
       <app-list-recurring-transaction
         *ngIf="activeSection === 'recurring'"
