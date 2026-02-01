@@ -8,5 +8,6 @@ export interface Transaction {
   date: Date;
   type: 'Recurring' | 'Debt' | 'One-Time' | 'Income';
   referenceId?: string; // ID of the related recurring transaction, Income, or Debt, if applicable, Determined by Type
+  startingBalance?: number; // Starting balance used for balance calculations (set when user edits balance)
   balances?: TransactionBalances; // Optional balance info for display purposes, not stored in DB
 }

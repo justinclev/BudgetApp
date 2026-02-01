@@ -56,29 +56,30 @@ export class DebtDetailComponent {
     private readonly transactionService: TransactionService,
     private readonly dialogRef: MatDialogRef<DebtDetailComponent>,
     private readonly confirmDialog: MatDialog,
-    @Optional() @Inject(MAT_DIALOG_DATA) readonly data: Debt,
+    @Optional() @Inject(MAT_DIALOG_DATA) readonly data: { debt?: Debt; currentBalance?: number },
   ) {
-    this.isEditMode = !!data;
+    const debt = data?.debt;
+    this.isEditMode = !!debt;
     if (this.isEditMode) {
-      this.editingId = data._id || null;
+      this.editingId = debt?._id || null;
     }
 
-    const hasRecurringDetails = !!(data?.frequency && data?.paymentDate && data?.minimumPayment);
+    const hasRecurringDetails = !!(debt?.frequency && debt?.paymentDate && debt?.minimumPayment);
 
     this.debtForm = this.fb.group({
-      name: [data?.name || '', [Validators.required], [this.nameUniqueValidator()]],
+      name: [debt?.name || '', [Validators.required], [this.nameUniqueValidator()]],
       amountOwed: [
-        data?.amountOwed || null,
+        debt?.amountOwed || null,
         [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)],
       ],
       interestRate: [
-        data?.interestRate || null,
+        debt?.interestRate || null,
         [Validators.required, Validators.min(0), Validators.max(100)],
       ],
       createRecurring: [hasRecurringDetails],
-      minimumPayment: [data?.minimumPayment || null],
-      paymentDate: [data?.paymentDate || ''],
-      frequency: [data?.frequency || ''],
+      minimumPayment: [debt?.minimumPayment || null],
+      paymentDate: [debt?.paymentDate || ''],
+      frequency: [debt?.frequency || ''],
     });
 
     this.updateValidators(hasRecurringDetails);
@@ -110,7 +111,7 @@ export class DebtDetailComponent {
         return of(null);
       }
       // If editing and name hasn't changed, it's valid
-      if (this.isEditMode && control.value === this.data.name) {
+      if (this.isEditMode && control.value === this.data?.debt?.name) {
         return of(null);
       }
       return timer(500).pipe(
@@ -319,12 +320,9 @@ export class DebtDetailComponent {
         endDate = new Date(lastTransaction.date);
       }
 
-      // Get current balance (from last transaction)
-      let currentBalance = 5000; // Default starting balance
-      if (existingTransactions.length > 0) {
-        const lastTransaction = existingTransactions[existingTransactions.length - 1];
-        currentBalance = lastTransaction.balances?.BalanceAfter ?? 5000;
-      }
+      // Get current balance from dashboard (passed via dialog data)
+      let currentBalance = this.data?.currentBalance ?? 0;
+      console.log(`📍 Using current balance from dashboard: $${currentBalance}`);
 
       console.log('📊 Generation parameters:', {
         startDate,
@@ -349,7 +347,7 @@ export class DebtDetailComponent {
   }
 
   onDelete(): void {
-    if (confirm(`Delete "${this.data?.name}"?`)) {
+    if (confirm(`Delete "${this.data?.debt?.name}"?`)) {
       if (this.editingId) {
         this.debtService.deleteDebt(this.editingId).subscribe({
           next: () => this.dialogRef.close('deleted'),

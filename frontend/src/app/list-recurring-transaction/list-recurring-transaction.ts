@@ -45,7 +45,10 @@ export class ListRecurringTransactionComponent implements OnInit {
   openTransactionDialog(transaction?: RecurringTransaction): void {
     const dialogRef = this.dialog.open(RecurringTransactionDetailComponent, {
       width: '600px',
-      data: transaction,
+      data: {
+        transaction: transaction,
+        currentBalance: 0, // Default, not used in list context
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {

@@ -56,6 +56,8 @@ pub struct Transaction {
     pub transaction_type: String,
     #[serde(rename = "referenceId", skip_serializing_if = "Option::is_none")]
     pub reference_id: Option<String>,
+    #[serde(rename = "startingBalance", skip_serializing_if = "Option::is_none", deserialize_with = "deserialize_option_f64_from_bson_number", default)]
+    pub starting_balance: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

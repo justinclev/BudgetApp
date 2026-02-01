@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../services/transaction.service';
 import { DebtService } from '../services/debt.service';
@@ -50,6 +50,8 @@ type GroupingMethod = 'Daily' | 'Weekly' | 'Monthly' | 'Annually';
   styleUrls: ['./list-transactions.scss'],
 })
 export class ListTransactionsComponent implements OnInit {
+  @Input() currentBalance: number = 5000; // Default balance from dashboard
+
   isLoading = true;
   allTransactions: Transaction[] = [];
   groupedTransactions: TransactionGroup[] = [];
@@ -104,7 +106,7 @@ export class ListTransactionsComponent implements OnInit {
   }
 
   recalculateAndGroup(): void {
-    this.calculateBalances(this.allTransactions, this.debts, this.recurringTransactions, 5000);
+    this.calculateBalances(this.allTransactions, this.debts, this.recurringTransactions, this.currentBalance);
     this.updateGrouping();
   }
 
@@ -334,10 +336,15 @@ export class ListTransactionsComponent implements OnInit {
     const startDate = new Date(lastDate.getFullYear(), lastDate.getMonth() + 1, 1);
     const endDate = new Date(lastDate.getFullYear(), lastDate.getMonth() + 2, 0);
 
-    // Get current balance from the last transaction
-    let currentBalance = 5000;
+    // Get current balance from the last transaction for future projections
+    let currentBalance = 0;
     if (lastTransaction?.balances?.BalanceAfter !== undefined) {
       currentBalance = lastTransaction.balances.BalanceAfter;
+      console.log(
+        `📍 Using BalanceAfter from last transaction for future projection: $${currentBalance}`,
+      );
+    } else {
+      console.log(`📍 Using default starting balance: $${currentBalance}`);
     }
 
     // Import TransactionGenerator
@@ -363,10 +370,15 @@ export class ListTransactionsComponent implements OnInit {
     const startDate = new Date(lastDate.getFullYear() + 1, lastDate.getMonth(), 1);
     const endDate = new Date(lastDate.getFullYear() + 2, lastDate.getMonth(), 0);
 
-    // Get current balance from the last transaction
-    let currentBalance = 5000;
+    // Get current balance from the last transaction for future projections
+    let currentBalance = 0;
     if (lastTransaction?.balances?.BalanceAfter !== undefined) {
       currentBalance = lastTransaction.balances.BalanceAfter;
+      console.log(
+        `📍 Using BalanceAfter from last transaction for future projection: $${currentBalance}`,
+      );
+    } else {
+      console.log(`📍 Using default starting balance: $${currentBalance}`);
     }
 
     // Import TransactionGenerator

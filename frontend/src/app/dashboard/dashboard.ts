@@ -9,6 +9,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
 import { ListRecurringTransactionComponent } from '../list-recurring-transaction/list-recurring-transaction';
 import { RecurringTransactionDetailComponent } from '../recurring-transaction-detail/recurring-transaction-detail';
 import { DebtDetailComponent } from '../debt-detail/debt-detail';
@@ -46,6 +48,8 @@ interface DashboardMetrics {
     MatDividerModule,
     MatCardModule,
     MatTooltipModule,
+    FormsModule,
+    MatInputModule,
     ListRecurringTransactionComponent,
     ListDebtComponent,
     ListTransactionsComponent,
@@ -66,6 +70,7 @@ export class DashboardComponent implements OnInit {
   debts: Debt[] = [];
   recurringTransactions: RecurringTransaction[] = [];
   transactions: Transaction[] = [];
+  private previousBalance: number = 0;
 
   constructor(
     private router: Router,
@@ -107,6 +112,7 @@ export class DashboardComponent implements OnInit {
     );
     const lastTransaction = sortedTransactions[0];
     this.metrics.currentBalance = lastTransaction?.balances?.BalanceAfter ?? 0;
+    this.previousBalance = this.metrics.currentBalance;
 
     // Total debt
     this.metrics.totalDebt = this.debts.reduce((sum, debt) => sum + debt.amountOwed, 0);
@@ -142,6 +148,9 @@ export class DashboardComponent implements OnInit {
   openAddRecurringTransactionModal(): void {
     const dialogRef = this.dialog.open(RecurringTransactionDetailComponent, {
       width: '500px',
+      data: {
+        currentBalance: this.metrics.currentBalance,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -154,6 +163,9 @@ export class DashboardComponent implements OnInit {
   openAddDebtAccountModal(): void {
     const dialogRef = this.dialog.open(DebtDetailComponent, {
       width: '500px',
+      data: {
+        currentBalance: this.metrics.currentBalance,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -178,5 +190,78 @@ export class DashboardComponent implements OnInit {
       recurring: 'Recurring Transactions',
     };
     return titles[section] || '';
+  }
+
+  onBalanceBlur(): void {
+    // Only recalculate if balance actually changed
+    if (this.metrics.currentBalance !== this.previousBalance) {
+      this.recalculateAllBalances(this.metrics.currentBalance);
+      this.previousBalance = this.metrics.currentBalance;
+    }
+  }
+
+  private recalculateAllBalances(newBalance: number): void {
+    console.log(`💰 Recalculating balances with new starting balance: $${newBalance}`);
+    
+    let runningBalance = newBalance;
+    const debtBalances = new Map<string, number>();
+
+    this.debts.forEach((d) => {
+      if (d._id) debtBalances.set(d._id, d.amountOwed);
+    });
+
+    const rtMap = new Map<string, RecurringTransaction>();
+    this.recurringTransactions.forEach((rt) => {
+      if (rt._id) rtMap.set(rt._id, rt);
+    });
+
+    // Recalculate balances for all transactions
+    for (const t of this.transactions) {
+      const balancePrior = runningBalance;
+
+      if (t.type === 'Income') {
+        runningBalance += t.amount;
+      } else {
+        runningBalance -= t.amount;
+      }
+
+      let debtPrior: number | undefined;
+      let debtAfter: number | undefined;
+
+      if (t.referenceId) {
+        const rt = rtMap.get(t.referenceId);
+        if (rt?.linkedDebtId) {
+          debtPrior = debtBalances.get(rt.linkedDebtId);
+          if (debtPrior !== undefined) {
+            debtAfter = debtPrior - t.amount;
+            debtBalances.set(rt.linkedDebtId, debtAfter);
+          }
+        }
+      }
+
+      t.balances = {
+        BalancePrior: balancePrior,
+        BalanceAfter: runningBalance,
+        DebtBalancePrior: debtPrior,
+        DebtBalanceAfter: debtAfter,
+      };
+
+      // Set startingBalance on first transaction only
+      if (this.transactions.indexOf(t) === 0) {
+        t.startingBalance = newBalance;
+      }
+    }
+
+    console.log(`✅ Balances recalculated - Final Balance: $${runningBalance}`);
+    
+    // Save changes to database
+    this.transactionService.saveTransactions(this.transactions).subscribe({
+      next: () => {
+        console.log('💾 Transactions saved successfully');
+      },
+      error: (err) => {
+        console.error('❌ Error saving transactions:', err);
+      },
+    });
   }
 }

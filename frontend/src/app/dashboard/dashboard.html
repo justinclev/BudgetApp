@@ -31,9 +31,20 @@
             <mat-icon>refresh</mat-icon>
           </button>
         </div>
-        <div class="balance-value" [class.negative]="metrics.currentBalance < 0">
-          {{ metrics.currentBalance | currency }}
+        
+        <div class="balance-value-wrapper">
+          <span class="currency-symbol">$</span>
+          <input
+            type="number"
+            [(ngModel)]="metrics.currentBalance"
+            (blur)="onBalanceBlur()"
+            placeholder="0.00"
+            class="balance-input"
+            inputmode="decimal"
+            step="0.01"
+          />
         </div>
+
         <div class="balance-footer">
           <span class="month-label">This Month:</span>
           <span
@@ -152,7 +163,7 @@
       </button>
     </div>
     <div class="sheet-content">
-      <app-list-transactions *ngIf="activeSection === 'transactions'"></app-list-transactions>
+      <app-list-transactions *ngIf="activeSection === 'transactions'" [currentBalance]="metrics.currentBalance"></app-list-transactions>
       <app-list-debt *ngIf="activeSection === 'debt'"></app-list-debt>
       <app-list-recurring-transaction
         *ngIf="activeSection === 'recurring'"

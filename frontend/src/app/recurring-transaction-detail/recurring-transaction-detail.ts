@@ -54,23 +54,26 @@ export class RecurringTransactionDetailComponent {
     private transactionService: TransactionService,
     private debtService: DebtService,
     private confirmDialog: MatDialog,
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: RecurringTransaction,
+    @Optional()
+    @Inject(MAT_DIALOG_DATA)
+    public data: { transaction?: RecurringTransaction; currentBalance?: number },
   ) {
-    this.isEditMode = !!data;
+    const transaction = data?.transaction;
+    this.isEditMode = !!transaction;
     if (this.isEditMode) {
-      this.editingId = data._id || null;
+      this.editingId = transaction?._id || null;
     }
 
     this.transactionForm = this.fb.group({
-      name: [data?.name || '', [Validators.required], [this.nameUniqueValidator()]],
-      description: [data?.description || '', Validators.required],
+      name: [transaction?.name || '', [Validators.required], [this.nameUniqueValidator()]],
+      description: [transaction?.description || '', Validators.required],
       amount: [
-        data?.amount || null,
+        transaction?.amount || null,
         [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)],
       ],
-      frequency: [data?.frequency || '', Validators.required],
-      startingDate: [data?.startingDate || '', Validators.required],
-      type: [data?.type || 'expense', Validators.required],
+      frequency: [transaction?.frequency || '', Validators.required],
+      startingDate: [transaction?.startingDate || '', Validators.required],
+      type: [transaction?.type || 'expense', Validators.required],
     });
   }
 
@@ -79,7 +82,7 @@ export class RecurringTransactionDetailComponent {
       if (!control.value) {
         return of(null);
       }
-      if (this.isEditMode && control.value === this.data.name) {
+      if (this.isEditMode && control.value === this.data?.transaction?.name) {
         return of(null);
       }
 
@@ -217,12 +220,9 @@ export class RecurringTransactionDetailComponent {
       endDate = new Date(lastTransaction.date);
     }
 
-    // Get current balance (from last transaction)
-    let currentBalance = 5000; // Default starting balance
-    if (existingTransactions.length > 0) {
-      const lastTransaction = existingTransactions[existingTransactions.length - 1];
-      currentBalance = lastTransaction.balances?.BalanceAfter ?? 5000;
-    }
+    // Get current balance from dashboard (passed via dialog data)
+    let currentBalance = this.data?.currentBalance ?? 0;
+    console.log(`📍 Using current balance from dashboard: $${currentBalance}`);
 
     console.log('📊 Generation parameters:', {
       startDate,
@@ -241,7 +241,7 @@ export class RecurringTransactionDetailComponent {
   }
 
   onDelete(): void {
-    if (confirm(`Delete "${this.data?.name}"?`)) {
+    if (confirm(`Delete "${this.data?.transaction?.name}"?`)) {
       if (this.editingId) {
         this.recurringTransactionService.deleteTransaction(this.editingId).subscribe({
           next: () => this.dialogRef.close('deleted'),

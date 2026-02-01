@@ -37,7 +37,10 @@ export class ListDebtComponent implements OnInit {
   openDebtDialog(debt?: Debt): void {
     const dialogRef = this.dialog.open(DebtDetailComponent, {
       width: '600px',
-      data: debt,
+      data: {
+        debt: debt,
+        currentBalance: 0, // Default, not used in list context
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
