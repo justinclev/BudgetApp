@@ -13,7 +13,7 @@ import { ListRecurringTransactionComponent } from '../list-recurring-transaction
 import { RecurringTransactionDetailComponent } from '../recurring-transaction-detail/recurring-transaction-detail';
 import { DebtDetailComponent } from '../debt-detail/debt-detail';
 import { ListDebtComponent } from '../list-debt/list-debt';
-import { ViewTransactionsComponent } from '../view-transactions/view-transactions';
+import { ListTransactionsComponent } from '../list-transactions/list-transactions';
 import { RecurringTransactionService } from '../services/recurring-transaction.service';
 import { DebtService } from '../services/debt.service';
 import { TransactionService } from '../services/transaction.service';
@@ -48,7 +48,7 @@ interface DashboardMetrics {
     MatTooltipModule,
     ListRecurringTransactionComponent,
     ListDebtComponent,
-    ViewTransactionsComponent,
+    ListTransactionsComponent,
   ],
 })
 export class DashboardComponent implements OnInit {

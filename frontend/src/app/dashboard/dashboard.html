@@ -152,7 +152,7 @@
       </button>
     </div>
     <div class="sheet-content">
-      <app-view-transactions *ngIf="activeSection === 'transactions'"></app-view-transactions>
+      <app-list-transactions *ngIf="activeSection === 'transactions'"></app-list-transactions>
       <app-list-debt *ngIf="activeSection === 'debt'"></app-list-debt>
       <app-list-recurring-transaction
         *ngIf="activeSection === 'recurring'"
