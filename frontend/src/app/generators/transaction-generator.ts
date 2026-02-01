@@ -15,44 +15,43 @@ export class TransactionGenerator {
   ) {}
 
   /**
-   * Generates transactions for a date range and saves them
+   * Generates recurring transactions for a date range with intelligent merge strategy
+   *
    * @param startDate Start of generation period
    * @param endDate End of generation period
-   * @param currentBalance Starting balance
-   * @param recurringTransactionId Optional: filter to specific recurring transaction
+   * @param currentBalance Starting balance for balance calculations
+   * @param recurringTransactionId Optional: generate only for this recurring transaction type
+   * @param replace If true, replace existing duplicates with newly generated transactions.
+   *                If both recurringTransactionId and replace are true, only replace
+   *                duplicates for that specific recurring transaction.
    */
   async Generate(
     startDate: Date,
     endDate: Date,
     currentBalance: number,
     recurringTransactionId: string = '',
+    replace: boolean = false,
   ): Promise<void> {
     // Normalize dates to day boundaries
     const start = this.normalizeDate(startDate, 'start');
     const end = this.normalizeDate(endDate, 'end');
 
     // Generate new transactions from recurring rules
-    const generated = this.generateTransactions(
-      start,
-      end,
-      recurringTransactionId,
-    );
+    const generated = this.generateTransactions(start, end, recurringTransactionId);
 
-    // Get existing transactions to avoid duplicates
-    const existing = await firstValueFrom(
-      this.transactionService.getTransactions(),
-    );
+    // Get existing transactions from database
+    const existing = await firstValueFrom(this.transactionService.getTransactions());
 
-    // Merge: keep existing, add new generated ones that don't already exist
-    this.transactions = this.mergeTransactions(existing, generated);
+    // Merge strategy: replace old duplicates if requested, otherwise keep existing
+    this.transactions = replace
+      ? this.mergeWithReplacement(existing, generated, recurringTransactionId)
+      : this.mergeWithoutReplacement(existing, generated);
 
-    // Calculate running balance and debt balances
+    // Calculate running balance and debt balances from starting point
     this.calculateBalances(currentBalance);
 
-    // Save to database
-    await firstValueFrom(
-      this.transactionService.saveTransactions(this.transactions),
-    );
+    // Persist to database
+    await firstValueFrom(this.transactionService.saveTransactions(this.transactions));
   }
 
   /** Normalize date to start (00:00:00) or end (23:59:59) of day */
@@ -75,9 +74,7 @@ export class TransactionGenerator {
     // Filter to specific recurring transaction if provided
     const recurring =
       recurringTransactionId.length > 0
-        ? this.recurringTransactions.filter(
-            (rt) => rt._id === recurringTransactionId,
-          )
+        ? this.recurringTransactions.filter((rt) => rt._id === recurringTransactionId)
         : this.recurringTransactions;
 
     const generated: Transaction[] = [];
@@ -107,16 +104,19 @@ export class TransactionGenerator {
     return generated;
   }
 
-  /** Merge existing and generated transactions, avoiding duplicates */
-  private mergeTransactions(
+  /**
+   * Merge strategy: Keep existing, only add new generated transactions
+   * (Financial principle: Trust historical data - don't overwrite user records)
+   */
+  private mergeWithoutReplacement(
     existing: Transaction[],
     generated: Transaction[],
   ): Transaction[] {
-    // Index existing transactions by "referenceId-date" to detect duplicates
+    // Build index of existing transactions by "recurringId-date" for O(1) lookup
     const existingMap = new Map<string, Transaction>();
 
     const merged: Transaction[] = existing.map((t) => {
-      t.date = new Date(t.date); // Ensure date is Date object
+      t.date = new Date(t.date); // Ensure date objects
       if (t.referenceId) {
         const key = `${t.referenceId}-${this.dateKey(t.date)}`;
         existingMap.set(key, t);
@@ -124,7 +124,7 @@ export class TransactionGenerator {
       return t;
     });
 
-    // Add generated transactions that don't already exist
+    // Add generated transactions only if they don't already exist
     for (const t of generated) {
       const key = `${t.referenceId}-${this.dateKey(t.date)}`;
       if (!existingMap.has(key)) {
@@ -132,7 +132,57 @@ export class TransactionGenerator {
       }
     }
 
-    // Sort by date ascending
+    return merged.sort((a, b) => a.date.getTime() - b.date.getTime());
+  }
+
+  /**
+   * Merge strategy: Replace existing duplicates with newly generated transactions
+   * (Financial principle: Regenerate allows user to correct rules and recalculate)
+   *
+   * If recurringTransactionId is specified, only replace duplicates for that type.
+   * This prevents accidental overwrites of unrelated transactions.
+   */
+  private mergeWithReplacement(
+    existing: Transaction[],
+    generated: Transaction[],
+    recurringTransactionId: string,
+  ): Transaction[] {
+    // Build index of generated transactions for fast duplicate detection
+    const generatedMap = new Map<string, Transaction>();
+    for (const t of generated) {
+      const key = `${t.referenceId}-${this.dateKey(t.date)}`;
+      generatedMap.set(key, t);
+    }
+
+    // Build set of recurring IDs to replace
+    const idsToReplace = new Set<string>();
+    if (recurringTransactionId.length > 0) {
+      // Only replace this specific recurring transaction
+      idsToReplace.add(recurringTransactionId);
+    } else {
+      // Replace all recurring transactions that have generated transactions
+      for (const t of generated) {
+        idsToReplace.add(t.referenceId!);
+      }
+    }
+
+    // Keep existing transactions, but replace those matching our filter
+    const merged: Transaction[] = [];
+    for (const t of existing) {
+      t.date = new Date(t.date);
+      const key = `${t.referenceId}-${this.dateKey(t.date)}`;
+
+      // If this is a duplicate of a generated transaction AND we're replacing this recurring type, skip it
+      if (t.referenceId && idsToReplace.has(t.referenceId) && generatedMap.has(key)) {
+        continue; // Skip - will be replaced by generated version
+      }
+
+      merged.push(t);
+    }
+
+    // Add all generated transactions (these are the fresh, regenerated ones)
+    merged.push(...generated);
+
     return merged.sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 
@@ -144,12 +194,8 @@ export class TransactionGenerator {
   /** Calculate running balance and debt payments for all transactions */
   private calculateBalances(initialBalance: number): void {
     let runningBalance = initialBalance;
-    const debtMap = new Map(
-      this.debts.map((d) => [d._id, d.amountOwed]),
-    );
-    const rtMap = new Map(
-      this.recurringTransactions.map((rt) => [rt._id, rt]),
-    );
+    const debtMap = new Map(this.debts.map((d) => [d._id, d.amountOwed]));
+    const rtMap = new Map(this.recurringTransactions.map((rt) => [rt._id, rt]));
 
     for (const t of this.transactions) {
       const balancePrior = runningBalance;
