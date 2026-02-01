@@ -325,6 +325,33 @@ export class ViewTransactionsComponent implements OnInit {
     });
   }
 
+  testGenerate(): void {
+    // Generate transactions for the next 3 months
+    const now = new Date();
+    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0);
+
+    // Get current balance from the last transaction
+    let currentBalance = 5000;
+    const lastTransaction = this.allTransactions[this.allTransactions.length - 1];
+    if (lastTransaction?.balances?.BalanceAfter !== undefined) {
+      currentBalance = lastTransaction.balances.BalanceAfter;
+    }
+
+    // Import TransactionGenerator
+    import('../generators/transaction-generator').then(({ TransactionGenerator }) => {
+      const generator = new TransactionGenerator(
+        this.recurringTransactions,
+        this.debts,
+        this.transactionService,
+      );
+
+      generator.Generate(startDate, endDate, currentBalance).then(() => {
+        this.loadTransactions();
+      });
+    });
+  }
+
   // --- Grouping Helpers ---
   private getGroupKey(date: Date, method: GroupingMethod): string {
     const d = new Date(date);
