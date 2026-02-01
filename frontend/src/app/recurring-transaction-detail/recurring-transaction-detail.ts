@@ -119,7 +119,6 @@ export class RecurringTransactionDetailComponent {
               debts,
               this.transactionGeneratorService,
             );
-            await generator.AutoRegeneratTransactions();
 
             // Close dialog after successful generation
             this.dialogRef.close(true);
