@@ -33,7 +33,7 @@ import { TransactionGenerator } from '../generators/transaction-generator';
     MatNativeDateModule,
     MatButtonModule,
     MatIconModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
   ],
   templateUrl: './recurring-transaction-detail.html',
   styleUrls: ['./recurring-transaction-detail.scss'],
@@ -67,7 +67,7 @@ export class RecurringTransactionDetailComponent {
       ],
       frequency: [data?.frequency || '', Validators.required],
       startingDate: [data?.startingDate || '', Validators.required],
-      type: [data?.type || 'expense', Validators.required]
+      type: [data?.type || 'expense', Validators.required],
     });
   }
 
@@ -109,7 +109,7 @@ export class RecurringTransactionDetailComponent {
           try {
             // Get all recurring transactions and debts needed for generation
             const recurringTransactions = await firstValueFrom(
-              this.transactionService.getTransactions()
+              this.transactionService.getTransactions(),
             );
             const debts = await firstValueFrom(this.debtService.getDebts());
 
@@ -117,7 +117,7 @@ export class RecurringTransactionDetailComponent {
             const generator = new TransactionGenerator(
               recurringTransactions,
               debts,
-              this.transactionGeneratorService
+              this.transactionGeneratorService,
             );
             await generator.AutoRegeneratTransactions();
 
