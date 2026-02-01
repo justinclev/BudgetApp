@@ -2,11 +2,13 @@ import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { Transaction } from '../models/transaction.model';
 import { Debt } from '../models/debt.model';
 import { TransactionService } from '../services/transaction.service';
+import { BalanceCalculationService } from '../services/balance-calculation.service';
 import { firstValueFrom } from 'rxjs';
 
 /** Generates recurring transactions and calculates running balances */
 export class TransactionGenerator {
   transactions: Transaction[] = [];
+  private balanceCalculationService = new BalanceCalculationService();
 
   constructor(
     private recurringTransactions: RecurringTransaction[],
@@ -194,48 +196,12 @@ export class TransactionGenerator {
 
   /** Calculate running balance and debt payments for all transactions */
   private calculateBalances(initialBalance: number): void {
-    let runningBalance = initialBalance;
-    const debtMap = new Map(this.debts.map((d) => [d._id, d.amountOwed]));
-    const rtMap = new Map(this.recurringTransactions.map((rt) => [rt._id, rt]));
-
-    let incomeTotal = 0;
-    let expenseTotal = 0;
-
-    for (const t of this.transactions) {
-      const balancePrior = runningBalance;
-
-      // Update running balance: income adds, expenses subtract
-      if (t.type === 'Income') {
-        incomeTotal += t.amount;
-        runningBalance += t.amount;
-      } else {
-        expenseTotal += t.amount;
-        runningBalance -= t.amount;
-      }
-
-      // Update debt balance if this transaction is linked to a debt
-      let debtPrior: number | undefined;
-      let debtAfter: number | undefined;
-
-      if (t.referenceId) {
-        const rt = rtMap.get(t.referenceId);
-        if (rt?.linkedDebtId) {
-          debtPrior = debtMap.get(rt.linkedDebtId);
-          if (debtPrior !== undefined) {
-            debtAfter = debtPrior - t.amount;
-            debtMap.set(rt.linkedDebtId, debtAfter);
-          }
-        }
-      }
-
-      // Attach balance info to transaction
-      t.balances = {
-        BalancePrior: balancePrior,
-        BalanceAfter: runningBalance,
-        DebtBalancePrior: debtPrior,
-        DebtBalanceAfter: debtAfter,
-      };
-    }
+    this.balanceCalculationService.calculateBalances(
+      this.transactions,
+      this.debts,
+      this.recurringTransactions,
+      initialBalance,
+    );
   }
 
   /** Calculate next occurrence date based on frequency */

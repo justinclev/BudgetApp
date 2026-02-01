@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TransactionService } from '../services/transaction.service';
 import { DebtService } from '../services/debt.service';
 import { RecurringTransactionService } from '../services/recurring-transaction.service';
+import { BalanceCalculationService } from '../services/balance-calculation.service';
 import { Transaction } from '../models/transaction.model';
 import { Debt } from '../models/debt.model';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
@@ -68,6 +69,7 @@ export class ListTransactionsComponent implements OnInit {
     private transactionService: TransactionService,
     private debtService: DebtService,
     private recurringTransactionService: RecurringTransactionService,
+    private balanceCalculationService: BalanceCalculationService,
     private dialog: MatDialog,
   ) {}
 
@@ -106,57 +108,13 @@ export class ListTransactionsComponent implements OnInit {
   }
 
   recalculateAndGroup(): void {
-    this.calculateBalances(this.allTransactions, this.debts, this.recurringTransactions, this.currentBalance);
+    this.balanceCalculationService.calculateBalances(
+      this.allTransactions,
+      this.debts,
+      this.recurringTransactions,
+      this.currentBalance,
+    );
     this.updateGrouping();
-  }
-
-  private calculateBalances(
-    transactions: Transaction[],
-    debts: Debt[],
-    recurring: RecurringTransaction[],
-    initialBalance: number,
-  ) {
-    let runningBalance = initialBalance;
-    const debtBalances = new Map<string, number>();
-
-    debts.forEach((d) => {
-      if (d._id) debtBalances.set(d._id, d.amountOwed);
-    });
-
-    const rtMap = new Map<string, RecurringTransaction>();
-    recurring.forEach((rt) => {
-      if (rt._id) rtMap.set(rt._id, rt);
-    });
-
-    for (const t of transactions) {
-      const balancePrior = runningBalance;
-      if (t.type === 'Income') {
-        runningBalance += t.amount;
-      } else {
-        runningBalance -= t.amount;
-      }
-      const balanceAfter = runningBalance;
-      let debtPrior: number | undefined;
-      let debtAfter: number | undefined;
-
-      if (t.referenceId) {
-        const rt = rtMap.get(t.referenceId);
-        if (rt && rt.linkedDebtId) {
-          debtPrior = debtBalances.get(rt.linkedDebtId);
-          if (debtPrior !== undefined) {
-            debtAfter = debtPrior - t.amount;
-            debtBalances.set(rt.linkedDebtId, debtAfter);
-          }
-        }
-      }
-
-      t.balances = {
-        BalancePrior: balancePrior,
-        BalanceAfter: balanceAfter,
-        DebtBalancePrior: debtPrior,
-        DebtBalanceAfter: debtAfter,
-      };
-    }
   }
 
   updateGrouping(): void {

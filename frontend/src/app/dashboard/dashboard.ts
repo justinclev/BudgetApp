@@ -19,6 +19,7 @@ import { ListTransactionsComponent } from '../list-transactions/list-transaction
 import { RecurringTransactionService } from '../services/recurring-transaction.service';
 import { DebtService } from '../services/debt.service';
 import { TransactionService } from '../services/transaction.service';
+import { BalanceCalculationService } from '../services/balance-calculation.service';
 import { forkJoin } from 'rxjs';
 import { Debt } from '../models/debt.model';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
@@ -78,6 +79,7 @@ export class DashboardComponent implements OnInit {
     private recurringTransactionService: RecurringTransactionService,
     private debtService: DebtService,
     private transactionService: TransactionService,
+    private balanceCalculationService: BalanceCalculationService,
   ) {}
 
   ngOnInit(): void {
@@ -211,53 +213,16 @@ export class DashboardComponent implements OnInit {
   }
 
   private recalculateAllBalances(newBalance: number): void {
-    let runningBalance = newBalance;
-    const debtBalances = new Map<string, number>();
+    this.balanceCalculationService.calculateBalances(
+      this.transactions,
+      this.debts,
+      this.recurringTransactions,
+      newBalance,
+    );
 
-    this.debts.forEach((d) => {
-      if (d._id) debtBalances.set(d._id, d.amountOwed);
-    });
-
-    const rtMap = new Map<string, RecurringTransaction>();
-    this.recurringTransactions.forEach((rt) => {
-      if (rt._id) rtMap.set(rt._id, rt);
-    });
-
-    // Recalculate balances for all transactions
-    for (const t of this.transactions) {
-      const balancePrior = runningBalance;
-
-      if (t.type === 'Income') {
-        runningBalance += t.amount;
-      } else {
-        runningBalance -= t.amount;
-      }
-
-      let debtPrior: number | undefined;
-      let debtAfter: number | undefined;
-
-      if (t.referenceId) {
-        const rt = rtMap.get(t.referenceId);
-        if (rt?.linkedDebtId) {
-          debtPrior = debtBalances.get(rt.linkedDebtId);
-          if (debtPrior !== undefined) {
-            debtAfter = debtPrior - t.amount;
-            debtBalances.set(rt.linkedDebtId, debtAfter);
-          }
-        }
-      }
-
-      t.balances = {
-        BalancePrior: balancePrior,
-        BalanceAfter: runningBalance,
-        DebtBalancePrior: debtPrior,
-        DebtBalanceAfter: debtAfter,
-      };
-
-      // Set startingBalance on first transaction only
-      if (this.transactions.indexOf(t) === 0) {
-        t.startingBalance = newBalance;
-      }
+    // Set startingBalance on first transaction only
+    if (this.transactions.length > 0) {
+      this.transactions[0].startingBalance = newBalance;
     }
 
     // Save changes to database

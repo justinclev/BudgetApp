@@ -20,6 +20,12 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
+
+  @media (max-width: 599px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
 }
 
 .grouping-pills {
@@ -31,6 +37,12 @@
   padding: 12px 0;
   align-items: center;
   flex: 1;
+
+  @media (max-width: 599px) {
+    width: 100%;
+    flex: 1 1 auto;
+    padding: 8px 0;
+  }
 
   &::-webkit-scrollbar {
     display: none;
@@ -44,6 +56,46 @@
   align-items: center;
   flex-wrap: wrap;
   justify-content: flex-end;
+
+  @media (max-width: 599px) {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  button[mat-stroked-button] {
+    @media (max-width: 599px) {
+      flex: 1;
+      min-width: 0;
+      height: 44px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      gap: 6px;
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 12px;
+      }
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .icon-btn {
+    @media (max-width: 599px) {
+      flex-shrink: 0;
+    }
+  }
 }
 
 .icon-btn {
@@ -215,6 +267,10 @@
 
 .groups-container {
   padding: 16px;
+
+  @media (max-width: 599px) {
+    padding: 8px 0;
+  }
 }
 
 .transaction-group {
@@ -225,6 +281,12 @@
     0 1px 3px rgba(0, 0, 0, 0.04),
     0 4px 12px rgba(0, 0, 0, 0.03);
   overflow: hidden;
+
+  @media (max-width: 599px) {
+    margin-bottom: 8px;
+    border-radius: 0;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+  }
 }
 
 .group-header {
@@ -236,6 +298,10 @@
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-bottom: 1px solid #e2e8f0;
   flex-wrap: wrap;
+
+  @media (max-width: 599px) {
+    padding: 12px 12px;
+  }
 
   &:active {
     background: #f1f5f9;
@@ -601,6 +667,11 @@
   border-top: 1px solid #f1f5f9;
   cursor: pointer;
   transition: background 0.15s ease;
+
+  @media (max-width: 599px) {
+    padding: 12px 12px;
+    gap: 10px;
+  }
 
   &:active {
     background: #f8fafc;
