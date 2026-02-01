@@ -14,19 +14,10 @@
 
   <!-- Action buttons -->
   <div class="dialog-actions">
-    <button
-      mat-stroked-button
-      class="cancel-btn"
-      (click)="onCancel()"
-    >
+    <button mat-stroked-button class="cancel-btn" (click)="onCancel()">
       {{ getCancelText() }}
     </button>
-    <button
-      mat-raised-button
-      color="primary"
-      class="confirm-btn"
-      (click)="onConfirm()"
-    >
+    <button mat-raised-button color="primary" class="confirm-btn" (click)="onConfirm()">
       <mat-icon>check</mat-icon>
       {{ getConfirmText() }}
     </button>

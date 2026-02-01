@@ -162,13 +162,19 @@ export class DebtDetailComponent {
       next: async (savedDebt) => {
         try {
           // If debt has recurring details, handle transaction generation
-          if (createRecurring && debtData.minimumPayment && debtData.paymentDate && debtData.frequency) {
+          if (
+            createRecurring &&
+            debtData.minimumPayment &&
+            debtData.paymentDate &&
+            debtData.frequency
+          ) {
             // For new debts, find or create the recurring transaction first
             if (!this.isEditMode) {
               linkedRecurringId = await this.createOrUpdateRecurringForDebt(savedDebt, debtData);
             } else {
               // For updates, use the linked recurring ID we found earlier
-              linkedRecurringId = linkedRecurringId || await this.findLinkedRecurringTransactionId(savedDebt._id!);
+              linkedRecurringId =
+                linkedRecurringId || (await this.findLinkedRecurringTransactionId(savedDebt._id!));
             }
 
             // Generate transactions if we have a recurring transaction
@@ -197,9 +203,7 @@ export class DebtDetailComponent {
   /** Find the recurring transaction linked to this debt */
   private async findLinkedRecurringTransactionId(debtId: string): Promise<string | null> {
     try {
-      const transactions = await firstValueFrom(
-        this.recurringTransactionService.getTransactions(),
-      );
+      const transactions = await firstValueFrom(this.recurringTransactionService.getTransactions());
       const linked = transactions.find((t) => t.linkedDebtId === debtId);
       return linked?._id || null;
     } catch (err) {
@@ -225,9 +229,7 @@ export class DebtDetailComponent {
         type: 'expense',
       };
 
-      const transactions = await firstValueFrom(
-        this.recurringTransactionService.getTransactions(),
-      );
+      const transactions = await firstValueFrom(this.recurringTransactionService.getTransactions());
       const existing = transactions.find(
         (t) => t.name === transactionName || t.linkedDebtId === savedDebt._id,
       );
@@ -298,9 +300,7 @@ export class DebtDetailComponent {
       );
 
       // Get existing transactions to determine date range and balance
-      const existingTransactions = await firstValueFrom(
-        this.transactionService.getTransactions(),
-      );
+      const existingTransactions = await firstValueFrom(this.transactionService.getTransactions());
 
       // Calculate date range: if no transactions, generate 1 year from now; otherwise use first to last transaction dates
       let startDate: Date;
@@ -335,13 +335,7 @@ export class DebtDetailComponent {
       });
 
       // Generate with appropriate strategy
-      await generator.Generate(
-        startDate,
-        endDate,
-        currentBalance,
-        linkedRecurringId,
-        replace,
-      );
+      await generator.Generate(startDate, endDate, currentBalance, linkedRecurringId, replace);
 
       console.log('✅ Debt transactions generated successfully');
     } catch (err) {

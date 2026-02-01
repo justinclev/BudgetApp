@@ -198,9 +198,7 @@ export class RecurringTransactionDetailComponent {
     );
 
     // Get existing transactions to determine date range and balance
-    const existingTransactions = await firstValueFrom(
-      this.transactionService.getTransactions(),
-    );
+    const existingTransactions = await firstValueFrom(this.transactionService.getTransactions());
 
     // Calculate date range: if no transactions, generate 1 year from now; otherwise use first to last transaction dates
     let startDate: Date;
@@ -235,13 +233,7 @@ export class RecurringTransactionDetailComponent {
     });
 
     // Generate with appropriate strategy
-    await generator.Generate(
-      startDate,
-      endDate,
-      currentBalance,
-      recurringTransactionId,
-      replace,
-    );
+    await generator.Generate(startDate, endDate, currentBalance, recurringTransactionId, replace);
   }
 
   onCancel(): void {
