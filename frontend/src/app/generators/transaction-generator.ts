@@ -21,9 +21,9 @@ export class TransactionGenerator {
    * @param endDate End of generation period
    * @param currentBalance Starting balance for balance calculations
    * @param recurringTransactionId Optional: generate only for this recurring transaction type
-   * @param replace If true, replace existing duplicates with newly generated transactions.
-   *                If both recurringTransactionId and replace are true, only replace
-   *                duplicates for that specific recurring transaction.
+   * @param replace If true, delete existing transactions before generating:
+   *                - If recurringTransactionId is "", delete ALL transactions
+   *                - If recurringTransactionId is specified, delete only those transactions
    */
   async Generate(
     startDate: Date,
@@ -32,26 +32,50 @@ export class TransactionGenerator {
     recurringTransactionId: string = '',
     replace: boolean = false,
   ): Promise<void> {
+    console.log('🔄 [TransactionGenerator.Generate] Called with:', {
+      startDate,
+      endDate,
+      currentBalance,
+      recurringTransactionId,
+      replace,
+    });
+
     // Normalize dates to day boundaries
     const start = this.normalizeDate(startDate, 'start');
     const end = this.normalizeDate(endDate, 'end');
+    console.log('📅 [TransactionGenerator.Generate] Normalized dates:', { start, end });
 
     // Generate new transactions from recurring rules
     const generated = this.generateTransactions(start, end, recurringTransactionId);
+    console.log(`✨ [TransactionGenerator.Generate] Generated ${generated.length} transactions`);
 
     // Get existing transactions from database
-    const existing = await firstValueFrom(this.transactionService.getTransactions());
+    let existing = await firstValueFrom(this.transactionService.getTransactions());
+    console.log(`📦 [TransactionGenerator.Generate] Fetched ${existing.length} existing transactions`);
 
-    // Merge strategy: replace old duplicates if requested, otherwise keep existing
+    // Replace strategy: delete relevant transactions before merging
+    if (replace) {
+      console.log(`🗑️  [TransactionGenerator.Generate] Replace=true, deleting relevant transactions`);
+      existing = this.deleteRelevantTransactions(existing, recurringTransactionId);
+      console.log(`📋 [TransactionGenerator.Generate] After deletion: ${existing.length} transactions remain`);
+    } else {
+      console.log('🔒 [TransactionGenerator.Generate] Replace=false, keeping all existing transactions');
+    }
+
+    // Merge strategy: add generated transactions to what remains
     this.transactions = replace
-      ? this.mergeWithReplacement(existing, generated, recurringTransactionId)
+      ? [...existing, ...generated]
       : this.mergeWithoutReplacement(existing, generated);
+    console.log(`📊 [TransactionGenerator.Generate] Final merged count: ${this.transactions.length} transactions`);
 
     // Calculate running balance and debt balances from starting point
+    console.log(`💰 [TransactionGenerator.Generate] Calculating balances with starting balance: $${currentBalance}`);
     this.calculateBalances(currentBalance);
 
     // Persist to database
+    console.log(`💾 [TransactionGenerator.Generate] Saving ${this.transactions.length} transactions to database`);
     await firstValueFrom(this.transactionService.saveTransactions(this.transactions));
+    console.log('✅ [TransactionGenerator.Generate] Complete!');
   }
 
   /** Normalize date to start (00:00:00) or end (23:59:59) of day */
@@ -71,21 +95,32 @@ export class TransactionGenerator {
     end: Date,
     recurringTransactionId: string,
   ): Transaction[] {
+    console.log('🔨 [generateTransactions] Called with:', { start, end, recurringTransactionId });
+
     // Filter to specific recurring transaction if provided
     const recurring =
       recurringTransactionId.length > 0
         ? this.recurringTransactions.filter((rt) => rt._id === recurringTransactionId)
         : this.recurringTransactions;
+    console.log(
+      `📋 [generateTransactions] Processing ${recurring.length} recurring transaction(s)`,
+      recurringTransactionId ? `(filtered to ID: ${recurringTransactionId})` : '(all)',
+    );
 
     const generated: Transaction[] = [];
 
     for (const rt of recurring) {
       let currentDate = this.normalizeDate(rt.startingDate, 'start');
+      console.log(`  📌 Processing recurring: "${rt.name}" (${rt.frequency}) - Starting: ${currentDate}`);
 
       // Skip if recurring starts after end date
-      if (currentDate > end) continue;
+      if (currentDate > end) {
+        console.log(`    ⏭️  Skipped (starts after end date)`);
+        continue;
+      }
 
       // Generate transaction for each occurrence in date range
+      let occurrenceCount = 0;
       while (currentDate <= end) {
         if (currentDate >= start) {
           generated.push({
@@ -96,12 +131,42 @@ export class TransactionGenerator {
             type: rt.type === 'income' ? 'Income' : 'Recurring',
             referenceId: rt._id,
           });
+          occurrenceCount++;
         }
         currentDate = this.getNextDate(currentDate, rt.frequency);
       }
+      console.log(`    ✓ Generated ${occurrenceCount} occurrences for "${rt.name}"`);
     }
 
+    console.log(`🎉 [generateTransactions] Total generated: ${generated.length} transactions\n`);
     return generated;
+  }
+
+  /**
+   * Delete transactions based on replacement strategy
+   * (Financial principle: Clean slate allows complete regeneration)
+   *
+   * @param existing All existing transactions
+   * @param recurringTransactionId If empty, delete all; if specified, delete only for that ID
+   * @returns Filtered transactions to keep
+   */
+  private deleteRelevantTransactions(
+    existing: Transaction[],
+    recurringTransactionId: string,
+  ): Transaction[] {
+    if (recurringTransactionId.length === 0) {
+      // Delete ALL transactions - complete regeneration
+      console.log(`🗑️  [deleteRelevantTransactions] Deleting ALL ${existing.length} transactions`);
+      return [];
+    }
+
+    // Delete only transactions related to this recurring transaction
+    const filtered = existing.filter((t) => t.referenceId !== recurringTransactionId);
+    const deletedCount = existing.length - filtered.length;
+    console.log(
+      `🗑️  [deleteRelevantTransactions] Deleted ${deletedCount} transactions for recurring ID: ${recurringTransactionId}`,
+    );
+    return filtered;
   }
 
   /**
@@ -112,6 +177,8 @@ export class TransactionGenerator {
     existing: Transaction[],
     generated: Transaction[],
   ): Transaction[] {
+    console.log(`🔗 [mergeWithoutReplacement] Merging ${existing.length} existing + ${generated.length} generated`);
+
     // Build index of existing transactions by "recurringId-date" for O(1) lookup
     const existingMap = new Map<string, Transaction>();
 
@@ -125,64 +192,21 @@ export class TransactionGenerator {
     });
 
     // Add generated transactions only if they don't already exist
+    let duplicatesSkipped = 0;
+    let newTransactionsAdded = 0;
     for (const t of generated) {
       const key = `${t.referenceId}-${this.dateKey(t.date)}`;
       if (!existingMap.has(key)) {
         merged.push(t);
+        newTransactionsAdded++;
+      } else {
+        duplicatesSkipped++;
       }
     }
 
-    return merged.sort((a, b) => a.date.getTime() - b.date.getTime());
-  }
-
-  /**
-   * Merge strategy: Replace existing duplicates with newly generated transactions
-   * (Financial principle: Regenerate allows user to correct rules and recalculate)
-   *
-   * If recurringTransactionId is specified, only replace duplicates for that type.
-   * This prevents accidental overwrites of unrelated transactions.
-   */
-  private mergeWithReplacement(
-    existing: Transaction[],
-    generated: Transaction[],
-    recurringTransactionId: string,
-  ): Transaction[] {
-    // Build index of generated transactions for fast duplicate detection
-    const generatedMap = new Map<string, Transaction>();
-    for (const t of generated) {
-      const key = `${t.referenceId}-${this.dateKey(t.date)}`;
-      generatedMap.set(key, t);
-    }
-
-    // Build set of recurring IDs to replace
-    const idsToReplace = new Set<string>();
-    if (recurringTransactionId.length > 0) {
-      // Only replace this specific recurring transaction
-      idsToReplace.add(recurringTransactionId);
-    } else {
-      // Replace all recurring transactions that have generated transactions
-      for (const t of generated) {
-        idsToReplace.add(t.referenceId!);
-      }
-    }
-
-    // Keep existing transactions, but replace those matching our filter
-    const merged: Transaction[] = [];
-    for (const t of existing) {
-      t.date = new Date(t.date);
-      const key = `${t.referenceId}-${this.dateKey(t.date)}`;
-
-      // If this is a duplicate of a generated transaction AND we're replacing this recurring type, skip it
-      if (t.referenceId && idsToReplace.has(t.referenceId) && generatedMap.has(key)) {
-        continue; // Skip - will be replaced by generated version
-      }
-
-      merged.push(t);
-    }
-
-    // Add all generated transactions (these are the fresh, regenerated ones)
-    merged.push(...generated);
-
+    console.log(
+      `  ✓ Added: ${newTransactionsAdded} new | Skipped: ${duplicatesSkipped} duplicates | Total: ${merged.length}`,
+    );
     return merged.sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 
@@ -193,15 +217,28 @@ export class TransactionGenerator {
 
   /** Calculate running balance and debt payments for all transactions */
   private calculateBalances(initialBalance: number): void {
+    console.log(
+      `💸 [calculateBalances] Starting with balance: $${initialBalance} | Processing ${this.transactions.length} transactions`,
+    );
+
     let runningBalance = initialBalance;
     const debtMap = new Map(this.debts.map((d) => [d._id, d.amountOwed]));
     const rtMap = new Map(this.recurringTransactions.map((rt) => [rt._id, rt]));
+
+    let incomeTotal = 0;
+    let expenseTotal = 0;
 
     for (const t of this.transactions) {
       const balancePrior = runningBalance;
 
       // Update running balance: income adds, expenses subtract
-      runningBalance += t.type === 'Income' ? t.amount : -t.amount;
+      if (t.type === 'Income') {
+        incomeTotal += t.amount;
+        runningBalance += t.amount;
+      } else {
+        expenseTotal += t.amount;
+        runningBalance -= t.amount;
+      }
 
       // Update debt balance if this transaction is linked to a debt
       let debtPrior: number | undefined;
@@ -226,6 +263,10 @@ export class TransactionGenerator {
         DebtBalanceAfter: debtAfter,
       };
     }
+
+    console.log(
+      `✅ [calculateBalances] Complete - Final Balance: $${runningBalance} | Income: $${incomeTotal} | Expenses: $${expenseTotal}\n`,
+    );
   }
 
   /** Calculate next occurrence date based on frequency */
