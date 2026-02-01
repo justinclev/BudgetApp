@@ -340,11 +340,6 @@ export class ListTransactionsComponent implements OnInit {
     let currentBalance = 0;
     if (lastTransaction?.balances?.BalanceAfter !== undefined) {
       currentBalance = lastTransaction.balances.BalanceAfter;
-      console.log(
-        `📍 Using BalanceAfter from last transaction for future projection: $${currentBalance}`,
-      );
-    } else {
-      console.log(`📍 Using default starting balance: $${currentBalance}`);
     }
 
     // Import TransactionGenerator
@@ -374,11 +369,6 @@ export class ListTransactionsComponent implements OnInit {
     let currentBalance = 0;
     if (lastTransaction?.balances?.BalanceAfter !== undefined) {
       currentBalance = lastTransaction.balances.BalanceAfter;
-      console.log(
-        `📍 Using BalanceAfter from last transaction for future projection: $${currentBalance}`,
-      );
-    } else {
-      console.log(`📍 Using default starting balance: $${currentBalance}`);
     }
 
     // Import TransactionGenerator

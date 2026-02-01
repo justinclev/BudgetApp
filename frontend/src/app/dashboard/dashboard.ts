@@ -211,8 +211,6 @@ export class DashboardComponent implements OnInit {
   }
 
   private recalculateAllBalances(newBalance: number): void {
-    console.log(`💰 Recalculating balances with new starting balance: $${newBalance}`);
-
     let runningBalance = newBalance;
     const debtBalances = new Map<string, number>();
 
@@ -262,15 +260,13 @@ export class DashboardComponent implements OnInit {
       }
     }
 
-    console.log(`✅ Balances recalculated - Final Balance: $${runningBalance}`);
-
     // Save changes to database
     this.transactionService.saveTransactions(this.transactions).subscribe({
       next: () => {
-        console.log('💾 Transactions saved successfully');
+        // Transactions saved
       },
       error: (err) => {
-        console.error('❌ Error saving transactions:', err);
+        console.error('Error saving transactions:', err);
       },
     });
   }
