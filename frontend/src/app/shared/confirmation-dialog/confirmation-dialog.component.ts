@@ -1,8 +1,9 @@
-import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
+/** Configuration data for the confirmation dialog */
 export interface ConfirmationData {
   title: string;
   message: string;
@@ -10,51 +11,47 @@ export interface ConfirmationData {
   cancelText?: string;
 }
 
-/** Simple confirmation dialog component */
+/** Reusable confirmation dialog component - modern Angular standards */
 @Component({
   selector: 'app-confirmation-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule],
-  template: `
-    <div class="confirmation-dialog">
-      <h2 mat-dialog-title>{{ data.title }}</h2>
-      <div mat-dialog-content>
-        <p>{{ data.message }}</p>
-      </div>
-      <div mat-dialog-actions align="end">
-        <button mat-button (click)="onCancel()">
-          {{ data.cancelText || 'Cancel' }}
-        </button>
-        <button mat-raised-button color="primary" (click)="onConfirm()">
-          {{ data.confirmText || 'Confirm' }}
-        </button>
-      </div>
-    </div>
-  `,
-  styles: [
-    `
-      .confirmation-dialog {
-        min-width: 300px;
-      }
-
-      p {
-        margin: 0;
-        color: rgba(0, 0, 0, 0.7);
-      }
-    `,
-  ],
+  imports: [MatDialogModule, MatButtonModule, MatIconModule],
+  templateUrl: './confirmation-dialog.component.html',
+  styleUrls: ['./confirmation-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmationDialogComponent {
   constructor(
-    public dialogRef: MatDialogRef<ConfirmationDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmationData,
-  ) {}
+    private readonly dialogRef: MatDialogRef<ConfirmationDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) readonly data: ConfirmationData,
+  ) {
+    this.validateData();
+  }
 
+  /** Validate that required dialog data is provided */
+  private validateData(): void {
+    if (!this.data?.title || !this.data?.message) {
+      console.warn('ConfirmationDialog: title and message are required', this.data);
+    }
+  }
+
+  /** Handle confirm action */
   onConfirm(): void {
     this.dialogRef.close(true);
   }
 
+  /** Handle cancel action */
   onCancel(): void {
     this.dialogRef.close(false);
+  }
+
+  /** Get confirm button text with fallback */
+  getConfirmText(): string {
+    return this.data.confirmText?.trim() || 'Yes';
+  }
+
+  /** Get cancel button text with fallback */
+  getCancelText(): string {
+    return this.data.cancelText?.trim() || 'No';
   }
 }

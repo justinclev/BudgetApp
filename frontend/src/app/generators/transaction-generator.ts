@@ -51,29 +51,43 @@ export class TransactionGenerator {
 
     // Get existing transactions from database
     let existing = await firstValueFrom(this.transactionService.getTransactions());
-    console.log(`📦 [TransactionGenerator.Generate] Fetched ${existing.length} existing transactions`);
+    console.log(
+      `📦 [TransactionGenerator.Generate] Fetched ${existing.length} existing transactions`,
+    );
 
     // Replace strategy: delete relevant transactions before merging
     if (replace) {
-      console.log(`🗑️  [TransactionGenerator.Generate] Replace=true, deleting relevant transactions`);
+      console.log(
+        `🗑️  [TransactionGenerator.Generate] Replace=true, deleting relevant transactions`,
+      );
       existing = this.deleteRelevantTransactions(existing, recurringTransactionId);
-      console.log(`📋 [TransactionGenerator.Generate] After deletion: ${existing.length} transactions remain`);
+      console.log(
+        `📋 [TransactionGenerator.Generate] After deletion: ${existing.length} transactions remain`,
+      );
     } else {
-      console.log('🔒 [TransactionGenerator.Generate] Replace=false, keeping all existing transactions');
+      console.log(
+        '🔒 [TransactionGenerator.Generate] Replace=false, keeping all existing transactions',
+      );
     }
 
     // Merge strategy: add generated transactions to what remains
     this.transactions = replace
       ? [...existing, ...generated]
       : this.mergeWithoutReplacement(existing, generated);
-    console.log(`📊 [TransactionGenerator.Generate] Final merged count: ${this.transactions.length} transactions`);
+    console.log(
+      `📊 [TransactionGenerator.Generate] Final merged count: ${this.transactions.length} transactions`,
+    );
 
     // Calculate running balance and debt balances from starting point
-    console.log(`💰 [TransactionGenerator.Generate] Calculating balances with starting balance: $${currentBalance}`);
+    console.log(
+      `💰 [TransactionGenerator.Generate] Calculating balances with starting balance: $${currentBalance}`,
+    );
     this.calculateBalances(currentBalance);
 
     // Persist to database
-    console.log(`💾 [TransactionGenerator.Generate] Saving ${this.transactions.length} transactions to database`);
+    console.log(
+      `💾 [TransactionGenerator.Generate] Saving ${this.transactions.length} transactions to database`,
+    );
     await firstValueFrom(this.transactionService.saveTransactions(this.transactions));
     console.log('✅ [TransactionGenerator.Generate] Complete!');
   }
@@ -111,7 +125,9 @@ export class TransactionGenerator {
 
     for (const rt of recurring) {
       let currentDate = this.normalizeDate(rt.startingDate, 'start');
-      console.log(`  📌 Processing recurring: "${rt.name}" (${rt.frequency}) - Starting: ${currentDate}`);
+      console.log(
+        `  📌 Processing recurring: "${rt.name}" (${rt.frequency}) - Starting: ${currentDate}`,
+      );
 
       // Skip if recurring starts after end date
       if (currentDate > end) {
@@ -177,7 +193,9 @@ export class TransactionGenerator {
     existing: Transaction[],
     generated: Transaction[],
   ): Transaction[] {
-    console.log(`🔗 [mergeWithoutReplacement] Merging ${existing.length} existing + ${generated.length} generated`);
+    console.log(
+      `🔗 [mergeWithoutReplacement] Merging ${existing.length} existing + ${generated.length} generated`,
+    );
 
     // Build index of existing transactions by "recurringId-date" for O(1) lookup
     const existingMap = new Map<string, Transaction>();

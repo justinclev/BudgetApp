@@ -1,4 +1,4 @@
-import { Component, Inject, Optional } from '@angular/core';
+import { Component, Inject, Optional, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -12,15 +12,18 @@ import {
 import { DebtService } from '../services/debt.service';
 import { Debt } from '../models/debt.model';
 import { RecurringTransactionService } from '../services/recurring-transaction.service';
+import { TransactionService } from '../services/transaction.service';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { FREQUENCIES } from '../models/frequency.model';
-import { Observable, map, catchError, of, timer, switchMap } from 'rxjs';
+import { Observable, map, catchError, of, timer, switchMap, firstValueFrom } from 'rxjs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { TransactionGenerator } from '../generators/transaction-generator';
+import { ConfirmationDialogComponent } from '../shared/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-debt-detail',
@@ -36,6 +39,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   ],
   templateUrl: './debt-detail.html',
   styleUrls: ['./debt-detail.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DebtDetailComponent {
   debtForm: FormGroup;
@@ -43,13 +47,16 @@ export class DebtDetailComponent {
   submissionError: string | null = null;
   isEditMode: boolean = false;
   editingId: string | null = null;
+  isSubmitting: boolean = false;
 
   constructor(
-    private fb: FormBuilder,
-    private debtService: DebtService,
-    private recurringTransactionService: RecurringTransactionService,
-    private dialogRef: MatDialogRef<DebtDetailComponent>,
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: Debt,
+    private readonly fb: FormBuilder,
+    private readonly debtService: DebtService,
+    private readonly recurringTransactionService: RecurringTransactionService,
+    private readonly transactionService: TransactionService,
+    private readonly dialogRef: MatDialogRef<DebtDetailComponent>,
+    private readonly confirmDialog: MatDialog,
+    @Optional() @Inject(MAT_DIALOG_DATA) readonly data: Debt,
   ) {
     this.isEditMode = !!data;
     if (this.isEditMode) {
@@ -81,7 +88,7 @@ export class DebtDetailComponent {
     });
   }
 
-  updateValidators(isChecked: boolean) {
+  updateValidators(isChecked: boolean): void {
     const controls = ['minimumPayment', 'paymentDate', 'frequency'];
     controls.forEach((controlName) => {
       const control = this.debtForm.get(controlName);
@@ -116,73 +123,230 @@ export class DebtDetailComponent {
     };
   }
 
-  onSubmit() {
+  async onSubmit(): Promise<void> {
     this.submissionError = null;
 
-    if (this.debtForm.valid) {
-      const debtData = this.debtForm.value;
-      const createRecurring = this.debtForm.get('createRecurring')?.value;
+    if (!this.debtForm.valid) {
+      this.debtForm.markAllAsTouched();
+      return;
+    }
 
-      let request: Observable<Debt>;
+    const debtData = this.debtForm.value;
+    const createRecurring = this.debtForm.get('createRecurring')?.value;
 
-      if (this.isEditMode && this.editingId) {
-        request = this.debtService.updateDebt(this.editingId, debtData);
+    // Check if debt has a linked recurring transaction
+    let linkedRecurringId: string | null = null;
+    if (this.isEditMode && this.editingId && createRecurring) {
+      linkedRecurringId = await this.findLinkedRecurringTransactionId(this.editingId);
+
+      // If updating and has linked recurring, confirm projection update
+      if (linkedRecurringId) {
+        const confirmed = await this.confirmProjectionUpdate();
+        if (!confirmed) {
+          console.log('⚠️  User cancelled debt update');
+          return; // Don't save, stay in dialog
+        }
+      }
+    }
+
+    this.isSubmitting = true;
+    let request: Observable<Debt>;
+
+    if (this.isEditMode && this.editingId) {
+      request = this.debtService.updateDebt(this.editingId, debtData);
+    } else {
+      request = this.debtService.createDebt(debtData);
+    }
+
+    request.subscribe({
+      next: async (savedDebt) => {
+        try {
+          // If debt has recurring details, handle transaction generation
+          if (createRecurring && debtData.minimumPayment && debtData.paymentDate && debtData.frequency) {
+            // For new debts, find or create the recurring transaction first
+            if (!this.isEditMode) {
+              linkedRecurringId = await this.createOrUpdateRecurringForDebt(savedDebt, debtData);
+            } else {
+              // For updates, use the linked recurring ID we found earlier
+              linkedRecurringId = linkedRecurringId || await this.findLinkedRecurringTransactionId(savedDebt._id!);
+            }
+
+            // Generate transactions if we have a recurring transaction
+            if (linkedRecurringId) {
+              const replace = this.isEditMode; // true for update, false for create
+              await this.generateTransactionsForDebt(linkedRecurringId, replace);
+            }
+          }
+
+          console.log('✅ Debt saved successfully');
+          this.dialogRef.close(true);
+        } catch (err) {
+          console.error('Failed to process debt:', err);
+          this.dialogRef.close(true);
+        } finally {
+          this.isSubmitting = false;
+        }
+      },
+      error: (err) => {
+        this.submissionError = err.error?.message || 'An error occurred while saving the debt.';
+        this.isSubmitting = false;
+      },
+    });
+  }
+
+  /** Find the recurring transaction linked to this debt */
+  private async findLinkedRecurringTransactionId(debtId: string): Promise<string | null> {
+    try {
+      const transactions = await firstValueFrom(
+        this.recurringTransactionService.getTransactions(),
+      );
+      const linked = transactions.find((t) => t.linkedDebtId === debtId);
+      return linked?._id || null;
+    } catch (err) {
+      console.error('Failed to find linked recurring transaction:', err);
+      return null;
+    }
+  }
+
+  /** Create or update recurring transaction for the debt */
+  private async createOrUpdateRecurringForDebt(
+    savedDebt: Debt,
+    debtData: any,
+  ): Promise<string | null> {
+    try {
+      const transactionName = `${savedDebt.name}`;
+      const transaction: RecurringTransaction = {
+        name: transactionName,
+        description: `${savedDebt.name} (Minimum Payment)`,
+        amount: debtData.minimumPayment,
+        startingDate: debtData.paymentDate,
+        frequency: debtData.frequency,
+        linkedDebtId: savedDebt._id,
+        type: 'expense',
+      };
+
+      const transactions = await firstValueFrom(
+        this.recurringTransactionService.getTransactions(),
+      );
+      const existing = transactions.find(
+        (t) => t.name === transactionName || t.linkedDebtId === savedDebt._id,
+      );
+
+      let created: RecurringTransaction;
+      if (existing && existing._id) {
+        created = await firstValueFrom(
+          this.recurringTransactionService.updateTransaction(existing._id, transaction),
+        );
       } else {
-        request = this.debtService.createDebt(debtData);
+        created = await firstValueFrom(
+          this.recurringTransactionService.createTransaction(transaction),
+        );
       }
 
-      request
-        .pipe(
-          switchMap((savedDebt) => {
-            if (
-              createRecurring &&
-              debtData.minimumPayment &&
-              debtData.paymentDate &&
-              debtData.frequency
-            ) {
-              const transactionName = `${savedDebt.name}`;
-              const transaction: RecurringTransaction = {
-                name: transactionName,
-                description: `${savedDebt.name} (Minimum Payment)`,
-                amount: debtData.minimumPayment,
-                startingDate: debtData.paymentDate,
-                frequency: debtData.frequency,
-                linkedDebtId: savedDebt._id,
-                type: 'expense'
-              };
+      return created._id || null;
+    } catch (err) {
+      console.error('Failed to create/update recurring transaction for debt:', err);
+      return null;
+    }
+  }
 
-              // Attempt to find existing transaction to update, or create new
-              return this.recurringTransactionService.getTransactions().pipe(
-                switchMap((transactions) => {
-                  const existing = transactions.find(
-                    (t) => t.name === transactionName || t.linkedDebtId === savedDebt._id,
-                  );
-                  if (existing && existing._id) {
-                    return this.recurringTransactionService.updateTransaction(
-                      existing._id,
-                      transaction,
-                    );
-                  } else {
-                    return this.recurringTransactionService.createTransaction(transaction);
-                  }
-                }),
-                map(() => savedDebt),
-              );
-            } else {
-              return of(savedDebt);
-            }
-          }),
-        )
-        .subscribe({
-          next: () => {
-            this.dialogRef.close(true);
-          },
-          error: (err) => {
-            this.submissionError = err.error?.message || 'An error occurred while saving the debt.';
-          },
-        });
-    } else {
-      this.debtForm.markAllAsTouched();
+  /** Prompt user to confirm that updating will regenerate projections */
+  private async confirmProjectionUpdate(): Promise<boolean> {
+    console.log('🔄 Showing projection update confirmation dialog');
+
+    return new Promise((resolve) => {
+      const dialogRef = this.confirmDialog.open(ConfirmationDialogComponent, {
+        data: {
+          title: 'Recalculate Forecast?',
+          message: 'This change will update your financial forecast and all relevant transactions.',
+          confirmText: 'Yes',
+          cancelText: 'No',
+        },
+        width: '90%',
+        maxWidth: '450px',
+        panelClass: 'confirmation-dialog-panel',
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        console.log('📋 Confirmation result:', result);
+        resolve(result === true);
+      });
+    });
+  }
+
+  /** Generate transactions for the linked recurring transaction */
+  private async generateTransactionsForDebt(
+    linkedRecurringId: string,
+    replace: boolean,
+  ): Promise<void> {
+    console.log(`🔄 Generating transactions for debt linked recurring ID: ${linkedRecurringId}`, {
+      replace,
+    });
+
+    try {
+      // Fetch all recurring transactions and debts
+      const [allRecurringTransactions, allDebts] = await Promise.all([
+        firstValueFrom(this.recurringTransactionService.getTransactions()),
+        firstValueFrom(this.debtService.getDebts()),
+      ]);
+
+      // Create generator
+      const generator = new TransactionGenerator(
+        allRecurringTransactions,
+        allDebts,
+        this.transactionService,
+      );
+
+      // Get existing transactions to determine date range and balance
+      const existingTransactions = await firstValueFrom(
+        this.transactionService.getTransactions(),
+      );
+
+      // Calculate date range: if no transactions, generate 1 year from now; otherwise use first to last transaction dates
+      let startDate: Date;
+      let endDate: Date;
+
+      if (existingTransactions.length === 0) {
+        // No transactions: generate 1 year from current date
+        const now = new Date();
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear() + 1, now.getMonth(), 0);
+      } else {
+        // Use first transaction date as start and last transaction date as end
+        const firstTransaction = existingTransactions[0];
+        const lastTransaction = existingTransactions[existingTransactions.length - 1];
+        startDate = new Date(firstTransaction.date);
+        endDate = new Date(lastTransaction.date);
+      }
+
+      // Get current balance (from last transaction)
+      let currentBalance = 5000; // Default starting balance
+      if (existingTransactions.length > 0) {
+        const lastTransaction = existingTransactions[existingTransactions.length - 1];
+        currentBalance = lastTransaction.balances?.BalanceAfter ?? 5000;
+      }
+
+      console.log('📊 Generation parameters:', {
+        startDate,
+        endDate,
+        currentBalance,
+        linkedRecurringId,
+        replace,
+      });
+
+      // Generate with appropriate strategy
+      await generator.Generate(
+        startDate,
+        endDate,
+        currentBalance,
+        linkedRecurringId,
+        replace,
+      );
+
+      console.log('✅ Debt transactions generated successfully');
+    } catch (err) {
+      console.error('Failed to generate debt transactions:', err);
+      throw err;
     }
   }
 
