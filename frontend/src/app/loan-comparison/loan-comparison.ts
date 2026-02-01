@@ -1,6 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,9 +15,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
 
 import { Debt } from '../models/debt.model';
 import { LoanDetails, LoanComparisonResult } from '../models/loan-comparison.model';
+import { FinancialAdvisory } from '../models/loan-advisory.model';
 import { LoanComparisonService } from '../services/loan-comparison.service';
 import { DebtService } from '../services/debt.service';
 
@@ -29,6 +37,7 @@ import { DebtService } from '../services/debt.service';
     MatTabsModule,
     MatProgressSpinnerModule,
     MatDividerModule,
+    MatIconModule,
   ],
   templateUrl: './loan-comparison.html',
   styleUrls: ['./loan-comparison.scss'],
@@ -38,6 +47,7 @@ export class LoanComparisonComponent implements OnInit {
   allDebts: Debt[] = [];
   selectedDebts: Set<string> = new Set();
   comparisonResult: LoanComparisonResult | null = null;
+  advisory: FinancialAdvisory | null = null;
   isLoading = false;
   error: string | null = null;
 
@@ -96,6 +106,7 @@ export class LoanComparisonComponent implements OnInit {
     const selected = this.allDebts.filter((d) => this.selectedDebts.has(d._id || ''));
 
     this.comparisonResult = this.loanService.generateComparison(loan, selected);
+    this.advisory = this.loanService.analyzeComparison(this.comparisonResult);
     this.error = null;
   }
 
@@ -117,6 +128,24 @@ export class LoanComparisonComponent implements OnInit {
 
   get isSavingsPositive(): boolean {
     return (this.comparisonResult?.totalCostSavings || 0) > 0;
+  }
+
+  getRatingColor(): string {
+    if (!this.advisory) return '#999';
+    switch (this.advisory.overallRating) {
+      case 'good':
+        return '#4caf50';
+      case 'reasonable':
+        return '#8bc34a';
+      case 'fair':
+        return '#ffc107';
+      case 'marginal':
+        return '#ff9800';
+      case 'poor':
+        return '#f44336';
+      default:
+        return '#999';
+    }
   }
 
   close(): void {

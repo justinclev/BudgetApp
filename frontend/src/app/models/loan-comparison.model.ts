@@ -31,21 +31,21 @@ export interface LoanDebtComparison {
 export interface LoanComparisonResult {
   loan: LoanDetails;
   selectedDebts: LoanDebtComparison[];
-  
+
   // Loan details
   originationFee: number;
   totalLoanAmount: number; // Amount + origination fee
   monthlyLoanPayment: number;
   totalLoanInterest: number;
   totalLoanCost: number; // Principal + interest + fees
-  
+
   // Combined totals
   currentScenarioTotalInterest: number;
   currentScenarioTotalCost: number;
-  
+
   loanScenarioTotalInterest: number;
   loanScenarioTotalCost: number;
-  
+
   // Overall savings
   totalInterestSavings: number;
   totalCostSavings: number;
