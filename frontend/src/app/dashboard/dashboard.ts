@@ -111,7 +111,7 @@ export class DashboardComponent implements OnInit {
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     );
     const lastTransaction = sortedByDate[sortedByDate.length - 1];
-    
+
     if (lastTransaction?.balances?.BalanceAfter !== undefined) {
       this.metrics.currentBalance = lastTransaction.balances.BalanceAfter;
     } else if (sortedByDate[0]?.startingBalance !== undefined) {
@@ -121,7 +121,7 @@ export class DashboardComponent implements OnInit {
       // Default to 5000 if no transactions exist
       this.metrics.currentBalance = 5000;
     }
-    
+
     this.previousBalance = this.metrics.currentBalance;
 
     // Total debt
