@@ -72,7 +72,17 @@ export class TransactionDetailComponent implements OnInit {
 
   onDelete(): void {
     if (confirm(`Delete "${this.data?.name}"?`)) {
-      this.dialogRef.close('deleted');
+      // Mark as deleted (soft delete)
+      const result: Transaction = {
+        ...this.data,
+        name: this.data?.name || '',
+        description: this.data?.description || '',
+        amount: this.data?.amount || 0,
+        date: this.data?.date || new Date(),
+        type: this.data?.type || 'One-Time',
+        deleted: true,
+      };
+      this.dialogRef.close(result);
     }
   }
 }

@@ -98,6 +98,8 @@ pub struct Transaction {
         default
     )]
     pub starting_balance: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub deleted: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

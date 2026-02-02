@@ -108,8 +108,10 @@ export class ListTransactionsComponent implements OnInit {
   }
 
   recalculateAndGroup(): void {
+    // Filter out deleted transactions for calculations
+    const activeTransactions = this.allTransactions.filter((t) => !t.deleted);
     this.balanceCalculationService.calculateBalances(
-      this.allTransactions,
+      activeTransactions,
       this.debts,
       this.recurringTransactions,
       this.currentBalance,
@@ -118,7 +120,10 @@ export class ListTransactionsComponent implements OnInit {
   }
 
   updateGrouping(): void {
-    if (!this.allTransactions.length) {
+    // Filter out deleted transactions for display
+    const activeTransactions = this.allTransactions.filter((t) => !t.deleted);
+    
+    if (!activeTransactions.length) {
       this.groupedTransactions = [];
       return;
     }
@@ -129,7 +134,7 @@ export class ListTransactionsComponent implements OnInit {
       if (rt._id) rtMap.set(rt._id, rt);
     });
 
-    this.allTransactions.forEach((t) => {
+    activeTransactions.forEach((t) => {
       const key = this.getGroupKey(t.date, this.selectedGrouping);
       const label = this.getGroupLabel(t.date, this.selectedGrouping);
 
@@ -246,13 +251,8 @@ export class ListTransactionsComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result === 'deleted') {
-        // Handle deletion from dialog
-        this.allTransactions = this.allTransactions.filter((t) => t !== transaction);
-        this.recalculateAndGroup();
-        this.saveChanges();
-      } else if (result) {
-        // Update local list
+      if (result) {
+        // Update local list (handles both edits and soft deletes)
         const index = this.allTransactions.findIndex((t) => t === transaction);
         if (index !== -1) {
           this.allTransactions[index] = result;
@@ -266,7 +266,8 @@ export class ListTransactionsComponent implements OnInit {
 
   deleteTransaction(transaction: Transaction): void {
     if (confirm(`Delete transaction "${transaction.name}"?`)) {
-      this.allTransactions = this.allTransactions.filter((t) => t !== transaction);
+      // Mark as deleted (soft delete)
+      transaction.deleted = true;
       this.recalculateAndGroup();
       this.saveChanges();
     }
