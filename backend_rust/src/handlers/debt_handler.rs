@@ -1,6 +1,5 @@
 use actix_web::{web, HttpResponse, Responder};
-use futures::stream::TryStreamExt;
-use futures::StreamExt; // Need StreamExt for next()
+use futures::StreamExt;
 use mongodb::bson::{doc, oid::ObjectId};
 use crate::models::{Debt, CheckNameResponse};
 use crate::db::AppState;
