@@ -10,7 +10,7 @@ pub struct AppState {
 }
 
 pub async fn init_db() -> AppState {
-    let mongo_uri = env::var("MONGO_URI").unwrap_or_else(|_| "mongodb+srv://admin:DS6Wx2qIWVeXCQMP@budgetflowdb.anhdnhq.mongodb.net/?appName=BudgetFlowDB".to_string());
+    let mongo_uri = env::var("MONGO_URI").unwrap_or_else(|_| "mongodb+srv://admin:I98gw2zKiEn8iMov@budgetflowdb.anhdnhq.mongodb.net/?appName=BudgetFlowDB".to_string());
     println!("Connecting to MongoDB at {}", mongo_uri);
 
     let client_options = ClientOptions::parse(&mongo_uri).await.unwrap();
