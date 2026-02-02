@@ -4,12 +4,12 @@ import { Observable } from 'rxjs';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RecurringTransactionService {
   private apiUrl = 'http://localhost:3000/api/recurring-transactions';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getTransactions(): Observable<RecurringTransaction[]> {
     return this.http.get<RecurringTransaction[]>(this.apiUrl);
@@ -19,7 +19,10 @@ export class RecurringTransactionService {
     return this.http.post<RecurringTransaction>(this.apiUrl, transaction);
   }
 
-  updateTransaction(id: string, transaction: RecurringTransaction): Observable<RecurringTransaction> {
+  updateTransaction(
+    id: string,
+    transaction: RecurringTransaction,
+  ): Observable<RecurringTransaction> {
     return this.http.put<RecurringTransaction>(`${this.apiUrl}/${id}`, transaction);
   }
 

@@ -4,12 +4,12 @@ import { Observable } from 'rxjs';
 import { Debt } from '../models/debt.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DebtService {
   private apiUrl = 'http://localhost:3000/api/debts';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getDebts(): Observable<Debt[]> {
     return this.http.get<Debt[]>(this.apiUrl);
