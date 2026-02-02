@@ -1,11 +1,11 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/dist/frontend",
-  "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+	"buildCommand": "cd frontend && npm install && npm run build",
+	"outputDirectory": "frontend/dist/frontend",
+	"cleanUrls": true,
+	"rewrites": [
+		{
+			"source": "/(.*)",
+			"destination": "/index.html"
+		}
+	]
 }
