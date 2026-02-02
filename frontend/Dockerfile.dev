@@ -9,4 +9,7 @@ COPY . .
 
 EXPOSE 4200
 
-CMD ["npm", "start", "--", "--host", "0.0.0.0", "--poll", "2000"]
+# Use FRONTEND_ENV to determine which proxy config to use
+ENV FRONTEND_ENV=local
+
+CMD npm start -- --host 0.0.0.0 --poll 2000 $( [ "$FRONTEND_ENV" = "prod" ] && echo "--configuration=prod-proxy" || echo "" )

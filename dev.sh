@@ -3,6 +3,19 @@
 # Define ports to clear
 PORTS=(3000 4200 27017)
 
+# Determine which environment to use
+ENV="${1:-local}"  # Default to 'local' if not specified
+
+if [[ "$ENV" != "local" && "$ENV" != "prod" ]]; then
+    echo "❌ Invalid environment: $ENV"
+    echo "Usage: ./dev.sh [local|prod]"
+    echo "  local - Uses localhost:3000 backend (default)"
+    echo "  prod  - Uses https://budgetapp-ma3x.onrender.com backend"
+    exit 1
+fi
+
+echo "🔧 Environment: $ENV"
+
 echo "🧹 Forcefully stopping containers..."
 # Force remove the specific containers for this project
 docker rm -f budget-app_frontend_1 budget-app_backend_1 budget-app_mongo_1 2>/dev/null || true
@@ -32,5 +45,8 @@ for PORT in "${PORTS[@]}"; do
     fi
 done
 
-echo "🚀 Starting application..."
+# Export environment variable for docker-compose
+export FRONTEND_ENV=$ENV
+
+echo "🚀 Starting application with $ENV environment..."
 docker-compose up --build

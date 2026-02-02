@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RecurringTransactionService {
-  private apiUrl = 'http://localhost:3000/api/recurring-transactions';
+  private apiUrl = `${environment.apiUrl}/recurring-transactions`;
 
   constructor(private http: HttpClient) {}
 
