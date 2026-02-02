@@ -3,10 +3,11 @@
   "outputDirectory": "dist/frontend",
   "cleanUrls": true,
   "installCommand": "npm install",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "status": 200
     }
   ]
 }
