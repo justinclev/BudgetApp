@@ -4,9 +4,13 @@
   "installCommand": "npm install",
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "^/((?!.*\\.).*|.*\\.html)$",
       "dest": "/index.html",
       "status": 200
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
