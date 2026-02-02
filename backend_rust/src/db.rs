@@ -1,5 +1,5 @@
-use mongodb::{Client, Collection, options::ClientOptions, bson::doc};
 use crate::models::{Debt, RecurringTransaction, UserTransactions};
+use mongodb::{bson::doc, options::ClientOptions, Client, Collection};
 use std::env;
 
 #[derive(Clone)]
@@ -10,7 +10,7 @@ pub struct AppState {
 }
 
 pub async fn init_db() -> AppState {
-    let mongo_uri = env::var("MONGO_URI").unwrap_or_else(|_| "mongodb://mongo:27017/budget-app".to_string());
+    let mongo_uri = env::var("MONGO_URI").unwrap_or_else(|_| "mongodb+srv://admin:DS6Wx2qIWVeXCQMP@budgetflowdb.anhdnhq.mongodb.net/?appName=BudgetFlowDB".to_string());
     println!("Connecting to MongoDB at {}", mongo_uri);
 
     let client_options = ClientOptions::parse(&mongo_uri).await.unwrap();
@@ -24,11 +24,19 @@ pub async fn init_db() -> AppState {
     // Ensure unique indexes
     let index_model = mongodb::IndexModel::builder()
         .keys(doc! { "name": 1 })
-        .options(mongodb::options::IndexOptions::builder().unique(true).build())
+        .options(
+            mongodb::options::IndexOptions::builder()
+                .unique(true)
+                .build(),
+        )
         .build();
-    
-    let _ = debts_collection.create_index(index_model.clone(), None).await;
-    let _ = transactions_collection.create_index(index_model, None).await;
+
+    let _ = debts_collection
+        .create_index(index_model.clone(), None)
+        .await;
+    let _ = transactions_collection
+        .create_index(index_model, None)
+        .await;
 
     AppState {
         debts_collection,

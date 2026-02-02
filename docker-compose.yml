@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   mongo:
@@ -9,19 +9,19 @@ services:
       - mongo-data:/data/db
 
   backend:
-    build: 
+    build:
       context: ./backend_rust
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
-      - MONGO_URI=mongodb://mongo:27017/budget-app
+      - MONGO_URI=mongodb+srv://admin:DS6Wx2qIWVeXCQMP@budgetflowdb.anhdnhq.mongodb.net/?appName=BudgetFlowDB
       - PORT=3000
     depends_on:
       - mongo
 
   frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile.dev
     volumes:
