@@ -4,14 +4,6 @@
     <div class="top-bar-content">
       <div class="top-bar-branding">💰 BudgetFlow</div>
       <div class="top-bar-actions">
-        <button
-          mat-icon-button
-          (click)="loadDashboardData()"
-          matTooltip="Refresh"
-          class="refresh-btn"
-        >
-          <mat-icon>refresh</mat-icon>
-        </button>
         <button mat-icon-button (click)="logout()" matTooltip="Logout" class="logout-btn">
           <mat-icon>logout</mat-icon>
         </button>
@@ -27,9 +19,6 @@
       <div class="main-balance-card">
         <div class="balance-header">
           <span class="balance-label">Current Balance</span>
-          <button mat-icon-button (click)="loadDashboardData()" class="refresh-mini">
-            <mat-icon>refresh</mat-icon>
-          </button>
         </div>
 
         <div class="balance-value-wrapper">
@@ -46,7 +35,7 @@
         </div>
 
         <div class="balance-footer">
-          <span class="month-label">This Month:</span>
+          <span class="month-label">This Month Saving's:</span>
           <span
             class="month-savings"
             [class.positive]="metrics.monthlySavings >= 0"

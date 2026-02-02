@@ -122,7 +122,7 @@ export class ListTransactionsComponent implements OnInit {
   updateGrouping(): void {
     // Filter out deleted transactions for display
     const activeTransactions = this.allTransactions.filter((t) => !t.deleted);
-    
+
     if (!activeTransactions.length) {
       this.groupedTransactions = [];
       return;

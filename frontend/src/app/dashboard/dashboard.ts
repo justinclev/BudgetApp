@@ -130,14 +130,14 @@ export class DashboardComponent implements OnInit {
     // Total debt
     this.metrics.totalDebt = this.debts.reduce((sum, debt) => sum + debt.amountOwed, 0);
 
-    // Current month metrics
+    // Current month metrics - filter out deleted transactions
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
     const monthTransactions = this.transactions.filter((t) => {
       const tDate = new Date(t.date);
-      return tDate >= monthStart && tDate <= monthEnd;
+      return !t.deleted && tDate >= monthStart && tDate <= monthEnd;
     });
 
     this.metrics.monthlyIncome = monthTransactions
