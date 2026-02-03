@@ -1,53 +1,30 @@
-// Mobile-first responsive design
-
 .transactions-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  padding-bottom: 60px;
+  padding-bottom: 100px;
 }
 
-// ============= HEADER =============
 .sticky-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  padding: 16px 20px 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 0;
 }
 
-.header-top {
+.header-controls {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  align-items: center;
+  gap: 16px;
 
-  @media (min-width: 600px) {
-    padding: 14px 24px;
-  }
-}
-
-.header-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e293b;
-  letter-spacing: -0.5px;
-
-  @media (min-width: 600px) {
-    font-size: 24px;
-  }
-}
-
-.grouping-controls {
-  padding: 12px 16px 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-
-  @media (min-width: 600px) {
-    padding: 12px 24px 8px;
+  @media (max-width: 599px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
 }
 
@@ -57,100 +34,74 @@
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding-bottom: 4px;
+  padding: 12px 0;
+  align-items: center;
+  flex: 1;
+
+  @media (max-width: 599px) {
+    width: 100%;
+    flex: 1 1 auto;
+    padding: 8px 0;
+  }
 
   &::-webkit-scrollbar {
     display: none;
-  }
-
-  .pill {
-    flex-shrink: 0;
-    padding: 8px 14px;
-    border-radius: 100px;
-    border: none;
-    background: #e2e8f0;
-    color: #475569;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-
-    @media (min-width: 600px) {
-      padding: 10px 18px;
-      font-size: 14px;
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    &.active {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    }
   }
 }
 
 .action-buttons {
   display: flex;
   gap: 8px;
-  padding: 8px 16px 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  flex-shrink: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 
-  @media (min-width: 600px) {
-    padding: 10px 24px 14px;
-    gap: 10px;
-  }
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  button {
-    flex-shrink: 0;
-    height: 40px;
-    padding: 0 14px;
-    border-radius: 10px;
-    border: 1px solid #cbd5e1;
-    background: white;
-    color: #3b82f6;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+  @media (max-width: 599px) {
+    width: 100%;
+    justify-content: flex-start;
     gap: 6px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
+  }
 
-    @media (min-width: 600px) {
+  button[mat-stroked-button] {
+    @media (max-width: 599px) {
+      flex: 1;
+      min-width: 0;
       height: 44px;
-      padding: 0 16px;
-      font-size: 14px;
-    }
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      gap: 6px;
 
-    &:active {
-      background: #f1f5f9;
-    }
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 12px;
+      }
 
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .icon-btn {
+    @media (max-width: 599px) {
       flex-shrink: 0;
     }
   }
 }
 
-// ============= ICONS =============
 .icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   border: none;
   background: #f1f5f9;
   color: #64748b;
@@ -161,14 +112,13 @@
   transition: all 0.2s ease;
   flex-shrink: 0;
 
-  @media (min-width: 600px) {
-    width: 44px;
-    height: 44px;
-  }
-
   &:active {
     transform: scale(0.95);
     background: #e2e8f0;
+  }
+
+  &.spinning mat-icon {
+    animation: spin 1s linear infinite;
   }
 
   &.add {
@@ -181,37 +131,67 @@
   }
 
   mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
 
-    @media (min-width: 600px) {
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.grouping-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 12px 0;
+  align-items: center;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pill {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    border-radius: 100px;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    &.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
   }
 }
 
-// ============= LOADING STATE =============
 .loading-state {
-  padding: 12px;
-
-  @media (min-width: 600px) {
-    padding: 16px;
-  }
+  padding: 20px;
 
   .skeleton-group {
     background: white;
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 8px;
-
-    @media (min-width: 600px) {
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
   }
 
   .skeleton-header,
@@ -219,17 +199,18 @@
     background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
-    border-radius: 8px;
+    border-radius: 12px;
     margin-bottom: 8px;
   }
 
   .skeleton-header {
-    height: 20px;
-    margin-bottom: 12px;
+    height: 24px;
+    margin-bottom: 16px;
+    border-radius: 8px;
   }
 
   .skeleton-item {
-    height: 50px;
+    height: 60px;
   }
 }
 
@@ -242,451 +223,551 @@
   }
 }
 
-// ============= EMPTY STATE =============
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 40px 60px;
+  padding: 60px 40px;
   text-align: center;
 }
 
 .empty-icon {
-  width: 70px;
-  height: 70px;
-  border-radius: 16px;
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
   background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-
-  @media (min-width: 600px) {
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
-    margin-bottom: 24px;
-  }
+  margin-bottom: 24px;
 
   mat-icon {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
     color: #4f46e5;
-
-    @media (min-width: 600px) {
-      font-size: 36px;
-      width: 36px;
-      height: 36px;
-    }
   }
 }
 
 .empty-state h3 {
   margin: 0 0 8px;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #1e293b;
-
-  @media (min-width: 600px) {
-    font-size: 20px;
-  }
 }
 
 .empty-state p {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   color: #64748b;
   line-height: 1.5;
   max-width: 260px;
-
-  @media (min-width: 600px) {
-    font-size: 15px;
-  }
 }
 
-// ============= GROUPS CONTAINER =============
 .groups-container {
-  padding: 8px;
+  padding: 16px;
 
-  @media (min-width: 600px) {
-    padding: 16px;
+  @media (max-width: 599px) {
+    padding: 8px 0;
   }
 }
 
 .transaction-group {
   background: white;
-  border-radius: 12px;
-  margin-bottom: 6px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.03);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 
-  @media (min-width: 600px) {
-    border-radius: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+  @media (max-width: 599px) {
+    margin-bottom: 8px;
+    border-radius: 0;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
   }
 }
 
-// ============= GROUP HEADER =============
 .group-header {
-  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
   cursor: pointer;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-bottom: 1px solid #e2e8f0;
-  transition: background 0.2s ease;
+  flex-wrap: wrap;
 
-  @media (min-width: 600px) {
-    padding: 14px 20px;
+  @media (max-width: 599px) {
+    padding: 12px 12px;
   }
 
   &:active {
     background: #f1f5f9;
   }
 
-  .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-
-    @media (min-width: 600px) {
-      margin-bottom: 12px;
-    }
-  }
-
-  .header-text {
+  .group-title {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    flex: 1;
-  }
+    flex-shrink: 0;
 
-  .group-label {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: #1e293b;
-
-    @media (min-width: 600px) {
+    .label {
       font-size: 16px;
       font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .count {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
     }
   }
 
-  .group-count {
-    font-size: 12px;
-    color: #94a3b8;
-    font-weight: 500;
+  .metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.5);
+    flex-shrink: 0;
+    min-width: auto;
 
-    @media (min-width: 600px) {
-      font-size: 13px;
+    .metric-label {
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+    }
+
+    .metric-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+
+    &.income {
+      .metric-label {
+        color: #1e40af;
+      }
+      .metric-value {
+        color: #1e40af;
+      }
+    }
+
+    &.expense {
+      .metric-label {
+        color: #991b1b;
+      }
+      .metric-value {
+        color: #991b1b;
+      }
+    }
+
+    &.savings {
+      .metric-label {
+        color: #1e40af;
+      }
+      .metric-value {
+        color: #1e40af;
+      }
+
+      &.positive {
+        .metric-label {
+          color: #166534;
+        }
+        .metric-value {
+          color: #166534;
+        }
+      }
+
+      &.negative {
+        .metric-label {
+          color: #991b1b;
+        }
+        .metric-value {
+          color: #991b1b;
+        }
+      }
+    }
+
+    &.debt {
+      .metric-label {
+        color: #92400e;
+      }
+      .metric-value {
+        color: #92400e;
+      }
+    }
+
+    &.balance {
+      .metric-label {
+        color: #64748b;
+      }
+
+      .metric-value {
+        color: #0f172a;
+        font-weight: 700;
+
+        &.negative {
+          color: #ef4444;
+        }
+      }
     }
   }
 
   .chevron {
     color: #94a3b8;
+    margin-left: auto;
     flex-shrink: 0;
-    transition: transform 0.25s ease;
-    font-size: 24px;
+    transition: transform 0.2s ease;
+  }
 
-    @media (min-width: 600px) {
-      font-size: 26px;
+  .chevron.expanded {
+    transform: rotate(180deg);
+  }
+
+  @media (max-width: 599px) {
+    gap: 6px;
+    padding: 12px 16px;
+
+    .group-title {
+      flex-basis: 100%;
+
+      .label {
+        font-size: 15px;
+      }
     }
 
-    &.expanded {
-      transform: rotate(180deg);
+    .metric-item {
+      padding: 4px 8px;
+
+      .metric-label {
+        font-size: 7px;
+      }
+
+      .metric-value {
+        font-size: 11px;
+      }
     }
   }
 
-  // ============= GROUP SUMMARY =============
-  .group-summary {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  @media (min-width: 600px) and (max-width: 799px) {
     gap: 8px;
 
-    @media (min-width: 600px) {
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
+    .metric-item {
+      padding: 6px 10px;
+
+      .metric-label {
+        font-size: 8px;
+      }
+
+      .metric-value {
+        font-size: 12px;
+      }
     }
+  }
 
-    .summary-item {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      padding: 8px;
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 8px;
+  @media (min-width: 800px) {
+    gap: 10px;
 
-      @media (min-width: 600px) {
-        padding: 10px;
-        border-radius: 10px;
+    .metric-item {
+      padding: 8px 12px;
+
+      .metric-label {
+        font-size: 9px;
       }
 
-      .label {
-        font-size: 10px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-        color: #94a3b8;
-
-        @media (min-width: 600px) {
-          font-size: 11px;
-          letter-spacing: 0.5px;
-        }
-      }
-
-      .value {
+      .metric-value {
         font-size: 13px;
-        font-weight: 700;
-        color: #0f172a;
-
-        @media (min-width: 600px) {
-          font-size: 14px;
-        }
-      }
-
-      &.income {
-        .label {
-          color: #1e40af;
-        }
-        .value {
-          color: #1e40af;
-        }
-      }
-
-      &.expense {
-        .label {
-          color: #991b1b;
-        }
-        .value {
-          color: #991b1b;
-        }
-      }
-
-      &.savings {
-        .label {
-          color: #1e40af;
-        }
-
-        &.positive {
-          .label {
-            color: #166534;
-          }
-          .value {
-            color: #166534;
-          }
-        }
-
-        &.negative {
-          .label {
-            color: #991b1b;
-          }
-          .value {
-            color: #991b1b;
-          }
-        }
-      }
-
-      &.balance {
-        .label {
-          color: #475569;
-        }
-
-        .value {
-          font-weight: 700;
-
-          &.negative {
-            color: #ef4444;
-          }
-        }
-      }
-
-      &.debt {
-        .label {
-          color: #92400e;
-        }
-        .value {
-          color: #92400e;
-        }
-      }
-
-      &:nth-child(n + 3) {
-        @media (max-width: 599px) {
-          display: none;
-        }
       }
     }
   }
 }
 
-// ============= TRANSACTIONS LIST =============
+.metric-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+
+  .metric-icon {
+    font-size: 16px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .metric-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    align-items: flex-start;
+  }
+
+  .metric-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.7;
+    display: block;
+  }
+
+  .metric-value {
+    font-size: 13px;
+    font-weight: 700;
+    display: block;
+  }
+
+  &.income {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.expense {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.savings {
+    background: #dbeafe;
+    color: #1e40af;
+
+    &.positive {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    &.negative {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  }
+
+  &.debt {
+    background: #fef3c7;
+    color: #92400e;
+  }
+}
+
+.group-metrics {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fafbfc;
+  border-top: 1px solid #f1f5f9;
+
+  &.expanded {
+    max-height: 500px;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+
+    @media (min-width: 600px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+      background: white;
+      border-radius: 12px;
+      border-left: 3px solid #cbd5e1;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      word-break: break-word;
+    }
+
+    .metric-item.income {
+      border-left-color: #10b981;
+    }
+
+    .metric-item.income .metric-value {
+      color: #10b981;
+    }
+
+    .metric-item.expense {
+      border-left-color: #ef4444;
+    }
+
+    .metric-item.expense .metric-value {
+      color: #ef4444;
+    }
+
+    .metric-item.savings {
+      border-left-color: #3b82f6;
+    }
+
+    .metric-item.savings .metric-value {
+      color: #3b82f6;
+    }
+
+    .metric-item.savings.positive .metric-value {
+      color: #10b981;
+    }
+
+    .metric-item.savings.negative .metric-value {
+      color: #ef4444;
+    }
+
+    .metric-item.debt {
+      border-left-color: #f59e0b;
+    }
+
+    .metric-item.debt .metric-value {
+      color: #f59e0b;
+    }
+  }
+}
+
 .transactions-list {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.expanded {
-    max-height: 3000px;
+    max-height: 2000px;
   }
 }
 
 .transaction-card {
   display: flex;
-  align-items: stretch;
-  padding: 0;
+  align-items: center;
+  padding: 14px 20px;
   border-top: 1px solid #f1f5f9;
   cursor: pointer;
   transition: background 0.15s ease;
-  min-height: 64px;
 
-  @media (min-width: 600px) {
-    min-height: 72px;
+  @media (max-width: 599px) {
+    padding: 12px 12px;
+    gap: 10px;
   }
 
   &:active {
     background: #f8fafc;
   }
 
-  .card-left {
+  .transaction-left {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 12px;
+    gap: 14px;
     flex: 1;
     min-width: 0;
 
-    @media (min-width: 600px) {
-      gap: 14px;
-      padding: 14px 16px;
-    }
-  }
-
-  .date-badge {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border: 1px solid #e2e8f0;
-
-    @media (min-width: 600px) {
+    .date-badge {
       width: 44px;
       height: 44px;
       border-radius: 12px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
-  }
 
-  .day {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-    line-height: 1;
-
-    @media (min-width: 600px) {
-      font-size: 15px;
+    .day {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.1;
     }
-  }
 
-  .month {
-    font-size: 9px;
-    font-weight: 600;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    margin-top: 2px;
-
-    @media (min-width: 600px) {
+    .month {
       font-size: 10px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-  }
 
-  .transaction-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
-    flex: 1;
-  }
+    .transaction-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+      flex: 1;
+    }
 
-  .transaction-name {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 500;
-    color: #1e293b;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @media (min-width: 600px) {
+    .name {
       font-size: 15px;
+      font-weight: 500;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-  }
 
-  .transaction-description {
-    margin: 0;
-    font-size: 12px;
-    color: #94a3b8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @media (min-width: 600px) {
+    .description {
       font-size: 13px;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-  }
 
-  .transaction-type {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    width: fit-content;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: #f1f5f9;
-    color: #64748b;
-
-    @media (min-width: 600px) {
+    .transaction-type {
       font-size: 11px;
-      padding: 3px 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: fit-content;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #64748b;
     }
 
-    &.income {
+    .transaction-type.income {
       background: rgba(16, 185, 129, 0.1);
       color: #10b981;
     }
 
-    &.expense {
+    .transaction-type.expense {
       background: rgba(239, 68, 68, 0.1);
       color: #ef4444;
     }
   }
 
-  .card-right {
+  .transaction-right {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    justify-content: center;
-    gap: 6px;
-    padding: 12px 12px;
-    padding-left: 8px;
-    flex-shrink: 0;
-
-    @media (min-width: 600px) {
-      gap: 8px;
-      padding: 14px 16px;
-      padding-left: 10px;
-    }
+    gap: 8px;
+    margin-left: 12px;
   }
 
-  .amount-section {
+  .amount-column {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -694,73 +775,71 @@
   }
 
   .amount {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: #0f172a;
-
-    @media (min-width: 600px) {
-      font-size: 15px;
-    }
-
-    &.expense {
-      color: #ef4444;
-    }
-
-    &.income {
-      color: #10b981;
-    }
   }
 
-  .balance-label {
-    font-size: 10px;
-    font-weight: 500;
-    color: #94a3b8;
+  .amount.expense {
+    color: #ef4444;
+  }
 
-    @media (min-width: 600px) {
-      font-size: 11px;
-    }
+  .amount.income {
+    color: #10b981;
   }
 
   .balance {
-    font-size: 11px;
+    font-size: 12px;
     color: #94a3b8;
     font-weight: 500;
-
-    @media (min-width: 600px) {
-      font-size: 12px;
-    }
   }
 
-  .debt-section {
+  .debt-info {
     display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    font-size: 12px;
     border-top: 1px solid #f1f5f9;
-    padding-top: 4px;
-
-    @media (min-width: 600px) {
-      font-size: 12px;
-      gap: 6px;
-    }
+    padding-top: 6px;
   }
 
   .debt-label {
     color: #94a3b8;
     font-weight: 500;
+    font-size: 11px;
   }
 
   .debt-amount {
     font-weight: 600;
     color: #f59e0b;
   }
+
+  .chevron-icon {
+    color: #cbd5e1;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+.generate-section {
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: 12px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
   }
 }
