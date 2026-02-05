@@ -33,7 +33,7 @@ interface TransactionGroup {
   debtPaymentCount: number;
 }
 
-type GroupingMethod = 'Daily' | 'Weekly' | 'Monthly' | 'Annually';
+type GroupingMethod = 'Daily' | 'Weekly' | 'BiWeekly' | 'SemiMonthly' | 'Monthly' | 'Annually';
 
 @Component({
   selector: 'app-list-transactions',
@@ -62,7 +62,7 @@ export class ListTransactionsComponent implements OnInit {
   debts: Debt[] = [];
   recurringTransactions: RecurringTransaction[] = [];
 
-  groupingOptions: GroupingMethod[] = ['Daily', 'Weekly', 'Monthly', 'Annually'];
+  groupingOptions: GroupingMethod[] = ['Daily', 'Weekly', 'BiWeekly', 'SemiMonthly', 'Monthly', 'Annually'];
   selectedGrouping: GroupingMethod = 'Monthly';
 
   constructor(
@@ -359,6 +359,15 @@ export class ListTransactionsComponent implements OnInit {
         const diff = d.getDate() - dayOfWeek;
         const sunday = new Date(d.setDate(diff));
         return `${sunday.getFullYear()}-${sunday.getMonth()}-${sunday.getDate()}`;
+      case 'BiWeekly':
+        const epoch = new Date(year, 0, 1);
+        const diffInMs = d.getTime() - epoch.getTime();
+        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+        const biWeekPeriod = Math.floor(diffInDays / 14);
+        return `${year}-biweek-${biWeekPeriod}`;
+      case 'SemiMonthly':
+        const half = day <= 14 ? '1' : '2';
+        return `${year}-${month}-${half}`;
       case 'Monthly':
         return `${year}-${month}`;
       case 'Annually':
@@ -381,6 +390,24 @@ export class ListTransactionsComponent implements OnInit {
         const startDiff = d.getDate() - dayOfWeek;
         const startOfWeek = new Date(d.getFullYear(), d.getMonth(), startDiff);
         return `Week of ${startOfWeek.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+      case 'BiWeekly':
+        const biWeekD = new Date(date);
+        const epoch = new Date(biWeekD.getFullYear(), 0, 1);
+        const diffInMs = biWeekD.getTime() - epoch.getTime();
+        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+        const biWeekStartDay = Math.floor(diffInDays / 14) * 14;
+        const biWeekStartDate = new Date(biWeekD.getFullYear(), 0, 1 + biWeekStartDay);
+        const biWeekEndDate = new Date(biWeekStartDate);
+        biWeekEndDate.setDate(biWeekEndDate.getDate() + 13);
+        return `${biWeekStartDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - ${biWeekEndDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+      case 'SemiMonthly':
+        const semiDay = date.getDate();
+        const monthYear = date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+        if (semiDay <= 14) {
+          return `${monthYear} (1st-14th)`;
+        } else {
+          return `${monthYear} (15th-31st)`;
+        }
       case 'Monthly':
         return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
       case 'Annually':
@@ -399,6 +426,20 @@ export class ListTransactionsComponent implements OnInit {
         const dayOfWeek = d.getDay();
         const diff = d.getDate() - dayOfWeek;
         return new Date(d.setDate(diff));
+      case 'BiWeekly':
+        const biWeekD = new Date(d);
+        const epoch = new Date(biWeekD.getFullYear(), 0, 1);
+        const diffInMs = biWeekD.getTime() - epoch.getTime();
+        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+        const biWeekStartDay = Math.floor(diffInDays / 14) * 14;
+        return new Date(biWeekD.getFullYear(), 0, 1 + biWeekStartDay);
+      case 'SemiMonthly':
+        const semiDay = d.getDate();
+        if (semiDay <= 14) {
+          return new Date(d.getFullYear(), d.getMonth(), 1);
+        } else {
+          return new Date(d.getFullYear(), d.getMonth(), 15);
+        }
       case 'Monthly':
         return new Date(d.getFullYear(), d.getMonth(), 1);
       case 'Annually':
