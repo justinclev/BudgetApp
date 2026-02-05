@@ -377,12 +377,11 @@
     gap: 4px;
     padding: 8px 14px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.5);
     flex-shrink: 0;
     min-width: auto;
 
     .metric-label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -493,7 +492,7 @@
       padding: 6px 10px;
 
       .metric-label {
-        font-size: 11px;
+        font-size: 10px;
       }
 
       .metric-value {
@@ -525,7 +524,7 @@
       padding: 8px 14px;
 
       .metric-label {
-        font-size: 11px;
+        font-size: 10px;
       }
 
       .metric-value {
@@ -632,13 +631,13 @@
       flex-direction: column;
       gap: 6px;
       padding: 12px;
-      background: white;
+      // background: white;
       border-radius: 12px;
       border-left: 3px solid #cbd5e1;
     }
 
     .metric-label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       color: #94a3b8;
       text-transform: uppercase;
