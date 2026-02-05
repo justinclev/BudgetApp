@@ -3,15 +3,18 @@
   <header class="sticky-header">
     <!-- Pill Selector -->
     <div class="header-controls">
-      <div class="grouping-pills">
-        <button
-          *ngFor="let option of groupingOptions"
-          class="pill"
-          [class.active]="selectedGrouping === option"
-          (click)="selectedGrouping = option; updateGrouping()"
+      <div class="grouping-dropdown">
+        <label for="grouping-select">Group by</label>
+        <select
+          id="grouping-select"
+          [(ngModel)]="selectedGrouping"
+          (change)="updateGrouping()"
+          class="grouping-select"
         >
-          {{ option }}
-        </button>
+          <option *ngFor="let option of groupingOptions" [value]="option">
+            {{ option }}
+          </option>
+        </select>
       </div>
       <div class="action-buttons">
         <button

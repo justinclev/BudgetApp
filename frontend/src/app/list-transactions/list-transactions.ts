@@ -62,7 +62,14 @@ export class ListTransactionsComponent implements OnInit {
   debts: Debt[] = [];
   recurringTransactions: RecurringTransaction[] = [];
 
-  groupingOptions: GroupingMethod[] = ['Daily', 'Weekly', 'BiWeekly', 'SemiMonthly', 'Monthly', 'Annually'];
+  groupingOptions: GroupingMethod[] = [
+    'Daily',
+    'Weekly',
+    'BiWeekly',
+    'SemiMonthly',
+    'Monthly',
+    'Annually',
+  ];
   selectedGrouping: GroupingMethod = 'Monthly';
 
   constructor(
