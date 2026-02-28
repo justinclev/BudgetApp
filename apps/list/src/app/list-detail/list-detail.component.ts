@@ -216,7 +216,11 @@ export class ListDetailComponent implements OnInit {
 
   onDragStart(item: ListItem): void {
     if (this.isExpanded(item.id)) {
-      this.expandedItems.update((s) => { const n = new Set(s); n.delete(item.id); return n; });
+      this.expandedItems.update((s) => {
+        const n = new Set(s);
+        n.delete(item.id);
+        return n;
+      });
     }
   }
 
@@ -248,11 +252,17 @@ export class ListDetailComponent implements OnInit {
     if (draft === undefined || draft === sub.text) return;
     if (draft.trim() === '') {
       this.listService.deleteSubItem(this.listId, parent.id, sub.id).subscribe({
-        next: (updated) => { this.list.set(updated); delete this.subDrafts[key]; },
+        next: (updated) => {
+          this.list.set(updated);
+          delete this.subDrafts[key];
+        },
       });
     } else {
       this.listService.updateSubItemText(this.listId, parent.id, sub.id, draft.trim()).subscribe({
-        next: (updated) => { this.list.set(updated); delete this.subDrafts[key]; },
+        next: (updated) => {
+          this.list.set(updated);
+          delete this.subDrafts[key];
+        },
       });
     }
   }
@@ -264,7 +274,10 @@ export class ListDetailComponent implements OnInit {
       const draft = this.subDrafts[key];
       if (draft !== undefined && draft !== sub.text && draft.trim()) {
         this.listService.updateSubItemText(this.listId, parent.id, sub.id, draft.trim()).subscribe({
-          next: (updated) => { this.list.set(updated); delete this.subDrafts[key]; },
+          next: (updated) => {
+            this.list.set(updated);
+            delete this.subDrafts[key];
+          },
         });
       }
     } else if (event.key === 'Backspace') {
@@ -273,7 +286,10 @@ export class ListDetailComponent implements OnInit {
       if (draft === '') {
         event.preventDefault();
         this.listService.deleteSubItem(this.listId, parent.id, sub.id).subscribe({
-          next: (updated) => { this.list.set(updated); delete this.subDrafts[key]; },
+          next: (updated) => {
+            this.list.set(updated);
+            delete this.subDrafts[key];
+          },
         });
       }
     }

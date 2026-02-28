@@ -1,6 +1,6 @@
-mod models;
-mod handlers;
 mod db;
+mod handlers;
+mod models;
 mod utils;
 
 use actix_cors::Cors;
@@ -8,14 +8,16 @@ use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 
-use handlers::{debt_handler, transaction_handler, health_handler, generated_transaction_handler, list_handler};
+use handlers::{
+    debt_handler, generated_transaction_handler, health_handler, list_handler, transaction_handler,
+};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
-    
+
     let port = env::var("PORT").unwrap_or_else(|_| "3000".to_string());
-    
+
     // Initialize DB
     let app_state = db::init_db().await;
 
@@ -36,37 +38,109 @@ async fn main() -> std::io::Result<()> {
             .route("/api/debts", web::get().to(debt_handler::get_debts))
             .route("/api/debts", web::post().to(debt_handler::create_debt))
             .route("/api/debts/{id}", web::put().to(debt_handler::update_debt))
-            .route("/api/debts/{id}", web::delete().to(debt_handler::delete_debt))
-            .route("/api/debts/check-name/{name}", web::get().to(debt_handler::check_debt_name))
+            .route(
+                "/api/debts/{id}",
+                web::delete().to(debt_handler::delete_debt),
+            )
+            .route(
+                "/api/debts/check-name/{name}",
+                web::get().to(debt_handler::check_debt_name),
+            )
             // Recurring Transaction Routes
-            .route("/api/recurring-transactions", web::get().to(transaction_handler::get_transactions))
-            .route("/api/recurring-transactions", web::post().to(transaction_handler::create_transaction))
-            .route("/api/recurring-transactions/{id}", web::put().to(transaction_handler::update_transaction))
-            .route("/api/recurring-transactions/{id}", web::delete().to(transaction_handler::delete_transaction))
-            .route("/api/recurring-transactions/check-name/{name}", web::get().to(transaction_handler::check_transaction_name))
+            .route(
+                "/api/recurring-transactions",
+                web::get().to(transaction_handler::get_transactions),
+            )
+            .route(
+                "/api/recurring-transactions",
+                web::post().to(transaction_handler::create_transaction),
+            )
+            .route(
+                "/api/recurring-transactions/{id}",
+                web::put().to(transaction_handler::update_transaction),
+            )
+            .route(
+                "/api/recurring-transactions/{id}",
+                web::delete().to(transaction_handler::delete_transaction),
+            )
+            .route(
+                "/api/recurring-transactions/check-name/{name}",
+                web::get().to(transaction_handler::check_transaction_name),
+            )
             // Generated Transaction Routes
-            .route("/api/transactions", web::get().to(generated_transaction_handler::get_generated_transactions))
-            .route("/api/transactions", web::post().to(generated_transaction_handler::save_generated_transactions))
+            .route(
+                "/api/transactions",
+                web::get().to(generated_transaction_handler::get_generated_transactions),
+            )
+            .route(
+                "/api/transactions",
+                web::post().to(generated_transaction_handler::save_generated_transactions),
+            )
             // List Routes
             .route("/api/lists", web::get().to(list_handler::get_lists))
             .route("/api/lists", web::post().to(list_handler::create_list))
-            .route("/api/lists/share/{token}", web::get().to(list_handler::get_list_by_share_token))
-            .route("/api/lists/share/{token}/join", web::post().to(list_handler::join_list_by_share_token))
+            .route(
+                "/api/lists/share/{token}",
+                web::get().to(list_handler::get_list_by_share_token),
+            )
+            .route(
+                "/api/lists/share/{token}/join",
+                web::post().to(list_handler::join_list_by_share_token),
+            )
             .route("/api/lists/{id}", web::get().to(list_handler::get_list))
             .route("/api/lists/{id}", web::put().to(list_handler::update_list))
-            .route("/api/lists/{id}", web::delete().to(list_handler::delete_list))
-            .route("/api/lists/{id}/items", web::post().to(list_handler::add_item))
-            .route("/api/lists/{id}/items/reorder", web::post().to(list_handler::reorder_items))
-            .route("/api/lists/{id}/items/{item_id}/subitems", web::post().to(list_handler::add_sub_item))
-            .route("/api/lists/{id}/items/{item_id}/subitems/{sub_id}/toggle", web::patch().to(list_handler::toggle_sub_item))
-            .route("/api/lists/{id}/items/{item_id}/subitems/{sub_id}", web::patch().to(list_handler::update_sub_item_text))
-            .route("/api/lists/{id}/items/{item_id}/subitems/{sub_id}", web::delete().to(list_handler::delete_sub_item))
-            .route("/api/lists/{id}/members/{user_id}", web::delete().to(list_handler::remove_member))
-            .route("/api/lists/{id}/items/{item_id}", web::delete().to(list_handler::delete_item))
-            .route("/api/lists/{id}/items/{item_id}", web::patch().to(list_handler::update_item_text))
-            .route("/api/lists/{id}/items/{item_id}/toggle", web::patch().to(list_handler::toggle_item))
-            .route("/api/lists/{id}/reset", web::post().to(list_handler::reset_list))
-            .route("/api/lists/{id}/clone", web::post().to(list_handler::clone_list))
+            .route(
+                "/api/lists/{id}",
+                web::delete().to(list_handler::delete_list),
+            )
+            .route(
+                "/api/lists/{id}/items",
+                web::post().to(list_handler::add_item),
+            )
+            .route(
+                "/api/lists/{id}/items/reorder",
+                web::post().to(list_handler::reorder_items),
+            )
+            .route(
+                "/api/lists/{id}/items/{item_id}/subitems",
+                web::post().to(list_handler::add_sub_item),
+            )
+            .route(
+                "/api/lists/{id}/items/{item_id}/subitems/{sub_id}/toggle",
+                web::patch().to(list_handler::toggle_sub_item),
+            )
+            .route(
+                "/api/lists/{id}/items/{item_id}/subitems/{sub_id}",
+                web::patch().to(list_handler::update_sub_item_text),
+            )
+            .route(
+                "/api/lists/{id}/items/{item_id}/subitems/{sub_id}",
+                web::delete().to(list_handler::delete_sub_item),
+            )
+            .route(
+                "/api/lists/{id}/members/{user_id}",
+                web::delete().to(list_handler::remove_member),
+            )
+            .route(
+                "/api/lists/{id}/items/{item_id}",
+                web::delete().to(list_handler::delete_item),
+            )
+            .route(
+                "/api/lists/{id}/items/{item_id}",
+                web::patch().to(list_handler::update_item_text),
+            )
+            .route(
+                "/api/lists/{id}/items/{item_id}/toggle",
+                web::patch().to(list_handler::toggle_item),
+            )
+            .route(
+                "/api/lists/{id}/reset",
+                web::post().to(list_handler::reset_list),
+            )
+            .route(
+                "/api/lists/{id}/clone",
+                web::post().to(list_handler::clone_list),
+            )
     })
     .bind(format!("0.0.0.0:{}", port))?
     .run()

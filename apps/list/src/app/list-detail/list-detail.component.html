@@ -51,7 +51,12 @@
                 (keydown)="onItemKeydown($event, item, i)"
                 maxlength="200"
               />
-              <button class="sub-btn" (click)="toggleExpand(item.id)" type="button" title="Sub-items">
+              <button
+                class="sub-btn"
+                (click)="toggleExpand(item.id)"
+                type="button"
+                title="Sub-items"
+              >
                 @if (!isExpanded(item.id) && item.subItems.length) {
                   <span class="sub-count">{{ item.subItems.length }}</span>
                 }
@@ -63,8 +68,15 @@
               <ul class="sub-list">
                 @for (sub of item.subItems; track sub.id) {
                   <li class="sub-item" [class.sub-done]="sub.completed">
-                    <button class="check-btn" [class.checked]="sub.completed" (click)="toggleSubItem(item, sub)" type="button">
-                      @if (sub.completed) {<span class="check-icon">✓</span>}
+                    <button
+                      class="check-btn"
+                      [class.checked]="sub.completed"
+                      (click)="toggleSubItem(item, sub)"
+                      type="button"
+                    >
+                      @if (sub.completed) {
+                        <span class="check-icon">✓</span>
+                      }
                     </button>
                     <input
                       class="item-input"
@@ -74,7 +86,9 @@
                       (keydown)="onSubItemKeydown($event, item, sub)"
                       maxlength="200"
                     />
-                    <button class="del-btn" (click)="deleteSubItem(item, sub)" type="button">×</button>
+                    <button class="del-btn" (click)="deleteSubItem(item, sub)" type="button">
+                      ×
+                    </button>
                   </li>
                 }
                 <li class="sub-item new-sub-row">
@@ -128,7 +142,12 @@
                   (keydown)="onItemKeydown($event, item, pendingItems().length + i)"
                   maxlength="200"
                 />
-                <button class="sub-btn" (click)="toggleExpand(item.id)" type="button" title="Sub-items">
+                <button
+                  class="sub-btn"
+                  (click)="toggleExpand(item.id)"
+                  type="button"
+                  title="Sub-items"
+                >
                   @if (!isExpanded(item.id) && item.subItems.length) {
                     <span class="sub-count">{{ item.subItems.length }}</span>
                   }
@@ -140,8 +159,15 @@
                 <ul class="sub-list">
                   @for (sub of item.subItems; track sub.id) {
                     <li class="sub-item" [class.sub-done]="sub.completed">
-                      <button class="check-btn" [class.checked]="sub.completed" (click)="toggleSubItem(item, sub)" type="button">
-                        @if (sub.completed) {<span class="check-icon">✓</span>}
+                      <button
+                        class="check-btn"
+                        [class.checked]="sub.completed"
+                        (click)="toggleSubItem(item, sub)"
+                        type="button"
+                      >
+                        @if (sub.completed) {
+                          <span class="check-icon">✓</span>
+                        }
                       </button>
                       <input
                         class="item-input"
@@ -151,7 +177,9 @@
                         (keydown)="onSubItemKeydown($event, item, sub)"
                         maxlength="200"
                       />
-                      <button class="del-btn" (click)="deleteSubItem(item, sub)" type="button">×</button>
+                      <button class="del-btn" (click)="deleteSubItem(item, sub)" type="button">
+                        ×
+                      </button>
                     </li>
                   }
                   <li class="sub-item new-sub-row">

@@ -683,11 +683,17 @@ pub async fn add_sub_item(
         .find_one_and_update(doc! { "_id": object_id }, update, options)
         .await
     {
-        Ok(Some(_)) => match data.lists_collection.find_one(doc! { "_id": object_id }, None).await {
+        Ok(Some(_)) => match data
+            .lists_collection
+            .find_one(doc! { "_id": object_id }, None)
+            .await
+        {
             Ok(Some(list)) => HttpResponse::Ok().json(list),
             _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
         },
-        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Ok(None) => {
+            HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" }))
+        }
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
 }
@@ -717,11 +723,17 @@ pub async fn update_sub_item_text(
         .find_one_and_update(doc! { "_id": object_id }, update, options)
         .await
     {
-        Ok(Some(_)) => match data.lists_collection.find_one(doc! { "_id": object_id }, None).await {
+        Ok(Some(_)) => match data
+            .lists_collection
+            .find_one(doc! { "_id": object_id }, None)
+            .await
+        {
             Ok(Some(list)) => HttpResponse::Ok().json(list),
             _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
         },
-        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Ok(None) => {
+            HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" }))
+        }
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
 }
@@ -746,11 +758,17 @@ pub async fn delete_sub_item(
         .find_one_and_update(doc! { "_id": object_id }, update, options)
         .await
     {
-        Ok(Some(_)) => match data.lists_collection.find_one(doc! { "_id": object_id }, None).await {
+        Ok(Some(_)) => match data
+            .lists_collection
+            .find_one(doc! { "_id": object_id }, None)
+            .await
+        {
             Ok(Some(list)) => HttpResponse::Ok().json(list),
             _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
         },
-        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Ok(None) => {
+            HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" }))
+        }
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
 }
@@ -771,7 +789,10 @@ pub async fn toggle_sub_item(
         .await
     {
         Ok(Some(l)) => l,
-        Ok(None) => return HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Ok(None) => {
+            return HttpResponse::NotFound()
+                .json(serde_json::json!({ "message": "List not found" }))
+        }
         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
     };
     let current = list
@@ -794,11 +815,17 @@ pub async fn toggle_sub_item(
         .find_one_and_update(doc! { "_id": object_id }, update, options)
         .await
     {
-        Ok(Some(_)) => match data.lists_collection.find_one(doc! { "_id": object_id }, None).await {
+        Ok(Some(_)) => match data
+            .lists_collection
+            .find_one(doc! { "_id": object_id }, None)
+            .await
+        {
             Ok(Some(list)) => HttpResponse::Ok().json(list),
             _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
         },
-        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Ok(None) => {
+            HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" }))
+        }
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
 }

@@ -231,7 +231,9 @@
   border-radius: 6px;
   color: #94a3b8;
   flex-shrink: 0;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 
   &:hover {
     background: #f1f5f9;
