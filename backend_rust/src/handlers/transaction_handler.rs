@@ -1,8 +1,8 @@
+use crate::db::AppState;
+use crate::models::{CheckNameResponse, RecurringTransaction};
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use futures::StreamExt;
 use mongodb::bson::{doc, oid::ObjectId};
-use crate::models::{RecurringTransaction, CheckNameResponse};
-use crate::db::AppState;
 
 fn extract_user_id(req: &HttpRequest) -> Option<String> {
     req.headers()
@@ -17,7 +17,11 @@ pub async fn get_transactions(req: HttpRequest, data: web::Data<AppState>) -> im
         None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
     };
 
-    let mut cursor = match data.transactions_collection.find(doc! { "user_id": &user_id }, None).await {
+    let mut cursor = match data
+        .transactions_collection
+        .find(doc! { "user_id": &user_id }, None)
+        .await
+    {
         Ok(cursor) => cursor,
         Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };
@@ -27,11 +31,11 @@ pub async fn get_transactions(req: HttpRequest, data: web::Data<AppState>) -> im
         match result {
             Ok(t) => transactions.push(t),
             Err(e) => {
-                 println!("Error deserializing transaction: {:?}", e);
+                println!("Error deserializing transaction: {:?}", e);
             }
         }
     }
-    
+
     transactions.sort_by(|a, b| a.name.cmp(&b.name));
 
     HttpResponse::Ok().json(transactions)
@@ -48,22 +52,33 @@ pub async fn create_transaction(
     };
     let mut new_transaction = transaction.into_inner();
     new_transaction.user_id = user_id;
-    match data.transactions_collection.insert_one(new_transaction, None).await {
+    match data
+        .transactions_collection
+        .insert_one(new_transaction, None)
+        .await
+    {
         Ok(insert_result) => {
-             if let Some(new_id) = insert_result.inserted_id.as_object_id() {
-                 match data.transactions_collection.find_one(doc! { "_id": new_id }, None).await {
-                     Ok(Some(t)) => HttpResponse::Created().json(t),
-                     _ => HttpResponse::InternalServerError().body("Failed to retrieve created transaction"),
-                 }
+            if let Some(new_id) = insert_result.inserted_id.as_object_id() {
+                match data
+                    .transactions_collection
+                    .find_one(doc! { "_id": new_id }, None)
+                    .await
+                {
+                    Ok(Some(t)) => HttpResponse::Created().json(t),
+                    _ => HttpResponse::InternalServerError()
+                        .body("Failed to retrieve created transaction"),
+                }
             } else {
                 HttpResponse::InternalServerError().body("Failed to get inserted ID")
             }
         }
         Err(err) => {
-             if err.to_string().contains("11000") {
-                 HttpResponse::BadRequest().json(serde_json::json!({ "message": "Transaction with this name already exists" }))
+            if err.to_string().contains("11000") {
+                HttpResponse::BadRequest().json(
+                    serde_json::json!({ "message": "Transaction with this name already exists" }),
+                )
             } else {
-                 HttpResponse::InternalServerError().body(err.to_string())
+                HttpResponse::InternalServerError().body(err.to_string())
             }
         }
     }
@@ -95,27 +110,44 @@ pub async fn update_transaction(
 
     match data
         .transactions_collection
-        .find_one_and_update(doc! { "_id": object_id, "user_id": &user_id }, doc! { "$set": doc }, None)
+        .find_one_and_update(
+            doc! { "_id": object_id, "user_id": &user_id },
+            doc! { "$set": doc },
+            None,
+        )
         .await
     {
         Ok(Some(_)) => {
-             match data.transactions_collection.find_one(doc! { "_id": object_id }, None).await {
-                     Ok(Some(t)) => HttpResponse::Ok().json(t),
-                     _ => HttpResponse::NotFound().json(serde_json::json!({ "message": "Transaction not found after update" })),
-                 }
+            match data
+                .transactions_collection
+                .find_one(doc! { "_id": object_id }, None)
+                .await
+            {
+                Ok(Some(t)) => HttpResponse::Ok().json(t),
+                _ => HttpResponse::NotFound()
+                    .json(serde_json::json!({ "message": "Transaction not found after update" })),
+            }
         }
-        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "Transaction not found" })),
+        Ok(None) => {
+            HttpResponse::NotFound().json(serde_json::json!({ "message": "Transaction not found" }))
+        }
         Err(err) => {
             if err.to_string().contains("11000") {
-                 HttpResponse::BadRequest().json(serde_json::json!({ "message": "Transaction with this name already exists" }))
+                HttpResponse::BadRequest().json(
+                    serde_json::json!({ "message": "Transaction with this name already exists" }),
+                )
             } else {
-                 HttpResponse::InternalServerError().body(err.to_string())
+                HttpResponse::InternalServerError().body(err.to_string())
             }
         }
     }
 }
 
-pub async fn delete_transaction(req: HttpRequest, data: web::Data<AppState>, path: web::Path<String>) -> impl Responder {
+pub async fn delete_transaction(
+    req: HttpRequest,
+    data: web::Data<AppState>,
+    path: web::Path<String>,
+) -> impl Responder {
     let user_id = match extract_user_id(&req) {
         Some(id) => id,
         None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
@@ -126,12 +158,18 @@ pub async fn delete_transaction(req: HttpRequest, data: web::Data<AppState>, pat
         Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
     };
 
-    match data.transactions_collection.delete_one(doc! { "_id": object_id, "user_id": &user_id }, None).await {
+    match data
+        .transactions_collection
+        .delete_one(doc! { "_id": object_id, "user_id": &user_id }, None)
+        .await
+    {
         Ok(result) => {
             if result.deleted_count == 1 {
-                HttpResponse::Ok().json(serde_json::json!({ "message": "Transaction deleted successfully" }))
+                HttpResponse::Ok()
+                    .json(serde_json::json!({ "message": "Transaction deleted successfully" }))
             } else {
-                HttpResponse::NotFound().json(serde_json::json!({ "message": "Transaction not found" }))
+                HttpResponse::NotFound()
+                    .json(serde_json::json!({ "message": "Transaction not found" }))
             }
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
