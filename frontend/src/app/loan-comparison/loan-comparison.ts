@@ -12,10 +12,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 
 import { Debt } from '../models/debt.model';
 import { LoanDetails, LoanComparisonResult } from '../models/loan-comparison.model';
@@ -34,10 +34,10 @@ import { DebtService } from '../services/debt.service';
     MatInputModule,
     MatButtonModule,
     MatCheckboxModule,
-    MatTabsModule,
     MatProgressSpinnerModule,
     MatDividerModule,
     MatIconModule,
+    MatCardModule,
   ],
   templateUrl: './loan-comparison.html',
   styleUrls: ['./loan-comparison.scss'],
