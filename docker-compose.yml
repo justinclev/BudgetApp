@@ -22,12 +22,13 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./apps/dashboard
       dockerfile: Dockerfile.dev
     environment:
       - FRONTEND_ENV=${FRONTEND_ENV:-local}
     volumes:
-      - ./frontend:/app
+      - ./apps/dashboard:/app
+      - ./apps/budget:/app/apps/budget
       - /app/node_modules
     ports:
       - "4200:4200"

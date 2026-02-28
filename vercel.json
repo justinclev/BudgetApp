@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd apps/dashboard && npm run build",
+  "devCommand": "cd apps/dashboard && npm run dev",
+  "installCommand": "npm install && cd apps/dashboard && npm install && cd ../budget && npm install",
+  "outputDirectory": "apps/dashboard/dist/frontend/browser"
+}
