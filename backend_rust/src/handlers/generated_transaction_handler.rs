@@ -15,7 +15,7 @@ pub async fn get_generated_transactions(req: HttpRequest, data: web::Data<AppSta
         Some(id) => id,
         None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
     };
-    match data.generated_transactions_collection.find_one(doc! { "user": &user_id }, None).await {
+    match data.generated_transactions_collection.find_one(doc! { "createdByUserId": &user_id }, None).await {
         Ok(Some(user_transactions)) => HttpResponse::Ok().json(user_transactions.transactions),
         Ok(None) => HttpResponse::Ok().json(Vec::<Transaction>::new()),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
@@ -42,7 +42,7 @@ pub async fn save_generated_transactions(
 
     let update = doc! {
         "$set": { "transactions": transactions_bson },
-        "$setOnInsert": { "user": &user_id }
+        "$setOnInsert": { "createdByUserId": &user_id }
     };
     
     let options = mongodb::options::UpdateOptions::builder().upsert(true).build();

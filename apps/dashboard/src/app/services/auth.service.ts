@@ -1,5 +1,8 @@
 import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 const COOKIE_NAME = 'budget_auth';
 
@@ -26,7 +29,11 @@ export class AuthService {
   private isAuthenticatedSignal = signal<boolean>(!!readAuthCookie());
   isAuthenticated = this.isAuthenticatedSignal.asReadonly();
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient) {}
+
+  loginWithGoogle(credential: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/api/auth/google`, { credential });
+  }
 
   login(userData: any, returnUrl?: string): void {
     writeAuthCookie(userData);

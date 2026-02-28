@@ -19,7 +19,7 @@ pub async fn get_debts(req: HttpRequest, data: web::Data<AppState>) -> impl Resp
 
     let mut cursor = match data
         .debts_collection
-        .find(doc! { "user_id": &user_id }, None)
+        .find(doc! { "createdByUserId": &user_id }, None)
         .await
     {
         Ok(cursor) => cursor,
@@ -51,7 +51,7 @@ pub async fn create_debt(
         None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
     };
     let mut new_debt = debt.into_inner();
-    new_debt.user_id = user_id;
+    new_debt.created_by_user_id = user_id;
     match data.debts_collection.insert_one(new_debt, None).await {
         Ok(insert_result) => {
             if let Some(new_id) = insert_result.inserted_id.as_object_id() {
@@ -183,7 +183,7 @@ pub async fn check_debt_name(
     let name = path.into_inner();
     let exclude_id_str = query.get("excludeId");
 
-    let mut filter = doc! { "name": name, "user_id": &user_id };
+    let mut filter = doc! { "name": name, "createdByUserId": &user_id };
     if let Some(id_str) = exclude_id_str {
         if let Ok(oid) = ObjectId::parse_str(id_str) {
             filter.insert("_id", doc! { "$ne": oid });

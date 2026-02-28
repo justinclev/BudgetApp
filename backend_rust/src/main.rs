@@ -10,6 +10,7 @@ use std::env;
 
 use handlers::{
     debt_handler, generated_transaction_handler, health_handler, list_handler, transaction_handler,
+    user_handler,
 };
 
 #[actix_web::main]
@@ -141,6 +142,12 @@ async fn main() -> std::io::Result<()> {
                 "/api/lists/{id}/clone",
                 web::post().to(list_handler::clone_list),
             )
+            // User Routes
+            .route("/api/users", web::get().to(user_handler::get_users))
+            .route("/api/users/{id}", web::get().to(user_handler::get_user))
+            .route("/api/users", web::post().to(user_handler::create_user))
+            // Auth Routes
+            .route("/api/auth/google", web::post().to(user_handler::google_auth))
     })
     .bind(format!("0.0.0.0:{}", port))?
     .run()

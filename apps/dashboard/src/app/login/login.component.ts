@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { environment } from '../../environments/environment';
+
+declare const google: any;
 
 @Component({
   selector: 'app-login',
@@ -13,6 +16,13 @@ import { AuthService } from '../services/auth.service';
         <div class="icon-circle">🔐</div>
         <h2>Welcome to Budget Apps</h2>
         <p>Sign in to access your apps and manage your finances.</p>
+
+        <!-- Google Sign-In -->
+        <div id="google-btn" class="google-btn-wrap"></div>
+
+        <div class="divider"><span>or</span></div>
+
+        <!-- Dev test accounts -->
         <p class="dev-label">Dev accounts</p>
         <button (click)="loginAs(0)" class="account-btn">
           <span class="acct-avatar acct-avatar--alice">A</span>
@@ -22,6 +32,8 @@ import { AuthService } from '../services/auth.service';
           <span class="acct-avatar acct-avatar--bob">B</span>
           Sign in as Bob
         </button>
+
+        <p *ngIf="googleError" class="error-msg">{{ googleError }}</p>
       </div>
     </div>
   `,
@@ -72,13 +84,44 @@ import { AuthService } from '../services/auth.service';
         font-size: 1rem;
       }
 
+      .google-btn-wrap {
+        display: flex;
+        justify-content: center;
+        margin: 0.5rem 0 0;
+        min-height: 44px;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 1.25rem 0 0.75rem;
+        color: #cbd5e0;
+        font-size: 13px;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e2e8f0;
+      }
+
+      .divider span {
+        color: #a0aec0;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
       .dev-label {
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: #94a3b8;
-        margin: 0.5rem 0 0.75rem;
+        margin: 0 0 0.75rem;
       }
 
       .account-btn {
@@ -130,6 +173,12 @@ import { AuthService } from '../services/auth.service';
         background: linear-gradient(135deg, #f59e0b, #ef4444);
       }
 
+      .error-msg {
+        margin-top: 1rem;
+        color: #e53e3e;
+        font-size: 0.875rem;
+      }
+
       @media (max-width: 480px) {
         .modern-card {
           padding: 2rem 1.5rem;
@@ -149,16 +198,46 @@ import { AuthService } from '../services/auth.service';
     `,
   ],
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit {
+  googleError: string | null = null;
+
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
   ) {}
 
   private readonly mockUsers = [
-    { id: '123', email: 'alice@example.com', name: 'Alice' },
-    { id: '2', email: 'bob@example.com', name: 'Bob' },
+    { id: '507f1f77bcf86cd799439011', email: 'alice@example.com', name: 'Alice' },
+    { id: '507f1f77bcf86cd799439012', email: 'bob@example.com', name: 'Bob' },
   ];
+
+  ngAfterViewInit(): void {
+    if (typeof google !== 'undefined' && environment.googleClientId !== 'YOUR_GOOGLE_CLIENT_ID') {
+      google.accounts.id.initialize({
+        client_id: environment.googleClientId,
+        callback: (response: any) => this.handleGoogleCredential(response),
+      });
+      google.accounts.id.renderButton(document.getElementById('google-btn'), {
+        theme: 'outline',
+        size: 'large',
+        width: 368,
+        text: 'signin_with',
+      });
+    }
+  }
+
+  handleGoogleCredential(response: any): void {
+    this.googleError = null;
+    this.authService.loginWithGoogle(response.credential).subscribe({
+      next: (user: any) => {
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        this.authService.login(user, returnUrl ?? undefined);
+      },
+      error: () => {
+        this.googleError = 'Google sign-in failed. Please try again.';
+      },
+    });
+  }
 
   loginAs(index: number): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');

@@ -19,7 +19,7 @@ pub async fn get_transactions(req: HttpRequest, data: web::Data<AppState>) -> im
 
     let mut cursor = match data
         .transactions_collection
-        .find(doc! { "user_id": &user_id }, None)
+        .find(doc! { "createdByUserId": &user_id }, None)
         .await
     {
         Ok(cursor) => cursor,
@@ -51,7 +51,7 @@ pub async fn create_transaction(
         None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
     };
     let mut new_transaction = transaction.into_inner();
-    new_transaction.user_id = user_id;
+    new_transaction.created_by_user_id = user_id;
     match data
         .transactions_collection
         .insert_one(new_transaction, None)
@@ -189,7 +189,7 @@ pub async fn check_transaction_name(
     let name = path.into_inner();
     let exclude_id_str = query.get("excludeId");
 
-    let mut filter = doc! { "name": name, "user_id": &user_id };
+    let mut filter = doc! { "name": name, "createdByUserId": &user_id };
     if let Some(id_str) = exclude_id_str {
         if let Ok(oid) = ObjectId::parse_str(id_str) {
             filter.insert("_id", doc! { "$ne": oid });

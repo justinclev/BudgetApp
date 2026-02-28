@@ -16,8 +16,8 @@ pub struct Debt {
     )]
     pub id: Option<ObjectId>,
     pub name: String,
-    #[serde(default)]
-    pub user_id: String,
+    #[serde(rename = "createdByUserId", default)]
+    pub created_by_user_id: String,
     #[serde(
         rename = "amountOwed",
         deserialize_with = "deserialize_f64_from_bson_number"
@@ -52,8 +52,8 @@ pub struct RecurringTransaction {
     )]
     pub id: Option<ObjectId>,
     pub name: String,
-    #[serde(default)]
-    pub user_id: String,
+    #[serde(rename = "createdByUserId", default)]
+    pub created_by_user_id: String,
     pub description: String,
     #[serde(deserialize_with = "deserialize_f64_from_bson_number")]
     pub amount: f64,
@@ -116,13 +116,41 @@ pub struct UserTransactions {
         default
     )]
     pub id: Option<ObjectId>,
-    pub user: String,
+    #[serde(rename = "createdByUserId")]
+    pub created_by_user_id: String,
     pub transactions: Vec<Transaction>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct CheckNameResponse {
     pub exists: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct User {
+    #[serde(
+        rename = "_id",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_oid_as_hex",
+        deserialize_with = "deserialize_oid_from_hex",
+        default
+    )]
+    pub id: Option<ObjectId>,
+    pub name: String,
+    pub email: String,
+    #[serde(rename = "googleId", skip_serializing_if = "Option::is_none", default)]
+    pub google_id: Option<String>,
+    #[serde(rename = "avatarUrl", skip_serializing_if = "Option::is_none", default)]
+    pub avatar_url: Option<String>,
+    #[serde(rename = "lastLogin", skip_serializing_if = "Option::is_none", default)]
+    pub last_login: Option<chrono::DateTime<chrono::Utc>>,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none", default)]
+    pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GoogleAuthRequest {
+    pub credential: String,
 }
 
 // ── List App Models ────────────────────────────────────────────────────────
@@ -162,6 +190,8 @@ pub struct UserList {
     pub list_type: String,
     #[serde(rename = "ownerId")]
     pub owner_id: String,
+    #[serde(rename = "createdByUserId", default)]
+    pub created_by_user_id: String,
     #[serde(rename = "authorizedUsers", default)]
     pub authorized_users: Vec<String>,
     #[serde(default)]
