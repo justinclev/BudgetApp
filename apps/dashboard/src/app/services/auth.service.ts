@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private isAuthenticatedSignal = signal<boolean>(this.loadAuthState());

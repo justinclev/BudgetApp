@@ -20,7 +20,7 @@ services:
     depends_on:
       - mongo
 
-  frontend:
+  frontend-dashboard:
     build:
       context: ./apps/dashboard
       dockerfile: Dockerfile.dev
@@ -28,10 +28,23 @@ services:
       - FRONTEND_ENV=${FRONTEND_ENV:-local}
     volumes:
       - ./apps/dashboard:/app
-      - ./apps/budget:/app/apps/budget
       - /app/node_modules
     ports:
       - "4200:4200"
+    depends_on:
+      - backend
+
+  frontend-budget:
+    build:
+      context: ./apps/budget
+      dockerfile: Dockerfile.dev
+    environment:
+      - FRONTEND_ENV=${FRONTEND_ENV:-local}
+    volumes:
+      - ./apps/budget:/app
+      - /app/node_modules
+    ports:
+      - "4201:4200"
     depends_on:
       - backend
 

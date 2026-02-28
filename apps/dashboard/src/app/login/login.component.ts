@@ -7,55 +7,108 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="page-container flex-center" style="height: 100vh;">
-      <div class="modern-card" style="max-width: 400px; width: 100%; text-align: center;">
+    <div class="page-container flex-center">
+      <div class="modern-card">
+        <div class="icon-circle">🔐</div>
         <h2>Welcome to Budget Apps</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-          Sign in to access your apps and manage your finances.
-        </p>
-        
-        <button 
-          (click)="loginWithGoogle()"
-          style="width: 100%; height: 48px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background 0.3s;">
+        <p>Sign in to access your apps and manage your finances.</p>
+
+        <button (click)="loginWithGoogle()" class="google-btn">
           Login with Google
         </button>
       </div>
     </div>
   `,
-  styles: [`
-    .page-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
+  styles: [
+    `
+      .page-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 1rem;
+      }
 
-    .flex-center {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+      .modern-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+      }
 
-    .modern-card {
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
+      .icon-circle {
+        font-size: 3rem;
+        background: rgba(102, 126, 234, 0.1);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+      }
 
-    h2 {
-      margin: 0 0 1rem 0;
-      color: #333;
-    }
+      h2 {
+        margin: 0 0 0.5rem 0;
+        color: #2d3748;
+        font-size: 1.75rem;
+        font-weight: 700;
+      }
 
-    p {
-      margin: 0 0 2rem 0;
-    }
+      p {
+        margin: 0 0 2rem 0;
+        color: #718096;
+        line-height: 1.5;
+        font-size: 1rem;
+      }
 
-    button:hover {
-      background: #5568d3 !important;
-    }
-  `]
+      .google-btn {
+        width: 100%;
+        height: 54px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .google-btn:hover {
+        background: #5a6ed6;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .google-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+      }
+
+      @media (max-width: 480px) {
+        .modern-card {
+          padding: 2rem 1.5rem;
+          border-radius: 16px;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+        }
+
+        .icon-circle {
+          width: 70px;
+          height: 70px;
+          font-size: 2.5rem;
+        }
+      }
+    `,
+  ],
 })
 export class LoginComponent {
   constructor(private authService: AuthService) {}
@@ -67,7 +120,7 @@ export class LoginComponent {
     const mockUser = {
       id: '123',
       email: 'user@example.com',
-      name: 'Test User'
+      name: 'Test User',
     };
     this.authService.login(mockUser);
   }

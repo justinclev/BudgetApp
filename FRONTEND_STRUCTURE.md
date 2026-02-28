@@ -27,6 +27,7 @@ This monorepo-style setup allows you to host multiple Angular apps under one Ver
 ## Running Apps Locally
 
 ### Dashboard (Default)
+
 ```bash
 ./frontend-dev.sh dashboard
 # or simply
@@ -34,12 +35,14 @@ This monorepo-style setup allows you to host multiple Angular apps under one Ver
 ```
 
 ### Budget App with Local Backend
+
 ```bash
 ./frontend-dev.sh budget local
 # Connects to http://localhost:3000
 ```
 
 ### Budget App with Production Backend
+
 ```bash
 ./frontend-dev.sh budget prod
 # Connects to https://budgetapp-ma3x.onrender.com
@@ -62,6 +65,7 @@ This monorepo-style setup allows you to host multiple Angular apps under one Ver
 ## Deployment
 
 To deploy to Vercel:
+
 1. Connect your repo to Vercel
 2. Vercel will automatically read `vercel.json` and build the dashboard
 3. Dashboard and all routed apps will be deployed together

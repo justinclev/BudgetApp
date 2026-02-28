@@ -1,11 +1,13 @@
 # Authentication Setup
 
 ## Overview
+
 Authentication is now centralized at the dashboard level. Users must log in before accessing any apps (dashboard or budget).
 
 ## Key Changes
 
 ### Dashboard App
+
 - **Login Page**: Located at `/login` - handles all user authentication
 - **AuthService**: Manages authentication state, login, logout, and user data storage
 - **Auth Guard**: Protects all routes except `/login` - redirects unauthenticated users to login
@@ -13,6 +15,7 @@ Authentication is now centralized at the dashboard level. Users must log in befo
 - **Top Bar**: Shows logout button for quick access
 
 ### Budget App
+
 - **Login Removed**: No longer has login functionality
 - **Routes Simplified**: Direct access to budget features without login redirect
 - **Protected by Parent**: Accessed through `/budget` route which is protected by auth guard
@@ -51,14 +54,14 @@ apps/budget/src/app/
 If you want to add a logout button in the budget app:
 
 ```typescript
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from "../../services/auth.service";
 
 export class MyComponent {
-  constructor(private authService: AuthService) {}
-  
-  logout() {
-    this.authService.logout();
-  }
+	constructor(private authService: AuthService) {}
+
+	logout() {
+		this.authService.logout();
+	}
 }
 ```
 

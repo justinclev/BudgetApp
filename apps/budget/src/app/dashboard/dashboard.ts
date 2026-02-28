@@ -26,6 +26,8 @@ import { Debt } from '../models/debt.model';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { Transaction } from '../models/transaction.model';
 
+import { environment } from '../../environments/environment';
+
 interface DashboardMetrics {
   currentBalance: number;
   totalDebt: number;
@@ -154,8 +156,8 @@ export class DashboardComponent implements OnInit {
     this.metrics.upcomingPaymentCount = this.recurringTransactions.length;
   }
 
-  logout(): void {
-    this.router.navigate(['/login']);
+  goToApps(): void {
+    window.location.href = environment.dashboardUrl;
   }
 
   openAddRecurringTransactionModal(): void {
