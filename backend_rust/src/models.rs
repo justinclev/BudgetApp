@@ -16,6 +16,8 @@ pub struct Debt {
     )]
     pub id: Option<ObjectId>,
     pub name: String,
+    #[serde(default)]
+    pub user_id: String,
     #[serde(
         rename = "amountOwed",
         deserialize_with = "deserialize_f64_from_bson_number"
@@ -50,6 +52,8 @@ pub struct RecurringTransaction {
     )]
     pub id: Option<ObjectId>,
     pub name: String,
+    #[serde(default)]
+    pub user_id: String,
     pub description: String,
     #[serde(deserialize_with = "deserialize_f64_from_bson_number")]
     pub amount: f64,

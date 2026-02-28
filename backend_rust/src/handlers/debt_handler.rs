@@ -1,11 +1,23 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use futures::StreamExt;
 use mongodb::bson::{doc, oid::ObjectId};
 use crate::models::{Debt, CheckNameResponse};
 use crate::db::AppState;
 
-pub async fn get_debts(data: web::Data<AppState>) -> impl Responder {
-    let mut cursor = match data.debts_collection.find(None, None).await {
+fn extract_user_id(req: &HttpRequest) -> Option<String> {
+    req.headers()
+        .get("X-User-Id")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.to_string())
+}
+
+pub async fn get_debts(req: HttpRequest, data: web::Data<AppState>) -> impl Responder {
+    let user_id = match extract_user_id(&req) {
+        Some(id) => id,
+        None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
+    };
+
+    let mut cursor = match data.debts_collection.find(doc! { "user_id": &user_id }, None).await {
         Ok(cursor) => cursor,
         Err(err) => return HttpResponse::InternalServerError().body(err.to_string()),
     };
@@ -25,8 +37,13 @@ pub async fn get_debts(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().json(debts)
 }
 
-pub async fn create_debt(data: web::Data<AppState>, debt: web::Json<Debt>) -> impl Responder {
-    let new_debt = debt.into_inner();
+pub async fn create_debt(req: HttpRequest, data: web::Data<AppState>, debt: web::Json<Debt>) -> impl Responder {
+    let user_id = match extract_user_id(&req) {
+        Some(id) => id,
+        None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
+    };
+    let mut new_debt = debt.into_inner();
+    new_debt.user_id = user_id;
     match data.debts_collection.insert_one(new_debt, None).await {
         Ok(insert_result) => {
             if let Some(new_id) = insert_result.inserted_id.as_object_id() {
@@ -49,10 +66,15 @@ pub async fn create_debt(data: web::Data<AppState>, debt: web::Json<Debt>) -> im
 }
 
 pub async fn update_debt(
+    req: HttpRequest,
     data: web::Data<AppState>,
     path: web::Path<String>,
     debt: web::Json<Debt>,
 ) -> impl Responder {
+    let user_id = match extract_user_id(&req) {
+        Some(id) => id,
+        None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
+    };
     let id_str = path.into_inner();
     let object_id = match ObjectId::parse_str(&id_str) {
         Ok(oid) => oid,
@@ -65,10 +87,11 @@ pub async fn update_debt(
         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
     };
     doc.remove("_id");
+    doc.remove("user_id");
 
     match data
         .debts_collection
-        .find_one_and_update(doc! { "_id": object_id }, doc! { "$set": doc }, None)
+        .find_one_and_update(doc! { "_id": object_id, "user_id": &user_id }, doc! { "$set": doc }, None)
         .await
     {
         Ok(Some(_)) => {
@@ -88,14 +111,18 @@ pub async fn update_debt(
     }
 }
 
-pub async fn delete_debt(data: web::Data<AppState>, path: web::Path<String>) -> impl Responder {
+pub async fn delete_debt(req: HttpRequest, data: web::Data<AppState>, path: web::Path<String>) -> impl Responder {
+    let user_id = match extract_user_id(&req) {
+        Some(id) => id,
+        None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
+    };
     let id_str = path.into_inner();
     let object_id = match ObjectId::parse_str(&id_str) {
         Ok(oid) => oid,
         Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
     };
 
-    match data.debts_collection.delete_one(doc! { "_id": object_id }, None).await {
+    match data.debts_collection.delete_one(doc! { "_id": object_id, "user_id": &user_id }, None).await {
         Ok(result) => {
             if result.deleted_count == 1 {
                 HttpResponse::Ok().json(serde_json::json!({ "message": "Debt deleted successfully" }))
@@ -108,14 +135,19 @@ pub async fn delete_debt(data: web::Data<AppState>, path: web::Path<String>) -> 
 }
 
 pub async fn check_debt_name(
+    req: HttpRequest,
     data: web::Data<AppState>,
     path: web::Path<String>,
     query: web::Query<std::collections::HashMap<String, String>>,
 ) -> impl Responder {
+    let user_id = match extract_user_id(&req) {
+        Some(id) => id,
+        None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
+    };
     let name = path.into_inner();
     let exclude_id_str = query.get("excludeId");
 
-    let mut filter = doc! { "name": name };
+    let mut filter = doc! { "name": name, "user_id": &user_id };
     if let Some(id_str) = exclude_id_str {
         if let Ok(oid) = ObjectId::parse_str(id_str) {
             filter.insert("_id", doc! { "$ne": oid });

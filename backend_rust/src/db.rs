@@ -23,9 +23,38 @@ pub async fn init_db() -> AppState {
     let generated_transactions_collection = db.collection::<UserTransactions>("transactions");
     let lists_collection = db.collection::<UserList>("lists");
 
-    // Ensure unique indexes for budget collections
+    // ── Migration: stamp pre-user-isolation docs with Alice's ID (no data loss) ──
+    let alice_id = "123";
+    let _ = debts_collection
+        .update_many(
+            doc! { "user_id": { "$exists": false } },
+            doc! { "$set": { "user_id": alice_id } },
+            None,
+        )
+        .await;
+    let _ = transactions_collection
+        .update_many(
+            doc! { "user_id": { "$exists": false } },
+            doc! { "$set": { "user_id": alice_id } },
+            None,
+        )
+        .await;
+    // generated_transactions used "default" as user key before
+    let _ = generated_transactions_collection
+        .update_many(
+            doc! { "user": "default" },
+            doc! { "$set": { "user": alice_id } },
+            None,
+        )
+        .await;
+
+    // Drop old name-only unique index; names are now unique per user
+    let _ = debts_collection.drop_index("name_1", None).await;
+    let _ = transactions_collection.drop_index("name_1", None).await;
+
+    // Compound unique index: (name, user_id)
     let index_model = mongodb::IndexModel::builder()
-        .keys(doc! { "name": 1 })
+        .keys(doc! { "name": 1, "user_id": 1 })
         .options(
             mongodb::options::IndexOptions::builder()
                 .unique(true)
