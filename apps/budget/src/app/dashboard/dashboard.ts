@@ -26,7 +26,6 @@ import { Debt } from '../models/debt.model';
 import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { Transaction } from '../models/transaction.model';
 
-import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
 
 interface DashboardMetrics {
@@ -163,7 +162,7 @@ export class DashboardComponent implements OnInit {
   }
 
   goToApps(): void {
-    window.location.href = environment.dashboardUrl;
+    window.location.href = location.hostname === 'localhost' ? 'http://localhost:4200' : '/';
   }
 
   openAddRecurringTransactionModal(): void {
