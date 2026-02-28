@@ -48,5 +48,19 @@ services:
     depends_on:
       - backend
 
+  frontend-list:
+    build:
+      context: ./apps/list
+      dockerfile: Dockerfile.dev
+    environment:
+      - FRONTEND_ENV=${FRONTEND_ENV:-local}
+    volumes:
+      - ./apps/list:/app
+      - /app/node_modules
+    ports:
+      - "4202:4200"
+    depends_on:
+      - backend
+
 volumes:
   mongo-data:

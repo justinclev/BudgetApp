@@ -1,0 +1,126 @@
+<div class="page">
+  <!-- Header -->
+  <header class="top-bar">
+    <button class="back-btn" (click)="goHome()">‹</button>
+    @if (editingName()) {
+      <input class="name-input" [(ngModel)]="editName"
+             (blur)="saveName()" (keydown.enter)="saveName()"
+             autofocus maxlength="60" />
+    } @else {
+      <h1 class="title" (click)="startEditName()">{{ list()?.name }}</h1>
+    }
+    <button class="icon-btn" (click)="showMenu = !showMenu">⋯</button>
+  </header>
+
+  <!-- Menu -->
+  @if (showMenu) {
+    <div class="menu-overlay" (click)="showMenu = false">
+      <div class="menu" (click)="$event.stopPropagation()">
+        <button (click)="copyShareLink()">🔗 Copy Share Link</button>
+        <button (click)="showMenu = false; showMembers = true">👥 Members</button>
+        <button (click)="resetList()">🔄 Reset All Items</button>
+        <button (click)="cloneList()">📋 Clone List</button>
+        <button class="danger" (click)="deleteList()">🗑 Delete List</button>
+      </div>
+    </div>
+  }
+
+  <!-- Items canvas -->
+  <main class="main">
+    @if (loading()) {
+      <div class="center-msg">Loading…</div>
+    } @else {
+
+      <!-- Pending items — draggable -->
+      <ul class="item-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
+        @for (item of pendingItems(); track item.id; let i = $index) {
+          <li class="item" cdkDrag>
+            <span class="drag-handle" cdkDragHandle></span>
+            <button class="check-btn" (click)="toggleItem(item)" type="button"></button>
+            <input
+              #itemInput
+              class="item-input"
+              [value]="item.text"
+              (input)="onDraftChange(item.id, $event)"
+              (blur)="onItemBlur(item)"
+              (keydown)="onItemKeydown($event, item, i)"
+              maxlength="200"
+            />
+            <button class="del-btn" (click)="deleteItem(item)" type="button">×</button>
+          </li>
+        }
+      </ul>
+
+      <!-- New item row -->
+      <ul class="item-list">
+        <li class="item new-row">
+          <span class="new-plus">+</span>
+          <input
+            #newInput
+            class="item-input new-input"
+            [(ngModel)]="newItemText"
+            placeholder="List item"
+            maxlength="200"
+            (keydown)="onNewItemKeydown($event)"
+          />
+        </li>
+      </ul>
+
+      <!-- Done items — static, sorted to bottom -->
+      @if (doneItems().length > 0) {
+        <ul class="item-list done-list">
+          @for (item of doneItems(); track item.id; let i = $index) {
+            <li class="item done">
+              <span class="drag-spacer"></span>
+              <button class="check-btn checked" (click)="toggleItem(item)" type="button">
+                <span class="check-icon">✓</span>
+              </button>
+              <input
+                #itemInput
+                class="item-input"
+                [value]="item.text"
+                (input)="onDraftChange(item.id, $event)"
+                (blur)="onItemBlur(item)"
+                (keydown)="onItemKeydown($event, item, pendingItems().length + i)"
+                maxlength="200"
+              />
+              <button class="del-btn" (click)="deleteItem(item)" type="button">×</button>
+            </li>
+          }
+        </ul>
+      }
+
+    }
+  </main>
+
+  <!-- Toast -->
+  @if (toast()) {
+    <div class="toast">{{ toast() }}</div>
+  }
+
+  <!-- Members panel -->
+  @if (showMembers) {
+    <div class="panel-overlay" (click)="showMembers = false">
+      <div class="panel" (click)="$event.stopPropagation()">
+        <div class="panel-header">
+          <h2>Members</h2>
+          <button class="panel-close" (click)="showMembers = false">×</button>
+        </div>
+        <ul class="member-list">
+          @for (uid of list()?.authorizedUsers ?? []; track uid) {
+            <li class="member-row">
+              <span class="member-avatar">{{ uid[0].toUpperCase() }}</span>
+              <span class="member-email">
+                {{ uid }}
+                @if (uid === list()?.ownerId) { <span class="owner-badge">owner</span> }
+              </span>
+              @if (isOwner() && uid !== list()?.ownerId) {
+                <button class="member-remove" (click)="removeMember(uid)" title="Remove member">×</button>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</div>

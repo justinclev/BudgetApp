@@ -1,4 +1,4 @@
-use crate::models::{Debt, RecurringTransaction, UserTransactions};
+use crate::models::{Debt, RecurringTransaction, UserTransactions, UserList};
 use mongodb::{bson::doc, options::ClientOptions, Client, Collection};
 use std::env;
 
@@ -7,6 +7,7 @@ pub struct AppState {
     pub debts_collection: Collection<Debt>,
     pub transactions_collection: Collection<RecurringTransaction>,
     pub generated_transactions_collection: Collection<UserTransactions>,
+    pub lists_collection: Collection<UserList>,
 }
 
 pub async fn init_db() -> AppState {
@@ -20,8 +21,9 @@ pub async fn init_db() -> AppState {
     let debts_collection = db.collection::<Debt>("debts");
     let transactions_collection = db.collection::<RecurringTransaction>("recurringtransactions");
     let generated_transactions_collection = db.collection::<UserTransactions>("transactions");
+    let lists_collection = db.collection::<UserList>("lists");
 
-    // Ensure unique indexes
+    // Ensure unique indexes for budget collections
     let index_model = mongodb::IndexModel::builder()
         .keys(doc! { "name": 1 })
         .options(
@@ -38,9 +40,21 @@ pub async fn init_db() -> AppState {
         .create_index(index_model, None)
         .await;
 
+    // Index lists by shareToken for fast lookup
+    let share_token_index = mongodb::IndexModel::builder()
+        .keys(doc! { "shareToken": 1 })
+        .options(
+            mongodb::options::IndexOptions::builder()
+                .unique(true)
+                .build(),
+        )
+        .build();
+    let _ = lists_collection.create_index(share_token_index, None).await;
+
     AppState {
         debts_collection,
         transactions_collection,
         generated_transactions_collection,
+        lists_collection,
     }
 }

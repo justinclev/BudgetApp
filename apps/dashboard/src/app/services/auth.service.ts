@@ -1,37 +1,47 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthService {
-  private isAuthenticatedSignal = signal<boolean>(this.loadAuthState());
+const COOKIE_NAME = 'budget_auth';
 
+function readAuthCookie(): any | null {
+  const match = document.cookie.match(/(?:^|;\s*)budget_auth=([^;]+)/);
+  if (!match) return null;
+  try { return JSON.parse(decodeURIComponent(match[1])); } catch { return null; }
+}
+
+function writeAuthCookie(user: any): void {
+  document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(user))}; path=/; SameSite=Lax`;
+}
+
+function clearAuthCookie(): void {
+  document.cookie = `${COOKIE_NAME}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+}
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private isAuthenticatedSignal = signal<boolean>(!!readAuthCookie());
   isAuthenticated = this.isAuthenticatedSignal.asReadonly();
 
   constructor(private router: Router) {}
 
-  private loadAuthState(): boolean {
-    // Check if user is authenticated from localStorage
-    return typeof localStorage !== 'undefined' && !!localStorage.getItem('user');
-  }
-
-  login(userData: any): void {
-    // Store user data in localStorage
-    localStorage.setItem('user', JSON.stringify(userData));
+  login(userData: any, returnUrl?: string): void {
+    writeAuthCookie(userData);
     this.isAuthenticatedSignal.set(true);
-    this.router.navigate(['/dashboard']);
+    if (returnUrl) {
+      window.location.href = decodeURIComponent(returnUrl);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   logout(): void {
-    localStorage.removeItem('user');
+    clearAuthCookie();
     this.isAuthenticatedSignal.set(false);
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   }
 
   getUser(): any {
-    if (typeof localStorage === 'undefined') return null;
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    return readAuthCookie();
   }
 }
+

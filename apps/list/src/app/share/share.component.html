@@ -1,0 +1,25 @@
+<div class="share-page">
+  <div class="share-card">
+    <div class="logo">📋</div>
+    @switch (status()) {
+      @case ('loading') {
+        <p class="msg">Joining list…</p>
+      }
+      @case ('joining') {
+        <h2>You're invited!</h2>
+        <p class="msg">Join <strong>{{ listName() }}</strong></p>
+        <button class="btn-join" (click)="join()">Join List</button>
+      }
+      @case ('success') {
+        <h2>✅ Joined!</h2>
+        <p class="msg">You've been added to <strong>{{ listName() }}</strong></p>
+        <button class="btn-join" (click)="openList()">Open List</button>
+      }
+      @case ('error') {
+        <h2>Link not found</h2>
+        <p class="msg">This share link may have expired or been removed.</p>
+        <button class="btn-join" (click)="goHome()">Back to My Lists</button>
+      }
+    }
+  </div>
+</div>

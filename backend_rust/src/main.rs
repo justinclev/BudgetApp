@@ -8,7 +8,7 @@ use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 
-use handlers::{debt_handler, transaction_handler, health_handler, generated_transaction_handler};
+use handlers::{debt_handler, transaction_handler, health_handler, generated_transaction_handler, list_handler};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -47,6 +47,22 @@ async fn main() -> std::io::Result<()> {
             // Generated Transaction Routes
             .route("/api/transactions", web::get().to(generated_transaction_handler::get_generated_transactions))
             .route("/api/transactions", web::post().to(generated_transaction_handler::save_generated_transactions))
+            // List Routes
+            .route("/api/lists", web::get().to(list_handler::get_lists))
+            .route("/api/lists", web::post().to(list_handler::create_list))
+            .route("/api/lists/share/{token}", web::get().to(list_handler::get_list_by_share_token))
+            .route("/api/lists/share/{token}/join", web::post().to(list_handler::join_list_by_share_token))
+            .route("/api/lists/{id}", web::get().to(list_handler::get_list))
+            .route("/api/lists/{id}", web::put().to(list_handler::update_list))
+            .route("/api/lists/{id}", web::delete().to(list_handler::delete_list))
+            .route("/api/lists/{id}/items", web::post().to(list_handler::add_item))
+            .route("/api/lists/{id}/items/reorder", web::post().to(list_handler::reorder_items))
+            .route("/api/lists/{id}/members/{user_id}", web::delete().to(list_handler::remove_member))
+            .route("/api/lists/{id}/items/{item_id}", web::delete().to(list_handler::delete_item))
+            .route("/api/lists/{id}/items/{item_id}", web::patch().to(list_handler::update_item_text))
+            .route("/api/lists/{id}/items/{item_id}/toggle", web::patch().to(list_handler::toggle_item))
+            .route("/api/lists/{id}/reset", web::post().to(list_handler::reset_list))
+            .route("/api/lists/{id}/clone", web::post().to(list_handler::clone_list))
     })
     .bind(format!("0.0.0.0:{}", port))?
     .run()
