@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": "dist/list",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -30,6 +31,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/list/",
               "budgets": [
                 {
                   "type": "initial",

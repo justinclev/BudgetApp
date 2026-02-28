@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: '/api',
-  dashboardUrl: '/',
+  apiUrl: 'https://budgetapp-ma3x.onrender.com/api',
+  dashboardUrl: '',
 };

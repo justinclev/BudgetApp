@@ -1,6 +1,10 @@
 {
-	"buildCommand": "cd apps/dashboard && npm run build",
-	"devCommand": "cd apps/dashboard && npm run dev",
-	"installCommand": "npm install && cd apps/dashboard && npm install && cd ../budget && npm install",
-	"outputDirectory": "apps/dashboard/dist/frontend/browser"
+  "installCommand": "(cd apps/dashboard && npm ci) && (cd apps/budget && npm ci) && (cd apps/list && npm ci)",
+  "buildCommand": "(cd apps/dashboard && npm run build) && (cd apps/budget && npm run build) && (cd apps/list && npm run build) && mkdir -p dist/budget dist/list && cp -r apps/dashboard/dist/dashboard/browser/. dist/ && cp -r apps/budget/dist/budget/browser/. dist/budget/ && cp -r apps/list/dist/list/browser/. dist/list/",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/budget/:path*", "destination": "/budget/index.html" },
+    { "source": "/list/:path*",   "destination": "/list/index.html" },
+    { "source": "/:path*",        "destination": "/index.html" }
+  ]
 }

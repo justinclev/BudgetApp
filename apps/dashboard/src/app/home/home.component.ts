@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -230,13 +231,13 @@ export class HomeComponent {
     {
       name: 'Budget App',
       description: 'Manage your debts and recurring transactions',
-      path: 'http://localhost:4201',
+      path: environment.budgetUrl,
       icon: '💰',
     },
     {
       name: 'List App',
       description: 'Grocery lists, chores, to-dos and more',
-      path: 'http://localhost:4202',
+      path: environment.listUrl,
       icon: '📋',
     },
   ];

@@ -1,16 +1,1 @@
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/frontend/browser",
-  "installCommand": "npm install",
-  "routes": [
-    {
-      "src": "^/((?!.*\\.).*|.*\\.html)$",
-      "dest": "/index.html",
-      "status": 200
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
-}
+{}
