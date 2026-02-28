@@ -7,7 +7,10 @@
 const ALICE_ID = "507f1f77bcf86cd799439011";
 
 db.debts.updateMany({}, { $set: { createdByUserId: ALICE_ID } });
-db.recurringtransactions.updateMany({}, { $set: { createdByUserId: ALICE_ID } });
+db.recurringtransactions.updateMany(
+	{},
+	{ $set: { createdByUserId: ALICE_ID } },
+);
 db.transactions.updateMany({}, { $set: { createdByUserId: ALICE_ID } });
 db.lists.updateMany({}, { $set: { createdByUserId: ALICE_ID } });
 

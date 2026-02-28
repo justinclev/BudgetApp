@@ -29,7 +29,10 @@ export class AuthService {
   private isAuthenticatedSignal = signal<boolean>(!!readAuthCookie());
   isAuthenticated = this.isAuthenticatedSignal.asReadonly();
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+  ) {}
 
   loginWithGoogle(credential: string): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/api/auth/google`, { credential });

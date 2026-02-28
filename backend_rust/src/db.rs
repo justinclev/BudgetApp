@@ -38,29 +38,37 @@ pub async fn init_db() -> AppState {
 
     // Seed Alice (upsert so re-deploys are safe)
     let alice_oid = mongodb::bson::oid::ObjectId::parse_str("507f1f77bcf86cd799439011").unwrap();
-    let _ = users_collection.update_one(
-        doc! { "_id": alice_oid },
-        doc! { "$setOnInsert": {
-            "_id": alice_oid,
-            "name": "Alice",
-            "email": "alice@example.com",
-            "createdAt": chrono::Utc::now()
-        }},
-        mongodb::options::UpdateOptions::builder().upsert(true).build(),
-    ).await;
+    let _ = users_collection
+        .update_one(
+            doc! { "_id": alice_oid },
+            doc! { "$setOnInsert": {
+                "_id": alice_oid,
+                "name": "Alice",
+                "email": "alice@example.com",
+                "createdAt": chrono::Utc::now()
+            }},
+            mongodb::options::UpdateOptions::builder()
+                .upsert(true)
+                .build(),
+        )
+        .await;
 
     // Seed Bob (upsert so re-deploys are safe)
     let bob_oid = mongodb::bson::oid::ObjectId::parse_str("507f1f77bcf86cd799439012").unwrap();
-    let _ = users_collection.update_one(
-        doc! { "_id": bob_oid },
-        doc! { "$setOnInsert": {
-            "_id": bob_oid,
-            "name": "Bob",
-            "email": "bob@example.com",
-            "createdAt": chrono::Utc::now()
-        }},
-        mongodb::options::UpdateOptions::builder().upsert(true).build(),
-    ).await;
+    let _ = users_collection
+        .update_one(
+            doc! { "_id": bob_oid },
+            doc! { "$setOnInsert": {
+                "_id": bob_oid,
+                "name": "Bob",
+                "email": "bob@example.com",
+                "createdAt": chrono::Utc::now()
+            }},
+            mongodb::options::UpdateOptions::builder()
+                .upsert(true)
+                .build(),
+        )
+        .await;
     // Alice's canonical MongoDB ObjectId (matches login.component.ts)
     let alice_id = "507f1f77bcf86cd799439011";
 
@@ -126,7 +134,9 @@ pub async fn init_db() -> AppState {
     let _ = debts_collection.drop_index("name_1", None).await;
     let _ = debts_collection.drop_index("name_1_user_id_1", None).await;
     let _ = transactions_collection.drop_index("name_1", None).await;
-    let _ = transactions_collection.drop_index("name_1_user_id_1", None).await;
+    let _ = transactions_collection
+        .drop_index("name_1_user_id_1", None)
+        .await;
 
     let index_model = mongodb::IndexModel::builder()
         .keys(doc! { "name": 1, "createdByUserId": 1 })
