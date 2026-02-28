@@ -60,6 +60,22 @@ export class ListService {
     return this.http.patch<UserList>(`${this.base}/${listId}/items/${itemId}`, { text });
   }
 
+  addSubItem(listId: string, itemId: string, req: AddItemRequest): Observable<UserList> {
+    return this.http.post<UserList>(`${this.base}/${listId}/items/${itemId}/subitems`, req);
+  }
+
+  updateSubItemText(listId: string, itemId: string, subId: string, text: string): Observable<UserList> {
+    return this.http.patch<UserList>(`${this.base}/${listId}/items/${itemId}/subitems/${subId}`, { text });
+  }
+
+  deleteSubItem(listId: string, itemId: string, subId: string): Observable<UserList> {
+    return this.http.delete<UserList>(`${this.base}/${listId}/items/${itemId}/subitems/${subId}`);
+  }
+
+  toggleSubItem(listId: string, itemId: string, subId: string): Observable<UserList> {
+    return this.http.patch<UserList>(`${this.base}/${listId}/items/${itemId}/subitems/${subId}/toggle`, {});
+  }
+
   toggleItem(listId: string, itemId: string): Observable<UserList> {
     return this.http.patch<UserList>(`${this.base}/${listId}/items/${itemId}/toggle`, {});
   }

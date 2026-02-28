@@ -1,8 +1,16 @@
+export interface SubItem {
+  id: string;
+  text: string;
+  completed: boolean;
+  createdAt: string;
+}
+
 export interface ListItem {
   id: string;
   text: string;
   completed: boolean;
   createdAt: string;
+  subItems: SubItem[];
 }
 
 export type ListType = 'shopping' | 'todo' | 'other';

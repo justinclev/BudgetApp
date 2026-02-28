@@ -6,7 +6,7 @@ use mongodb::bson::{doc, oid::ObjectId};
 use crate::db::AppState;
 use crate::models::{
     AddItemRequest, CloneListRequest, CreateListRequest, JoinListRequest, ListItem,
-    RemoveUserRequest, ReorderItemsRequest, UpdateItemRequest, UpdateListRequest, UserList,
+    ReorderItemsRequest, SubItem, UpdateItemRequest, UpdateListRequest, UserList,
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -195,6 +195,7 @@ pub async fn add_item(
         text: body.into_inner().text,
         completed: false,
         created_at: Utc::now(),
+        sub_items: vec![],
     };
 
     let item_doc = match mongodb::bson::to_document(&new_item) {
@@ -465,11 +466,38 @@ pub async fn reset_list(data: web::Data<AppState>, path: web::Path<String>) -> i
         Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
     };
 
-    let update = doc! { "$set": { "items.$[].completed": false } };
+    // Use an aggregation pipeline update so $ifNull handles old documents
+    // that predate the subItems field — a plain $set with positional operators
+    // fails with "path must exist" on those legacy items.
+    let pipeline = vec![doc! {
+        "$set": {
+            "items": {
+                "$map": {
+                    "input": "$items",
+                    "as": "item",
+                    "in": {
+                        "$mergeObjects": [
+                            "$$item",
+                            {
+                                "completed": false,
+                                "subItems": {
+                                    "$map": {
+                                        "input": { "$ifNull": ["$$item.subItems", []] },
+                                        "as": "sub",
+                                        "in": { "$mergeObjects": ["$$sub", { "completed": false }] }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }];
 
     match data
         .lists_collection
-        .find_one_and_update(doc! { "_id": object_id }, update, None)
+        .find_one_and_update(doc! { "_id": object_id }, pipeline, None)
         .await
     {
         Ok(Some(_)) => match data
@@ -526,6 +554,16 @@ pub async fn clone_list(
             text: item.text,
             completed: false,
             created_at: Utc::now(),
+            sub_items: item
+                .sub_items
+                .into_iter()
+                .map(|sub| SubItem {
+                    id: new_id(),
+                    text: sub.text,
+                    completed: false,
+                    created_at: Utc::now(),
+                })
+                .collect(),
         })
         .collect();
 
@@ -608,6 +646,159 @@ pub async fn join_list_by_share_token(
         },
         Ok(None) => HttpResponse::NotFound()
             .json(serde_json::json!({ "message": "List not found or invalid share token" })),
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
+}
+
+// ── POST /api/lists/:list_id/items/:item_id/subitems ──────────────────────────────
+pub async fn add_sub_item(
+    data: web::Data<AppState>,
+    path: web::Path<(String, String)>,
+    body: web::Json<AddItemRequest>,
+) -> impl Responder {
+    let (list_id_str, item_id) = path.into_inner();
+    let object_id = match ObjectId::parse_str(&list_id_str) {
+        Ok(oid) => oid,
+        Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
+    };
+
+    let new_sub = SubItem {
+        id: new_id(),
+        text: body.into_inner().text,
+        completed: false,
+        created_at: Utc::now(),
+    };
+    let sub_doc = match mongodb::bson::to_document(&new_sub) {
+        Ok(d) => d,
+        Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
+    };
+    let update = doc! { "$push": { "items.$[item].subItems": sub_doc } };
+    let array_filters = vec![doc! { "item.id": { "$eq": &item_id } }];
+    let options = mongodb::options::FindOneAndUpdateOptions::builder()
+        .array_filters(array_filters)
+        .build();
+
+    match data
+        .lists_collection
+        .find_one_and_update(doc! { "_id": object_id }, update, options)
+        .await
+    {
+        Ok(Some(_)) => match data.lists_collection.find_one(doc! { "_id": object_id }, None).await {
+            Ok(Some(list)) => HttpResponse::Ok().json(list),
+            _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
+        },
+        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
+}
+
+// ── PATCH /api/lists/:list_id/items/:item_id/subitems/:sub_id ───────────────────
+pub async fn update_sub_item_text(
+    data: web::Data<AppState>,
+    path: web::Path<(String, String, String)>,
+    body: web::Json<UpdateItemRequest>,
+) -> impl Responder {
+    let (list_id_str, item_id, sub_id) = path.into_inner();
+    let object_id = match ObjectId::parse_str(&list_id_str) {
+        Ok(oid) => oid,
+        Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
+    };
+    let req = body.into_inner();
+    let update = doc! { "$set": { "items.$[item].subItems.$[sub].text": &req.text } };
+    let array_filters = vec![
+        doc! { "item.id": { "$eq": &item_id } },
+        doc! { "sub.id": { "$eq": &sub_id } },
+    ];
+    let options = mongodb::options::FindOneAndUpdateOptions::builder()
+        .array_filters(array_filters)
+        .build();
+    match data
+        .lists_collection
+        .find_one_and_update(doc! { "_id": object_id }, update, options)
+        .await
+    {
+        Ok(Some(_)) => match data.lists_collection.find_one(doc! { "_id": object_id }, None).await {
+            Ok(Some(list)) => HttpResponse::Ok().json(list),
+            _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
+        },
+        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
+}
+
+// ── DELETE /api/lists/:list_id/items/:item_id/subitems/:sub_id ──────────────────
+pub async fn delete_sub_item(
+    data: web::Data<AppState>,
+    path: web::Path<(String, String, String)>,
+) -> impl Responder {
+    let (list_id_str, item_id, sub_id) = path.into_inner();
+    let object_id = match ObjectId::parse_str(&list_id_str) {
+        Ok(oid) => oid,
+        Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
+    };
+    let update = doc! { "$pull": { "items.$[item].subItems": { "id": &sub_id } } };
+    let array_filters = vec![doc! { "item.id": { "$eq": &item_id } }];
+    let options = mongodb::options::FindOneAndUpdateOptions::builder()
+        .array_filters(array_filters)
+        .build();
+    match data
+        .lists_collection
+        .find_one_and_update(doc! { "_id": object_id }, update, options)
+        .await
+    {
+        Ok(Some(_)) => match data.lists_collection.find_one(doc! { "_id": object_id }, None).await {
+            Ok(Some(list)) => HttpResponse::Ok().json(list),
+            _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
+        },
+        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
+}
+
+// ── PATCH /api/lists/:list_id/items/:item_id/subitems/:sub_id/toggle ───────────
+pub async fn toggle_sub_item(
+    data: web::Data<AppState>,
+    path: web::Path<(String, String, String)>,
+) -> impl Responder {
+    let (list_id_str, item_id, sub_id) = path.into_inner();
+    let object_id = match ObjectId::parse_str(&list_id_str) {
+        Ok(oid) => oid,
+        Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
+    };
+    let list = match data
+        .lists_collection
+        .find_one(doc! { "_id": object_id }, None)
+        .await
+    {
+        Ok(Some(l)) => l,
+        Ok(None) => return HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
+        Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
+    };
+    let current = list
+        .items
+        .iter()
+        .find(|i| i.id == item_id)
+        .and_then(|i| i.sub_items.iter().find(|s| s.id == sub_id))
+        .map(|s| s.completed)
+        .unwrap_or(false);
+    let update = doc! { "$set": { "items.$[item].subItems.$[sub].completed": !current } };
+    let array_filters = vec![
+        doc! { "item.id": { "$eq": &item_id } },
+        doc! { "sub.id": { "$eq": &sub_id } },
+    ];
+    let options = mongodb::options::FindOneAndUpdateOptions::builder()
+        .array_filters(array_filters)
+        .build();
+    match data
+        .lists_collection
+        .find_one_and_update(doc! { "_id": object_id }, update, options)
+        .await
+    {
+        Ok(Some(_)) => match data.lists_collection.find_one(doc! { "_id": object_id }, None).await {
+            Ok(Some(list)) => HttpResponse::Ok().json(list),
+            _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
+        },
+        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" })),
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
 }

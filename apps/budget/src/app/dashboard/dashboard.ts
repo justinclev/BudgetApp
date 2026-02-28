@@ -27,6 +27,7 @@ import { RecurringTransaction } from '../models/recurring-transaction.model';
 import { Transaction } from '../models/transaction.model';
 
 import { environment } from '../../environments/environment';
+import { AuthService } from '../services/auth.service';
 
 interface DashboardMetrics {
   currentBalance: number;
@@ -83,7 +84,12 @@ export class DashboardComponent implements OnInit {
     private debtService: DebtService,
     private transactionService: TransactionService,
     private balanceCalculationService: BalanceCalculationService,
+    private authService: AuthService,
   ) {}
+
+  get userName(): string {
+    return this.authService.getUser()?.name ?? '';
+  }
 
   ngOnInit(): void {
     this.loadDashboardData();

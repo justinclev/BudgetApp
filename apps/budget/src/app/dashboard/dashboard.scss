@@ -30,7 +30,8 @@
 
   .top-bar-actions {
     display: flex;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
 
     button {
       color: #64748b;
@@ -39,6 +40,12 @@
         background: rgba(0, 0, 0, 0.04);
       }
     }
+  }
+
+  .top-bar-user {
+    font-size: 13px;
+    color: #64748b;
+    opacity: 0.85;
   }
 }
 

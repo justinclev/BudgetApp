@@ -9,8 +9,11 @@ import { AuthService } from '../services/auth.service';
   template: `
     <div class="dashboard-container">
       <div class="top-bar">
-        <h1 style="margin: 0; flex: 1;">My Apps</h1>
-        <button (click)="logout()" class="logout-btn">Logout</button>
+        <span class="app-title">⊞ My Apps</span>
+        <div class="header-actions">
+          <span *ngIf="userName" class="user-name">{{ userName }}</span>
+          <button (click)="logout()" class="icon-btn" title="Logout">⏻</button>
+        </div>
       </div>
 
       <div class="header">
@@ -39,26 +42,49 @@ import { AuthService } from '../services/auth.service';
       }
 
       .top-bar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px 20px;
         display: flex;
         align-items: center;
-        padding: 1.5rem 2rem;
-        background: rgba(0, 0, 0, 0.1);
-        color: white;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 10;
       }
 
-      .logout-btn {
+      .app-title {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .user-name {
+        font-size: 13px;
+        opacity: 0.85;
+      }
+
+      .icon-btn {
         background: rgba(255, 255, 255, 0.2);
+        border: none;
         color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        font-size: 18px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      .logout-btn:hover {
+      .icon-btn:hover {
         background: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255, 255, 255, 0.5);
       }
 
       .header {
@@ -143,11 +169,11 @@ import { AuthService } from '../services/auth.service';
 
       @media (max-width: 600px) {
         .top-bar {
-          padding: 1rem;
+          padding: 12px 16px;
         }
 
-        .top-bar h1 {
-          font-size: 1.5rem;
+        .app-title {
+          font-size: 16px;
         }
 
         .header {
@@ -195,6 +221,10 @@ import { AuthService } from '../services/auth.service';
 })
 export class HomeComponent {
   constructor(private authService: AuthService) {}
+
+  get userName(): string {
+    return this.authService.getUser()?.name ?? '';
+  }
 
   apps = [
     {

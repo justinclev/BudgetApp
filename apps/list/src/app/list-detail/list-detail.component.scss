@@ -140,18 +140,17 @@
 .item {
   background: white;
   border-radius: 12px;
-  padding: 14px 12px;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   transition: opacity 0.2s;
 
   &.done {
     opacity: 0.55;
 
-    .item-text {
+    .item-input {
       text-decoration: line-through;
+      color: #94a3b8;
     }
 
     .check-btn {
@@ -160,6 +159,13 @@
       color: white;
     }
   }
+}
+
+.item-row {
+  padding: 14px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .check-btn {
@@ -213,6 +219,95 @@
   border-top: 1px solid #e2e8f0;
 }
 
+// Sub-item expand button
+.sub-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 2px;
+  border-radius: 6px;
+  color: #94a3b8;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: #f1f5f9;
+    color: #667eea;
+  }
+}
+
+.sub-chevron {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.sub-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: #667eea;
+  background: #ede9fe;
+  border-radius: 20px;
+  padding: 1px 5px;
+  line-height: 1.4;
+}
+
+// Inline sub-item list
+.sub-list {
+  list-style: none;
+  margin: 0;
+  padding: 2px 12px 10px 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.sub-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+
+  .check-btn {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  .item-input {
+    font-size: 14px;
+  }
+
+  .del-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  &:hover .del-btn,
+  &:focus-within .del-btn {
+    opacity: 1;
+  }
+
+  &.sub-done .item-input {
+    text-decoration: line-through;
+    color: #94a3b8;
+  }
+}
+
+.new-sub-row {
+  .new-plus {
+    width: 22px;
+    height: 22px;
+    font-size: 16px;
+  }
+}
+
 // Keep-style inline input
 .item-input {
   flex: 1;
@@ -241,6 +336,9 @@
   box-shadow: none;
   border-radius: 0;
   padding: 10px 12px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 
   .new-input {
     color: #64748b;
@@ -290,14 +388,22 @@
 ::ng-deep .cdk-drag-preview {
   background: white;
   border-radius: 12px;
-  padding: 14px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
-  font-size: 15px;
-  color: #0f172a;
   list-style: none;
+  overflow: hidden;
+
+  .item-row {
+    padding: 14px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #0f172a;
+  }
+
+  .sub-list {
+    display: none;
+  }
 }
 
 ::ng-deep .cdk-drag-placeholder {

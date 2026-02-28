@@ -4,6 +4,9 @@
     <div class="top-bar-content">
       <div class="top-bar-branding">💰 BudgetFlow</div>
       <div class="top-bar-actions">
+        @if (userName) {
+          <span class="top-bar-user">{{ userName }}</span>
+        }
         <button mat-icon-button (click)="goToApps()" matTooltip="Back to Apps" class="apps-btn">
           <mat-icon>apps</mat-icon>
         </button>

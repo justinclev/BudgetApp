@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AuthService } from '../services/auth.service';
 import { ListService } from '../services/list.service';
-import { UserList, ListItem } from '../models/list.model';
+import { UserList, ListItem, SubItem } from '../models/list.model';
 
 @Component({
   selector: 'app-list-detail',
@@ -53,6 +53,9 @@ export class ListDetailComponent implements OnInit {
 
   newItemText = '';
   private drafts: Record<string, string> = {};
+  private subDrafts: Record<string, string> = {}; // key: `${parentId}:${subId}`
+  expandedItems = signal<Set<string>>(new Set());
+  newSubTexts = signal<Record<string, string | undefined>>({});
   private listId = '';
 
   @ViewChildren('itemInput') itemInputs!: QueryList<ElementRef<HTMLInputElement>>;
@@ -193,6 +196,105 @@ export class ListDetailComponent implements OnInit {
         this.newItemText = '';
         setTimeout(() => this.newInputRef?.nativeElement.focus(), 30);
       },
+    });
+  }
+
+  // ── Sub-item expand / collapse ─────────────────────────────────────────────
+
+  isExpanded(itemId: string): boolean {
+    return this.expandedItems().has(itemId);
+  }
+
+  toggleExpand(itemId: string): void {
+    this.expandedItems.update((s) => {
+      const n = new Set(s);
+      if (n.has(itemId)) n.delete(itemId);
+      else n.add(itemId);
+      return n;
+    });
+  }
+
+  onDragStart(item: ListItem): void {
+    if (this.isExpanded(item.id)) {
+      this.expandedItems.update((s) => { const n = new Set(s); n.delete(item.id); return n; });
+    }
+  }
+
+  // ── Sub-item CRUD ──────────────────────────────────────────────────────────
+
+  setNewSubText(parentId: string, value: string): void {
+    this.newSubTexts.update((t) => ({ ...t, [parentId]: value }));
+  }
+
+  addSubItem(parent: ListItem): void {
+    const text = (this.newSubTexts()[parent.id] ?? '').trim();
+    if (!text) return;
+    this.listService.addSubItem(this.listId, parent.id, { text }).subscribe({
+      next: (updated) => {
+        this.list.set(updated);
+        this.newSubTexts.update((t) => ({ ...t, [parent.id]: '' }));
+        this.expandedItems.update((s) => new Set([...s, parent.id]));
+      },
+    });
+  }
+
+  onSubDraftChange(parentId: string, subId: string, event: Event): void {
+    this.subDrafts[`${parentId}:${subId}`] = (event.target as HTMLInputElement).value;
+  }
+
+  onSubItemBlur(parent: ListItem, sub: SubItem): void {
+    const key = `${parent.id}:${sub.id}`;
+    const draft = this.subDrafts[key];
+    if (draft === undefined || draft === sub.text) return;
+    if (draft.trim() === '') {
+      this.listService.deleteSubItem(this.listId, parent.id, sub.id).subscribe({
+        next: (updated) => { this.list.set(updated); delete this.subDrafts[key]; },
+      });
+    } else {
+      this.listService.updateSubItemText(this.listId, parent.id, sub.id, draft.trim()).subscribe({
+        next: (updated) => { this.list.set(updated); delete this.subDrafts[key]; },
+      });
+    }
+  }
+
+  onSubItemKeydown(event: KeyboardEvent, parent: ListItem, sub: SubItem): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const key = `${parent.id}:${sub.id}`;
+      const draft = this.subDrafts[key];
+      if (draft !== undefined && draft !== sub.text && draft.trim()) {
+        this.listService.updateSubItemText(this.listId, parent.id, sub.id, draft.trim()).subscribe({
+          next: (updated) => { this.list.set(updated); delete this.subDrafts[key]; },
+        });
+      }
+    } else if (event.key === 'Backspace') {
+      const key = `${parent.id}:${sub.id}`;
+      const draft = this.subDrafts[key] ?? sub.text;
+      if (draft === '') {
+        event.preventDefault();
+        this.listService.deleteSubItem(this.listId, parent.id, sub.id).subscribe({
+          next: (updated) => { this.list.set(updated); delete this.subDrafts[key]; },
+        });
+      }
+    }
+  }
+
+  onNewSubItemKeydown(event: KeyboardEvent, parent: ListItem): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.addSubItem(parent);
+    }
+  }
+
+  toggleSubItem(parent: ListItem, sub: SubItem): void {
+    this.listService.toggleSubItem(this.listId, parent.id, sub.id).subscribe({
+      next: (updated) => this.list.set(updated),
+    });
+  }
+
+  deleteSubItem(parent: ListItem, sub: SubItem): void {
+    this.listService.deleteSubItem(this.listId, parent.id, sub.id).subscribe({
+      next: (updated) => this.list.set(updated),
     });
   }
 

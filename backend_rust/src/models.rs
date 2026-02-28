@@ -124,12 +124,23 @@ pub struct CheckNameResponse {
 // ── List App Models ────────────────────────────────────────────────────────
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SubItem {
+    pub id: String,
+    pub text: String,
+    pub completed: bool,
+    #[serde(rename = "createdAt")]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ListItem {
     pub id: String,
     pub text: String,
     pub completed: bool,
     #[serde(rename = "createdAt")]
     pub created_at: chrono::DateTime<chrono::Utc>,
+    #[serde(rename = "subItems", default)]
+    pub sub_items: Vec<SubItem>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
