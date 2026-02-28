@@ -96,7 +96,9 @@ import { AuthService } from '../services/auth.service';
         cursor: pointer;
         margin-bottom: 10px;
         padding: 0 16px;
-        transition: background 0.15s, border-color 0.15s;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
       }
 
       .account-btn:hover {
@@ -121,8 +123,12 @@ import { AuthService } from '../services/auth.service';
         flex-shrink: 0;
       }
 
-      .acct-avatar--alice { background: linear-gradient(135deg, #667eea, #764ba2); }
-      .acct-avatar--bob   { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+      .acct-avatar--alice {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+      }
+      .acct-avatar--bob {
+        background: linear-gradient(135deg, #f59e0b, #ef4444);
+      }
 
       @media (max-width: 480px) {
         .modern-card {
@@ -144,11 +150,14 @@ import { AuthService } from '../services/auth.service';
   ],
 })
 export class LoginComponent {
-  constructor(private authService: AuthService, private route: ActivatedRoute) {}
+  constructor(
+    private authService: AuthService,
+    private route: ActivatedRoute,
+  ) {}
 
   private readonly mockUsers = [
     { id: '123', email: 'alice@example.com', name: 'Alice' },
-    { id: '2',   email: 'bob@example.com',   name: 'Bob' },
+    { id: '2', email: 'bob@example.com', name: 'Bob' },
   ];
 
   loginAs(index: number): void {

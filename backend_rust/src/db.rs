@@ -1,4 +1,4 @@
-use crate::models::{Debt, RecurringTransaction, UserTransactions, UserList};
+use crate::models::{Debt, RecurringTransaction, UserList, UserTransactions};
 use mongodb::{bson::doc, options::ClientOptions, Client, Collection};
 use std::env;
 

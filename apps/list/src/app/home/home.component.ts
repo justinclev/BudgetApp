@@ -44,7 +44,10 @@ export class HomeComponent implements OnInit {
   loadLists(): void {
     const userId = this.user()?.email ?? '';
     this.listService.getLists(userId).subscribe({
-      next: (data) => { this.lists.set(data); this.loading.set(false); },
+      next: (data) => {
+        this.lists.set(data);
+        this.loading.set(false);
+      },
       error: () => this.loading.set(false),
     });
   }
@@ -56,30 +59,36 @@ export class HomeComponent implements OnInit {
   createList(): void {
     if (!this.newName.trim()) return;
     const userId = this.user()?.email ?? '';
-    this.listService.createList({ name: this.newName.trim(), listType: this.newType, ownerId: userId }).subscribe({
-      next: (created) => {
-        this.lists.update(l => [created, ...l]);
-        this.showCreate = false;
-        this.newName = '';
-        this.newType = 'shopping';
-        this.router.navigate(['/list', created._id]);
-      },
-    });
+    this.listService
+      .createList({ name: this.newName.trim(), listType: this.newType, ownerId: userId })
+      .subscribe({
+        next: (created) => {
+          this.lists.update((l) => [created, ...l]);
+          this.showCreate = false;
+          this.newName = '';
+          this.newType = 'shopping';
+          this.router.navigate(['/list', created._id]);
+        },
+      });
   }
 
   deleteList(event: Event, list: UserList): void {
     event.stopPropagation();
     if (!confirm(`Delete "${list.name}"? This cannot be undone.`)) return;
     this.listService.deleteList(list._id!).subscribe({
-      next: () => this.lists.update(l => l.filter(x => x._id !== list._id)),
+      next: () => this.lists.update((l) => l.filter((x) => x._id !== list._id)),
     });
   }
 
-  typeLabel(t: string): string { return TYPE_LABELS[t] ?? '📝 Other'; }
-  typeColor(t: string): string { return TYPE_COLORS[t] ?? '#8b5cf6'; }
+  typeLabel(t: string): string {
+    return TYPE_LABELS[t] ?? '📝 Other';
+  }
+  typeColor(t: string): string {
+    return TYPE_COLORS[t] ?? '#8b5cf6';
+  }
 
   doneCount(list: UserList): number {
-    return list.items.filter(i => i.completed).length;
+    return list.items.filter((i) => i.completed).length;
   }
 
   progressPct(list: UserList): number {

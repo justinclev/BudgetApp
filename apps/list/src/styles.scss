@@ -1,6 +1,11 @@
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -10,5 +15,11 @@ html, body {
   color: #0f172a;
 }
 
-button { font-family: inherit; }
-input, select, textarea { font-family: inherit; }
+button {
+  font-family: inherit;
+}
+input,
+select,
+textarea {
+  font-family: inherit;
+}

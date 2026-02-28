@@ -6,7 +6,11 @@ const COOKIE_NAME = 'budget_auth';
 function readAuthCookie(): any | null {
   const match = document.cookie.match(/(?:^|;\s*)budget_auth=([^;]+)/);
   if (!match) return null;
-  try { return JSON.parse(decodeURIComponent(match[1])); } catch { return null; }
+  try {
+    return JSON.parse(decodeURIComponent(match[1]));
+  } catch {
+    return null;
+  }
 }
 
 function writeAuthCookie(user: any): void {
@@ -44,4 +48,3 @@ export class AuthService {
     return readAuthCookie();
   }
 }
-

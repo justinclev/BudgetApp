@@ -66,7 +66,9 @@ h1 {
   cursor: pointer;
   margin-bottom: 10px;
   padding: 0 16px;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 
   &:hover {
     background: #f1f5f9;
@@ -90,8 +92,12 @@ h1 {
   justify-content: center;
   flex-shrink: 0;
 
-  &--alice { background: linear-gradient(135deg, #667eea, #764ba2); }
-  &--bob   { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  &--alice {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+  }
+  &--bob {
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+  }
 }
 
 .back-link {

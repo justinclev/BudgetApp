@@ -197,8 +197,18 @@ export class HomeComponent {
   constructor(private authService: AuthService) {}
 
   apps = [
-    { name: 'Budget App', description: 'Manage your debts and recurring transactions', path: 'http://localhost:4201', icon: '💰' },
-    { name: 'List App',   description: 'Grocery lists, chores, to-dos and more',       path: 'http://localhost:4202', icon: '📋' },
+    {
+      name: 'Budget App',
+      description: 'Manage your debts and recurring transactions',
+      path: 'http://localhost:4201',
+      icon: '💰',
+    },
+    {
+      name: 'List App',
+      description: 'Grocery lists, chores, to-dos and more',
+      path: 'http://localhost:4202',
+      icon: '📋',
+    },
   ];
 
   logout(): void {

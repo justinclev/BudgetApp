@@ -26,12 +26,14 @@
               <div class="card-badge" [style.background]="typeColor(list.listType)">
                 {{ typeLabel(list.listType) }}
               </div>
-              <button class="card-delete" (click)="deleteList($event, list)" title="Delete list">×</button>
+              <button class="card-delete" (click)="deleteList($event, list)" title="Delete list">
+                ×
+              </button>
             </div>
             <h3 class="card-name">{{ list.name }}</h3>
             <p class="card-meta">
-              {{ list.items.length }} item{{ list.items.length === 1 ? '' : 's' }}
-              · {{ doneCount(list) }} done
+              {{ list.items.length }} item{{ list.items.length === 1 ? '' : 's' }} ·
+              {{ doneCount(list) }} done
             </p>
             <div class="card-progress">
               <div class="progress-bar" [style.width]="progressPct(list) + '%'"></div>
@@ -50,10 +52,12 @@
     <div class="modal-overlay" (click)="showCreate = false">
       <div class="modal" (click)="$event.stopPropagation()">
         <h2>New List</h2>
-        <label>Name
+        <label
+          >Name
           <input [(ngModel)]="newName" placeholder="My grocery run…" maxlength="60" autofocus />
         </label>
-        <label>Type
+        <label
+          >Type
           <select [(ngModel)]="newType">
             <option value="shopping">🛒 Shopping</option>
             <option value="todo">✅ To-Do</option>
@@ -62,7 +66,9 @@
         </label>
         <div class="modal-actions">
           <button class="btn-cancel" (click)="showCreate = false">Cancel</button>
-          <button class="btn-create" (click)="createList()" [disabled]="!newName.trim()">Create</button>
+          <button class="btn-create" (click)="createList()" [disabled]="!newName.trim()">
+            Create
+          </button>
         </div>
       </div>
     </div>

@@ -3,9 +3,14 @@
   <header class="top-bar">
     <button class="back-btn" (click)="goHome()">‹</button>
     @if (editingName()) {
-      <input class="name-input" [(ngModel)]="editName"
-             (blur)="saveName()" (keydown.enter)="saveName()"
-             autofocus maxlength="60" />
+      <input
+        class="name-input"
+        [(ngModel)]="editName"
+        (blur)="saveName()"
+        (keydown.enter)="saveName()"
+        autofocus
+        maxlength="60"
+      />
     } @else {
       <h1 class="title" (click)="startEditName()">{{ list()?.name }}</h1>
     }
@@ -30,7 +35,6 @@
     @if (loading()) {
       <div class="center-msg">Loading…</div>
     } @else {
-
       <!-- Pending items — draggable -->
       <ul class="item-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
         @for (item of pendingItems(); track item.id; let i = $index) {
@@ -89,7 +93,6 @@
           }
         </ul>
       }
-
     }
   </main>
 
@@ -112,10 +115,14 @@
               <span class="member-avatar">{{ uid[0].toUpperCase() }}</span>
               <span class="member-email">
                 {{ uid }}
-                @if (uid === list()?.ownerId) { <span class="owner-badge">owner</span> }
+                @if (uid === list()?.ownerId) {
+                  <span class="owner-badge">owner</span>
+                }
               </span>
               @if (isOwner() && uid !== list()?.ownerId) {
-                <button class="member-remove" (click)="removeMember(uid)" title="Remove member">×</button>
+                <button class="member-remove" (click)="removeMember(uid)" title="Remove member">
+                  ×
+                </button>
               }
             </li>
           }

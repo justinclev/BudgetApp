@@ -51,7 +51,9 @@ export class ListService {
   }
 
   removeMember(listId: string, userId: string): Observable<UserList> {
-    return this.http.delete<UserList>(`${this.base}/${listId}/members/${encodeURIComponent(userId)}`);
+    return this.http.delete<UserList>(
+      `${this.base}/${listId}/members/${encodeURIComponent(userId)}`,
+    );
   }
 
   updateItemText(listId: string, itemId: string, text: string): Observable<UserList> {

@@ -1,4 +1,15 @@
-import { Component, inject, signal, computed, effect, OnInit, ViewChildren, ViewChild, ElementRef, QueryList } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  computed,
+  effect,
+  OnInit,
+  ViewChildren,
+  ViewChild,
+  ElementRef,
+  QueryList,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -38,7 +49,7 @@ export class ListDetailComponent implements OnInit {
   });
 
   pendingItems = signal<ListItem[]>([]);
-  doneItems = computed(() => this.list()?.items.filter(i => i.completed) ?? []);
+  doneItems = computed(() => this.list()?.items.filter((i) => i.completed) ?? []);
 
   newItemText = '';
   private drafts: Record<string, string> = {};
@@ -50,7 +61,7 @@ export class ListDetailComponent implements OnInit {
   constructor() {
     effect(() => {
       const items = this.list()?.items ?? [];
-      this.pendingItems.set(items.filter(i => !i.completed));
+      this.pendingItems.set(items.filter((i) => !i.completed));
     });
   }
 
@@ -70,14 +81,16 @@ export class ListDetailComponent implements OnInit {
     });
   }
 
-  goHome(): void { this.router.navigate(['/']); }
+  goHome(): void {
+    this.router.navigate(['/']);
+  }
 
   onDrop(event: CdkDragDrop<ListItem[]>): void {
     if (event.previousIndex === event.currentIndex) return;
     const items = [...this.pendingItems()];
     moveItemInArray(items, event.previousIndex, event.currentIndex);
     this.pendingItems.set(items);
-    const allIds = [...items, ...this.doneItems()].map(i => i.id);
+    const allIds = [...items, ...this.doneItems()].map((i) => i.id);
     this.listService.reorderItems(this.listId, allIds).subscribe({
       next: (updated) => this.list.set(updated),
     });
@@ -89,14 +102,22 @@ export class ListDetailComponent implements OnInit {
   }
 
   saveName(): void {
-    if (!this.editName.trim()) { this.editingName.set(false); return; }
+    if (!this.editName.trim()) {
+      this.editingName.set(false);
+      return;
+    }
     const current = this.list();
-    this.listService.updateList(this.listId, {
-      name: this.editName.trim(),
-      listType: current?.listType ?? 'other',
-    }).subscribe({
-      next: (updated) => { this.list.set(updated); this.editingName.set(false); },
-    });
+    this.listService
+      .updateList(this.listId, {
+        name: this.editName.trim(),
+        listType: current?.listType ?? 'other',
+      })
+      .subscribe({
+        next: (updated) => {
+          this.list.set(updated);
+          this.editingName.set(false);
+        },
+      });
   }
 
   // ── Inline item editing ───────────────────────────────────────────────────
@@ -112,7 +133,10 @@ export class ListDetailComponent implements OnInit {
       this.deleteItem(item);
     } else {
       this.listService.updateItemText(this.listId, item.id, draft.trim()).subscribe({
-        next: (updated) => { this.list.set(updated); delete this.drafts[item.id]; },
+        next: (updated) => {
+          this.list.set(updated);
+          delete this.drafts[item.id];
+        },
       });
     }
   }
@@ -189,7 +213,10 @@ export class ListDetailComponent implements OnInit {
   resetList(): void {
     this.showMenu = false;
     this.listService.resetList(this.listId).subscribe({
-      next: (updated) => { this.list.set(updated); this.showToast('All items reset'); },
+      next: (updated) => {
+        this.list.set(updated);
+        this.showToast('All items reset');
+      },
     });
   }
 
@@ -222,7 +249,10 @@ export class ListDetailComponent implements OnInit {
 
   removeMember(userId: string): void {
     this.listService.removeMember(this.listId, userId).subscribe({
-      next: (updated) => { this.list.set(updated); this.showToast('Member removed'); },
+      next: (updated) => {
+        this.list.set(updated);
+        this.showToast('Member removed');
+      },
     });
   }
 
