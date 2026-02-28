@@ -154,7 +154,7 @@ import { AuthService } from '../services/auth.service';
           padding: 1rem;
           margin-bottom: 1rem;
         }
-        
+
         .header .subtitle {
           font-size: 1rem;
         }

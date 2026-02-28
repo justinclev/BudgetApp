@@ -13,9 +13,7 @@ import { AuthService } from '../services/auth.service';
         <h2>Welcome to Budget Apps</h2>
         <p>Sign in to access your apps and manage your finances.</p>
 
-        <button (click)="loginWithGoogle()" class="google-btn">
-          Login with Google
-        </button>
+        <button (click)="loginWithGoogle()" class="google-btn">Login with Google</button>
       </div>
     </div>
   `,
