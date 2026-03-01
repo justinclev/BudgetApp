@@ -1,5 +1,4 @@
 <div class="page">
-  <!-- Header -->
   <header class="top-bar">
     <button class="back-btn" (click)="goHome()">‹</button>
     @if (editingName()) {
@@ -17,7 +16,6 @@
     <button class="icon-btn" (click)="showMenu = !showMenu">⋯</button>
   </header>
 
-  <!-- Menu -->
   @if (showMenu) {
     <div class="menu-overlay" (click)="showMenu = false">
       <div class="menu" (click)="$event.stopPropagation()">
@@ -30,7 +28,6 @@
     </div>
   }
 
-  <!-- Items canvas -->
   <main class="main">
     @if (loading()) {
       <div class="center-msg">Loading…</div>
@@ -39,71 +36,23 @@
       <ul class="item-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
         @for (item of pendingItems(); track item.id; let i = $index) {
           <li class="item" cdkDrag (cdkDragStarted)="onDragStart(item)">
-            <div class="item-row">
-              <span class="drag-handle" cdkDragHandle></span>
-              <button class="check-btn" (click)="toggleItem(item)" type="button"></button>
-              <input
-                #itemInput
-                class="item-input"
-                [value]="item.text"
-                (input)="onDraftChange(item.id, $event)"
-                (blur)="onItemBlur(item)"
-                (keydown)="onItemKeydown($event, item, i)"
-                maxlength="200"
-              />
-              <button
-                class="sub-btn"
-                (click)="toggleExpand(item.id)"
-                type="button"
-                title="Sub-items"
-              >
-                @if (!isExpanded(item.id) && item.subItems.length) {
-                  <span class="sub-count">{{ item.subItems.length }}</span>
-                }
-                <span class="sub-chevron">{{ isExpanded(item.id) ? '▾' : '›' }}</span>
-              </button>
-              <button class="del-btn" (click)="deleteItem(item)" type="button">×</button>
-            </div>
-            @if (isExpanded(item.id)) {
-              <ul class="sub-list">
-                @for (sub of item.subItems; track sub.id) {
-                  <li class="sub-item" [class.sub-done]="sub.completed">
-                    <button
-                      class="check-btn"
-                      [class.checked]="sub.completed"
-                      (click)="toggleSubItem(item, sub)"
-                      type="button"
-                    >
-                      @if (sub.completed) {
-                        <span class="check-icon">✓</span>
-                      }
-                    </button>
-                    <input
-                      class="item-input"
-                      [value]="sub.text"
-                      (input)="onSubDraftChange(item.id, sub.id, $event)"
-                      (blur)="onSubItemBlur(item, sub)"
-                      (keydown)="onSubItemKeydown($event, item, sub)"
-                      maxlength="200"
-                    />
-                    <button class="del-btn" (click)="deleteSubItem(item, sub)" type="button">
-                      ×
-                    </button>
-                  </li>
-                }
-                <li class="sub-item new-sub-row">
-                  <span class="new-plus">+</span>
-                  <input
-                    class="item-input new-input"
-                    [value]="newSubTexts()[item.id] ?? ''"
-                    placeholder="Sub-item"
-                    maxlength="200"
-                    (input)="setNewSubText(item.id, $any($event.target).value)"
-                    (keydown)="onNewSubItemKeydown($event, item)"
-                  />
-                </li>
-              </ul>
-            }
+            <app-list-item
+              [item]="item"
+              [isExpanded]="isExpanded(item.id)"
+              [newSubText]="newSubTexts()[item.id] ?? ''"
+              (toggle)="toggleItem(item)"
+              (delete)="deleteItem(item)"
+              (saveText)="saveItemText(item, $event)"
+              (enterPressed)="focusNewInput()"
+              (deleteOnEmpty)="deleteItemAndFocusPrev(item, i)"
+              (expandToggle)="toggleExpand(item.id)"
+              (subToggle)="toggleSubItem(item, $event)"
+              (subDelete)="deleteSubItem(item, $event)"
+              (subSaveText)="saveSubItemText(item, $event)"
+              (subDeleteOnEmpty)="deleteSubItem(item, $event)"
+              (newSubTextChange)="setNewSubText(item.id, $event)"
+              (addSubItem)="addSubItem(item, $event)"
+            />
           </li>
         }
       </ul>
@@ -123,78 +72,28 @@
         </li>
       </ul>
 
-      <!-- Done items — static, sorted to bottom -->
+      <!-- Done items -->
       @if (doneItems().length > 0) {
         <ul class="item-list done-list">
           @for (item of doneItems(); track item.id; let i = $index) {
             <li class="item done">
-              <div class="item-row">
-                <span class="drag-spacer"></span>
-                <button class="check-btn checked" (click)="toggleItem(item)" type="button">
-                  <span class="check-icon">✓</span>
-                </button>
-                <input
-                  #itemInput
-                  class="item-input"
-                  [value]="item.text"
-                  (input)="onDraftChange(item.id, $event)"
-                  (blur)="onItemBlur(item)"
-                  (keydown)="onItemKeydown($event, item, pendingItems().length + i)"
-                  maxlength="200"
-                />
-                <button
-                  class="sub-btn"
-                  (click)="toggleExpand(item.id)"
-                  type="button"
-                  title="Sub-items"
-                >
-                  @if (!isExpanded(item.id) && item.subItems.length) {
-                    <span class="sub-count">{{ item.subItems.length }}</span>
-                  }
-                  <span class="sub-chevron">{{ isExpanded(item.id) ? '▾' : '›' }}</span>
-                </button>
-                <button class="del-btn" (click)="deleteItem(item)" type="button">×</button>
-              </div>
-              @if (isExpanded(item.id)) {
-                <ul class="sub-list">
-                  @for (sub of item.subItems; track sub.id) {
-                    <li class="sub-item" [class.sub-done]="sub.completed">
-                      <button
-                        class="check-btn"
-                        [class.checked]="sub.completed"
-                        (click)="toggleSubItem(item, sub)"
-                        type="button"
-                      >
-                        @if (sub.completed) {
-                          <span class="check-icon">✓</span>
-                        }
-                      </button>
-                      <input
-                        class="item-input"
-                        [value]="sub.text"
-                        (input)="onSubDraftChange(item.id, sub.id, $event)"
-                        (blur)="onSubItemBlur(item, sub)"
-                        (keydown)="onSubItemKeydown($event, item, sub)"
-                        maxlength="200"
-                      />
-                      <button class="del-btn" (click)="deleteSubItem(item, sub)" type="button">
-                        ×
-                      </button>
-                    </li>
-                  }
-                  <li class="sub-item new-sub-row">
-                    <span class="new-plus">+</span>
-                    <input
-                      class="item-input new-input"
-                      [value]="newSubTexts()[item.id] ?? ''"
-                      placeholder="Sub-item"
-                      maxlength="200"
-                      (input)="setNewSubText(item.id, $any($event.target).value)"
-                      (keydown)="onNewSubItemKeydown($event, item)"
-                    />
-                  </li>
-                </ul>
-              }
+              <app-list-item
+                [item]="item"
+                [isExpanded]="isExpanded(item.id)"
+                [newSubText]="newSubTexts()[item.id] ?? ''"
+                (toggle)="toggleItem(item)"
+                (delete)="deleteItem(item)"
+                (saveText)="saveItemText(item, $event)"
+                (enterPressed)="focusNewInput()"
+                (deleteOnEmpty)="deleteItemAndFocusPrev(item, pendingItems().length + i)"
+                (expandToggle)="toggleExpand(item.id)"
+                (subToggle)="toggleSubItem(item, $event)"
+                (subDelete)="deleteSubItem(item, $event)"
+                (subSaveText)="saveSubItemText(item, $event)"
+                (subDeleteOnEmpty)="deleteSubItem(item, $event)"
+                (newSubTextChange)="setNewSubText(item.id, $event)"
+                (addSubItem)="addSubItem(item, $event)"
+              />
             </li>
           }
         </ul>
@@ -202,38 +101,16 @@
     }
   </main>
 
-  <!-- Toast -->
   @if (toast()) {
     <div class="toast">{{ toast() }}</div>
   }
 
-  <!-- Members panel -->
-  @if (showMembers) {
-    <div class="panel-overlay" (click)="showMembers = false">
-      <div class="panel" (click)="$event.stopPropagation()">
-        <div class="panel-header">
-          <h2>Members</h2>
-          <button class="panel-close" (click)="showMembers = false">×</button>
-        </div>
-        <ul class="member-list">
-          @for (uid of list()?.authorizedUsers ?? []; track uid) {
-            <li class="member-row">
-              <span class="member-avatar">{{ uid[0].toUpperCase() }}</span>
-              <span class="member-email">
-                {{ uid }}
-                @if (uid === list()?.ownerId) {
-                  <span class="owner-badge">owner</span>
-                }
-              </span>
-              @if (isOwner() && uid !== list()?.ownerId) {
-                <button class="member-remove" (click)="removeMember(uid)" title="Remove member">
-                  ×
-                </button>
-              }
-            </li>
-          }
-        </ul>
-      </div>
-    </div>
+  @if (showMembers && list()) {
+    <app-members-panel
+      [list]="list()!"
+      [isOwner]="isOwner()"
+      (close)="showMembers = false"
+      (removeMember)="removeMember($event)"
+    />
   }
 </div>

@@ -1,0 +1,21 @@
+<div class="modal-overlay" (click)="cancel.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2>New List</h2>
+    <label>
+      Name
+      <input [(ngModel)]="name" placeholder="My grocery run…" maxlength="60" autofocus />
+    </label>
+    <label>
+      Type
+      <select [(ngModel)]="listType">
+        <option value="shopping">🛒 Shopping</option>
+        <option value="todo">✅ To-Do</option>
+        <option value="other">📝 Other</option>
+      </select>
+    </label>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancel.emit()">Cancel</button>
+      <button class="btn-create" (click)="submit()" [disabled]="!name.trim()">Create</button>
+    </div>
+  </div>
+</div>

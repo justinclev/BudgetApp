@@ -1,6 +1,7 @@
 use crate::utils::{
-    deserialize_f64_from_bson_number, deserialize_oid_from_hex,
-    deserialize_option_f64_from_bson_number, serialize_oid_as_hex,
+    deserialize_datetime_from_bson, deserialize_f64_from_bson_number, deserialize_oid_from_hex,
+    deserialize_option_datetime_from_bson, deserialize_option_f64_from_bson_number,
+    serialize_oid_as_hex,
 };
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
@@ -35,7 +36,12 @@ pub struct Debt {
         default
     )]
     pub minimum_payment: Option<f64>,
-    #[serde(rename = "paymentDate", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "paymentDate",
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_option_datetime_from_bson",
+        default
+    )]
     pub payment_date: Option<chrono::DateTime<chrono::Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frequency: Option<String>,
@@ -58,7 +64,10 @@ pub struct RecurringTransaction {
     #[serde(deserialize_with = "deserialize_f64_from_bson_number")]
     pub amount: f64,
     pub frequency: String,
-    #[serde(rename = "startingDate")]
+    #[serde(
+        rename = "startingDate",
+        deserialize_with = "deserialize_datetime_from_bson"
+    )]
     pub starting_date: chrono::DateTime<chrono::Utc>,
     #[serde(
         rename = "linkedDebtId",
@@ -90,6 +99,7 @@ pub struct Transaction {
     pub description: String,
     #[serde(deserialize_with = "deserialize_f64_from_bson_number")]
     pub amount: f64,
+    #[serde(deserialize_with = "deserialize_datetime_from_bson")]
     pub date: chrono::DateTime<chrono::Utc>,
     #[serde(rename = "type")]
     pub transaction_type: String,
@@ -142,9 +152,19 @@ pub struct User {
     pub google_id: Option<String>,
     #[serde(rename = "avatarUrl", skip_serializing_if = "Option::is_none", default)]
     pub avatar_url: Option<String>,
-    #[serde(rename = "lastLogin", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "lastLogin",
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_option_datetime_from_bson",
+        default
+    )]
     pub last_login: Option<chrono::DateTime<chrono::Utc>>,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "createdAt",
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_option_datetime_from_bson",
+        default
+    )]
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
@@ -160,7 +180,10 @@ pub struct SubItem {
     pub id: String,
     pub text: String,
     pub completed: bool,
-    #[serde(rename = "createdAt")]
+    #[serde(
+        rename = "createdAt",
+        deserialize_with = "deserialize_datetime_from_bson"
+    )]
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
@@ -169,7 +192,10 @@ pub struct ListItem {
     pub id: String,
     pub text: String,
     pub completed: bool,
-    #[serde(rename = "createdAt")]
+    #[serde(
+        rename = "createdAt",
+        deserialize_with = "deserialize_datetime_from_bson"
+    )]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[serde(rename = "subItems", default)]
     pub sub_items: Vec<SubItem>,
@@ -198,7 +224,10 @@ pub struct UserList {
     pub items: Vec<ListItem>,
     #[serde(rename = "shareToken")]
     pub share_token: String,
-    #[serde(rename = "createdAt")]
+    #[serde(
+        rename = "createdAt",
+        deserialize_with = "deserialize_datetime_from_bson"
+    )]
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 

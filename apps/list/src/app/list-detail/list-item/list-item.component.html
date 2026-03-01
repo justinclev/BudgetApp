@@ -1,0 +1,68 @@
+<div class="item-row">
+  @if (item.completed) {
+    <span class="drag-spacer"></span>
+  } @else {
+    <span class="drag-handle" cdkDragHandle></span>
+  }
+  <button class="check-btn" [class.checked]="item.completed" (click)="toggle.emit()" type="button">
+    @if (item.completed) {
+      <span class="check-icon">✓</span>
+    }
+  </button>
+  <input
+    #textInput
+    class="item-input"
+    [class.done-text]="item.completed"
+    [value]="item.text"
+    (input)="onDraftChange($event)"
+    (blur)="onBlur()"
+    (keydown)="onKeydown($event)"
+    maxlength="200"
+  />
+  <button class="sub-btn" (click)="expandToggle.emit()" type="button" title="Sub-items">
+    @if (!isExpanded && item.subItems.length) {
+      <span class="sub-count">{{ item.subItems.length }}</span>
+    }
+    <span class="sub-chevron">{{ isExpanded ? '▾' : '›' }}</span>
+  </button>
+  <button class="del-btn" (click)="delete.emit()" type="button">×</button>
+</div>
+
+@if (isExpanded) {
+  <ul class="sub-list">
+    @for (sub of item.subItems; track sub.id) {
+      <li class="sub-item" [class.sub-done]="sub.completed">
+        <button
+          class="check-btn"
+          [class.checked]="sub.completed"
+          (click)="subToggle.emit(sub)"
+          type="button"
+        >
+          @if (sub.completed) {
+            <span class="check-icon">✓</span>
+          }
+        </button>
+        <input
+          class="item-input"
+          [value]="sub.text"
+          (input)="onSubDraftChange(sub.id, $event)"
+          (blur)="onSubBlur(sub)"
+          (keydown)="onSubKeydown($event, sub)"
+          maxlength="200"
+        />
+        <button class="del-btn" (click)="subDelete.emit(sub)" type="button">×</button>
+      </li>
+    }
+    <li class="sub-item new-sub-row">
+      <span class="new-plus">+</span>
+      <input
+        class="item-input new-input"
+        [value]="newSubText"
+        placeholder="Sub-item"
+        maxlength="200"
+        (input)="newSubTextChange.emit($any($event.target).value)"
+        (keydown)="onNewSubKeydown($event)"
+      />
+    </li>
+  </ul>
+}

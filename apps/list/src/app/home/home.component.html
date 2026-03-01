@@ -1,5 +1,4 @@
 <div class="page">
-  <!-- Top bar -->
   <header class="top-bar">
     <span class="app-title">📋 My Lists</span>
     <div class="header-actions">
@@ -8,7 +7,6 @@
     </div>
   </header>
 
-  <!-- List grid -->
   <main class="main">
     @if (loading()) {
       <div class="center-msg">Loading…</div>
@@ -21,56 +19,19 @@
     } @else {
       <div class="list-grid">
         @for (list of lists(); track list._id) {
-          <div class="list-card" (click)="openList(list)">
-            <div class="card-top">
-              <div class="card-badge" [style.background]="typeColor(list.listType)">
-                {{ typeLabel(list.listType) }}
-              </div>
-              <button class="card-delete" (click)="deleteList($event, list)" title="Delete list">
-                ×
-              </button>
-            </div>
-            <h3 class="card-name">{{ list.name }}</h3>
-            <p class="card-meta">
-              {{ list.items.length }} item{{ list.items.length === 1 ? '' : 's' }} ·
-              {{ doneCount(list) }} done
-            </p>
-            <div class="card-progress">
-              <div class="progress-bar" [style.width]="progressPct(list) + '%'"></div>
-            </div>
-          </div>
+          <app-list-card
+            [list]="list"
+            (open)="openList(list)"
+            (delete)="deleteList($event, list)"
+          />
         }
       </div>
     }
   </main>
 
-  <!-- FAB -->
   <button class="fab" (click)="showCreate = true" title="New list">＋</button>
 
-  <!-- Create modal -->
   @if (showCreate) {
-    <div class="modal-overlay" (click)="showCreate = false">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <h2>New List</h2>
-        <label
-          >Name
-          <input [(ngModel)]="newName" placeholder="My grocery run…" maxlength="60" autofocus />
-        </label>
-        <label
-          >Type
-          <select [(ngModel)]="newType">
-            <option value="shopping">🛒 Shopping</option>
-            <option value="todo">✅ To-Do</option>
-            <option value="other">📝 Other</option>
-          </select>
-        </label>
-        <div class="modal-actions">
-          <button class="btn-cancel" (click)="showCreate = false">Cancel</button>
-          <button class="btn-create" (click)="createList()" [disabled]="!newName.trim()">
-            Create
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-create-list-modal (create)="createList($event)" (cancel)="showCreate = false" />
   }
 </div>
