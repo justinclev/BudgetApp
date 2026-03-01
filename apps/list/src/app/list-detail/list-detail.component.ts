@@ -40,7 +40,7 @@ export class ListDetailComponent implements OnInit {
   showMembers = false;
   toast = signal('');
 
-  isOwner = computed(() => this.list()?.ownerId === (this.auth.user()?.email ?? ''));
+  isOwner = computed(() => this.list()?.ownerId === (this.auth.user()?.id ?? ''));
 
   pendingItems = signal<ListItem[]>([]);
   doneItems = computed(() => this.list()?.items.filter((i) => i.completed) ?? []);
@@ -247,7 +247,7 @@ export class ListDetailComponent implements OnInit {
 
   cloneList(): void {
     this.showMenu = false;
-    const userId = this.auth.user()?.email ?? '';
+    const userId = this.auth.user()?.id ?? '';
     this.listService.cloneList(this.listId, userId).subscribe({
       next: (clone) => {
         this.showToast('List cloned!');

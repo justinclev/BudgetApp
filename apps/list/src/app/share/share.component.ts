@@ -28,7 +28,7 @@ export class ShareComponent implements OnInit {
         this.listId = list._id ?? '';
         this.listName.set(list.name);
         // Check if already authorized
-        const userId = this.auth.user()?.email ?? '';
+        const userId = this.auth.user()?.id ?? '';
         if (list.ownerId === userId || list.authorizedUsers.includes(userId)) {
           this.status.set('success');
         } else {
@@ -40,7 +40,7 @@ export class ShareComponent implements OnInit {
   }
 
   join(): void {
-    const userId = this.auth.user()?.email ?? '';
+    const userId = this.auth.user()?.id ?? '';
     this.listService.joinListByShareToken(this.token, { userId }).subscribe({
       next: (list: UserList) => {
         this.listId = list._id ?? '';

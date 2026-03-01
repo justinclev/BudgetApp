@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadLists(): void {
-    const userId = this.user()?.email ?? '';
+    const userId = this.user()?.id ?? '';
     this.listService.getLists(userId).subscribe({
       next: (data) => {
         this.lists.set(data);
@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit {
   }
 
   createList({ name, listType }: CreateListForm): void {
-    const userId = this.user()?.email ?? '';
+    const userId = this.user()?.id ?? '';
     this.listService.createList({ name, listType, ownerId: userId }).subscribe({
       next: (created) => {
         this.lists.update((l) => [created, ...l]);
