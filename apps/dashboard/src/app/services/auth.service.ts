@@ -39,7 +39,9 @@ export class AuthService {
   }
 
   login(userData: any, returnUrl?: string): void {
-    writeAuthCookie(userData);
+    // Normalize _id → id so all apps can use user.id consistently
+    const normalized = { ...userData, id: userData.id ?? userData._id };
+    writeAuthCookie(normalized);
     this.isAuthenticatedSignal.set(true);
     if (returnUrl) {
       window.location.href = decodeURIComponent(returnUrl);
