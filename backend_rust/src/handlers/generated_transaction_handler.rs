@@ -1,7 +1,7 @@
+use crate::db::AppState;
+use crate::models::{Transaction, UserTransactions};
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use mongodb::bson::doc;
-use crate::models::{UserTransactions, Transaction};
-use crate::db::AppState;
 
 fn extract_user_id(req: &HttpRequest) -> Option<String> {
     req.headers()
@@ -10,12 +10,19 @@ fn extract_user_id(req: &HttpRequest) -> Option<String> {
         .map(|s| s.to_string())
 }
 
-pub async fn get_generated_transactions(req: HttpRequest, data: web::Data<AppState>) -> impl Responder {
+pub async fn get_generated_transactions(
+    req: HttpRequest,
+    data: web::Data<AppState>,
+) -> impl Responder {
     let user_id = match extract_user_id(&req) {
         Some(id) => id,
         None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
     };
-    match data.generated_transactions_collection.find_one(doc! { "createdByUserId": &user_id }, None).await {
+    match data
+        .generated_transactions_collection
+        .find_one(doc! { "createdByUserId": &user_id }, None)
+        .await
+    {
         Ok(Some(user_transactions)) => HttpResponse::Ok().json(user_transactions.transactions),
         Ok(None) => HttpResponse::Ok().json(Vec::<Transaction>::new()),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
@@ -44,11 +51,18 @@ pub async fn save_generated_transactions(
         "$set": { "transactions": transactions_bson },
         "$setOnInsert": { "createdByUserId": &user_id }
     };
-    
-    let options = mongodb::options::UpdateOptions::builder().upsert(true).build();
 
-    match data.generated_transactions_collection.update_one(filter, update, options).await {
-        Ok(_) => HttpResponse::Ok().json(serde_json::json!({ "message": "Transactions saved successfully" })),
+    let options = mongodb::options::UpdateOptions::builder()
+        .upsert(true)
+        .build();
+
+    match data
+        .generated_transactions_collection
+        .update_one(filter, update, options)
+        .await
+    {
+        Ok(_) => HttpResponse::Ok()
+            .json(serde_json::json!({ "message": "Transactions saved successfully" })),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
