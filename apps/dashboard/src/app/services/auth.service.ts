@@ -46,7 +46,7 @@ export class AuthService {
     if (returnUrl) {
       window.location.href = decodeURIComponent(returnUrl);
     } else {
-      this.router.navigate(['/']);
+      window.location.href = '/';
     }
   }
 
