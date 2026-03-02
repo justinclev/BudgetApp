@@ -63,27 +63,86 @@ where
     }
 }
 
-/// Deserializes a required BSON DateTime into `chrono::DateTime<Utc>`.
-/// Uses `mongodb::bson::DateTime` directly so the BSON driver's native
-/// deserializer handles the wire format correctly.
+/// Deserializes a required DateTime from either:
+/// - BSON DateTime (MongoDB cursor) — driver calls visit_i64 with millis
+/// - RFC 3339 string (JSON request body from frontend)
 pub fn deserialize_datetime_from_bson<'de, D>(
     deserializer: D,
 ) -> Result<chrono::DateTime<chrono::Utc>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    mongodb::bson::DateTime::deserialize(deserializer).map(|dt| dt.to_chrono())
+    struct DateTimeVisitor;
+
+    impl<'de> serde::de::Visitor<'de> for DateTimeVisitor {
+        type Value = chrono::DateTime<chrono::Utc>;
+
+        fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            f.write_str("a BSON DateTime or RFC 3339 string")
+        }
+
+        // BSON DateTime arrives as i64 milliseconds from the MongoDB driver
+        fn visit_i64<E: serde::de::Error>(self, v: i64) -> Result<Self::Value, E> {
+            Ok(mongodb::bson::DateTime::from_millis(v).to_chrono())
+        }
+
+        // JSON string from frontend (RFC 3339)
+        fn visit_str<E: serde::de::Error>(self, v: &str) -> Result<Self::Value, E> {
+            chrono::DateTime::parse_from_rfc3339(v)
+                .map(|dt| dt.with_timezone(&chrono::Utc))
+                .map_err(serde::de::Error::custom)
+        }
+    }
+
+    deserializer.deserialize_any(DateTimeVisitor)
 }
 
-/// Deserializes an optional BSON DateTime into `Option<chrono::DateTime<Utc>>`.
-/// Uses `mongodb::bson::DateTime` directly so the BSON driver's native
-/// deserializer handles the wire format correctly.
+/// Deserializes an optional DateTime from either:
+/// - BSON DateTime (MongoDB cursor) — driver calls visit_i64 with millis
+/// - RFC 3339 string (JSON request body from frontend)
+/// - null / missing field
 pub fn deserialize_option_datetime_from_bson<'de, D>(
     deserializer: D,
 ) -> Result<Option<chrono::DateTime<chrono::Utc>>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    Option::<mongodb::bson::DateTime>::deserialize(deserializer)
-        .map(|opt| opt.map(|dt| dt.to_chrono()))
+    struct OptDateTimeVisitor;
+
+    impl<'de> serde::de::Visitor<'de> for OptDateTimeVisitor {
+        type Value = Option<chrono::DateTime<chrono::Utc>>;
+
+        fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            f.write_str("a BSON DateTime, RFC 3339 string, or null")
+        }
+
+        fn visit_none<E: serde::de::Error>(self) -> Result<Self::Value, E> {
+            Ok(None)
+        }
+
+        fn visit_unit<E: serde::de::Error>(self) -> Result<Self::Value, E> {
+            Ok(None)
+        }
+
+        // BSON DateTime arrives as i64 milliseconds from the MongoDB driver
+        fn visit_i64<E: serde::de::Error>(self, v: i64) -> Result<Self::Value, E> {
+            Ok(Some(mongodb::bson::DateTime::from_millis(v).to_chrono()))
+        }
+
+        // JSON string from frontend (RFC 3339)
+        fn visit_str<E: serde::de::Error>(self, v: &str) -> Result<Self::Value, E> {
+            if v.is_empty() {
+                return Ok(None);
+            }
+            chrono::DateTime::parse_from_rfc3339(v)
+                .map(|dt| Some(dt.with_timezone(&chrono::Utc)))
+                .map_err(serde::de::Error::custom)
+        }
+
+        fn visit_some<D2: Deserializer<'de>>(self, d: D2) -> Result<Self::Value, D2::Error> {
+            deserialize_datetime_from_bson(d).map(Some)
+        }
+    }
+
+    deserializer.deserialize_option(OptDateTimeVisitor)
 }
