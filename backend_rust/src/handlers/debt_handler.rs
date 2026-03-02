@@ -17,6 +17,8 @@ pub async fn get_debts(req: HttpRequest, data: web::Data<AppState>) -> impl Resp
         None => return HttpResponse::Unauthorized().body("Missing X-User-Id header"),
     };
 
+    println!("[get_debts] querying createdByUserId = {:?}", user_id);
+
     let mut cursor = match data
         .debts_collection
         .find(doc! { "createdByUserId": &user_id }, None)

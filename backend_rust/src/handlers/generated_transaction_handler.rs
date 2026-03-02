@@ -33,7 +33,7 @@ pub async fn save_generated_transactions(
     };
     let transaction_list = transactions.into_inner();
 
-    let filter = doc! { "user": &user_id };
+    let filter = doc! { "createdByUserId": &user_id };
 
     let transactions_bson = match mongodb::bson::to_bson(&transaction_list) {
         Ok(b) => b,
