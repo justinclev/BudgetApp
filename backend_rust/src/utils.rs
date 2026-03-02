@@ -144,5 +144,5 @@ where
         }
     }
 
-    deserializer.deserialize_option(OptDateTimeVisitor)
+    deserializer.deserialize_any(OptDateTimeVisitor)
 }
