@@ -16,7 +16,13 @@ import { DatePipe } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AuthService } from '../services/auth.service';
 import { ListService } from '../services/list.service';
-import { UserList, ListItem, SubItem, RepeatFrequency, REPEAT_FREQUENCY_LABELS } from '../models/list.model';
+import {
+  UserList,
+  ListItem,
+  SubItem,
+  RepeatFrequency,
+  REPEAT_FREQUENCY_LABELS,
+} from '../models/list.model';
 import { ListItemComponent, SubSaveEvent } from './list-item/list-item.component';
 import { MembersPanelComponent } from './members-panel/members-panel.component';
 
@@ -260,9 +266,7 @@ export class ListDetailComponent implements OnInit {
     const req = {
       name: list.name,
       listType: list.listType,
-      completeByDate: this.scheduleDate
-        ? new Date(this.scheduleDate).toISOString()
-        : '',
+      completeByDate: this.scheduleDate ? new Date(this.scheduleDate).toISOString() : '',
       repeatFrequency: this.scheduleRepeat || '',
     };
     this.listService.updateList(this.listId, req).subscribe({

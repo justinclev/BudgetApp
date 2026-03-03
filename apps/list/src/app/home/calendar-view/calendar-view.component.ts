@@ -32,32 +32,40 @@ export class CalendarViewComponent implements OnChanges {
 
   readonly views: { key: CalendarView; label: string }[] = [
     { key: 'today', label: 'Today' },
-    { key: 'week',  label: 'Week'  },
+    { key: 'week', label: 'Week' },
     { key: 'month', label: 'Month' },
-    { key: 'year',  label: 'Year'  },
+    { key: 'year', label: 'Year' },
   ];
 
-  primary   = computed(() => this.entries().filter((e) => !e.isUndated && e.isPrimary));
+  primary = computed(() => this.entries().filter((e) => !e.isUndated && e.isPrimary));
   secondary = computed(() => this.entries().filter((e) => !e.isUndated && !e.isPrimary));
-  undated   = computed(() => this.entries().filter((e) => e.isUndated));
+  undated = computed(() => this.entries().filter((e) => e.isUndated));
 
   hasAny = computed(() => this.entries().length > 0);
 
   primaryHeading = computed<string>(() => {
     switch (this.selectedView()) {
-      case 'today': return '🔴 Due Today & Overdue';
-      case 'week':  return '📅 Due This Week';
-      case 'month': return '📅 Due This Month';
-      case 'year':  return '📅 Due This Year';
+      case 'today':
+        return '🔴 Due Today & Overdue';
+      case 'week':
+        return '📅 Due This Week';
+      case 'month':
+        return '📅 Due This Month';
+      case 'year':
+        return '📅 Due This Year';
     }
   });
 
   secondaryHeading = computed<string>(() => {
     switch (this.selectedView()) {
-      case 'today': return '🔜 Due This Week';
-      case 'week':  return '🔜 Due Next Week';
-      case 'month': return '🔜 Due Next Month';
-      default:      return '';
+      case 'today':
+        return '🔜 Due This Week';
+      case 'week':
+        return '🔜 Due Next Week';
+      case 'month':
+        return '🔜 Due Next Month';
+      default:
+        return '';
     }
   });
 
@@ -92,11 +100,20 @@ export class CalendarViewComponent implements OnChanges {
     const start = this.toDateStr(now);
     let end: string;
     switch (this.selectedView()) {
-      case 'today':  end = this.toDateStr(add(now, 7));   break;
-      case 'week':   end = this.toDateStr(add(now, 14));  break;
-      case 'month':  end = this.toDateStr(new Date(now.getFullYear(), now.getMonth() + 2, 0)); break;
-      case 'year':   end = this.toDateStr(new Date(now.getFullYear(), 11, 31)); break;
-      default:       end = this.toDateStr(add(now, 14));
+      case 'today':
+        end = this.toDateStr(add(now, 7));
+        break;
+      case 'week':
+        end = this.toDateStr(add(now, 14));
+        break;
+      case 'month':
+        end = this.toDateStr(new Date(now.getFullYear(), now.getMonth() + 2, 0));
+        break;
+      case 'year':
+        end = this.toDateStr(new Date(now.getFullYear(), 11, 31));
+        break;
+      default:
+        end = this.toDateStr(add(now, 14));
     }
     return { startDate: start, endDate: end };
   }
@@ -137,14 +154,19 @@ export class CalendarViewComponent implements OnChanges {
       let isPrimary = true;
       if (!isUndated) {
         switch (view) {
-          case 'today':  isPrimary = offset <= 0; break;
-          case 'week':   isPrimary = offset >= 0 && offset <= 6; break;
+          case 'today':
+            isPrimary = offset <= 0;
+            break;
+          case 'week':
+            isPrimary = offset >= 0 && offset <= 6;
+            break;
           case 'month':
             isPrimary =
-              occDate.getFullYear() === now.getFullYear() &&
-              occDate.getMonth() === now.getMonth();
+              occDate.getFullYear() === now.getFullYear() && occDate.getMonth() === now.getMonth();
             break;
-          case 'year':   isPrimary = true; break;
+          case 'year':
+            isPrimary = true;
+            break;
         }
       }
 
@@ -220,7 +242,7 @@ export class CalendarViewComponent implements OnChanges {
     const due = new Date(entry.dueDate);
     due.setHours(0, 0, 0, 0);
     const diff = Math.round((due.getTime() - today.getTime()) / 86_400_000);
-    if (diff < 0)  return `${Math.abs(diff)}d overdue`;
+    if (diff < 0) return `${Math.abs(diff)}d overdue`;
     if (diff === 0) return 'Today';
     if (diff === 1) return 'Tomorrow';
     return `In ${diff} days`;
@@ -234,4 +256,3 @@ export class CalendarViewComponent implements OnChanges {
     return e.occurrenceId ?? `${e.listId}-${e.item.id}`;
   }
 }
-

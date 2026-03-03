@@ -23,11 +23,7 @@ function addDays(d: Date, n: number): Date {
  * Returns true if `checkDate` is a scheduled occurrence for a recurring
  * schedule that started on `startDate`.
  */
-export function isScheduledOn(
-  startDate: Date,
-  freq: RepeatFrequency,
-  checkDate: Date,
-): boolean {
+export function isScheduledOn(startDate: Date, freq: RepeatFrequency, checkDate: Date): boolean {
   const start = startOfDay(startDate);
   const check = startOfDay(checkDate);
   if (check < start) return false;
@@ -128,9 +124,7 @@ export function buildCalendarEntries(lists: UserList[], view: CalendarView): Cal
     // For recurring lists every occurrence is independent — ignore item.completed
     // so a daily item checked off yesterday still shows today.
     // For non-recurring lists, respect the permanent completed flag.
-    const pending = list.repeatFrequency
-      ? list.items
-      : list.items.filter((i) => !i.completed);
+    const pending = list.repeatFrequency ? list.items : list.items.filter((i) => !i.completed);
     if (pending.length === 0) continue;
 
     // ── Undated list ──────────────────────────────────────────────────────
@@ -164,20 +158,24 @@ export function buildCalendarEntries(lists: UserList[], view: CalendarView): Cal
 
     switch (view) {
       case 'today':
-        if (offset <= 0) { isPrimary = true; }
-        else if (offset <= 7) { isPrimary = false; }
-        else continue;
+        if (offset <= 0) {
+          isPrimary = true;
+        } else if (offset <= 7) {
+          isPrimary = false;
+        } else continue;
         break;
 
       case 'week':
-        if (offset < 0 || offset <= 6) { isPrimary = true; }
-        else if (offset <= 13) { isPrimary = false; }
-        else continue;
+        if (offset < 0 || offset <= 6) {
+          isPrimary = true;
+        } else if (offset <= 13) {
+          isPrimary = false;
+        } else continue;
         break;
 
       case 'month': {
         const nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-        const nextMonthEnd   = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        const nextMonthEnd = new Date(today.getFullYear(), today.getMonth() + 2, 0);
         const dueMs = candidateDue.getTime();
         if (offset < 0) {
           isPrimary = true;

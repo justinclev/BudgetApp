@@ -37,10 +37,18 @@
   margin: 0 0 10px;
 }
 
-.overdue-title { color: #dc2626; }
-.today-title   { color: #16a34a; }
-.soon-title    { color: #d97706; }
-.undated-title { color: #64748b; }
+.overdue-title {
+  color: #dc2626;
+}
+.today-title {
+  color: #16a34a;
+}
+.soon-title {
+  color: #d97706;
+}
+.undated-title {
+  color: #64748b;
+}
 
 // ── Cards ─────────────────────────────────────────────────────────────────────
 
@@ -52,7 +60,9 @@
   cursor: pointer;
   border-left: 4px solid transparent;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
 
   &:hover {
     transform: translateY(-1px);
@@ -60,10 +70,18 @@
   }
 }
 
-.overdue-card { border-left-color: #dc2626; }
-.today-card   { border-left-color: #16a34a; }
-.soon-card    { border-left-color: #d97706; }
-.undated-card { border-left-color: #94a3b8; }
+.overdue-card {
+  border-left-color: #dc2626;
+}
+.today-card {
+  border-left-color: #16a34a;
+}
+.soon-card {
+  border-left-color: #d97706;
+}
+.undated-card {
+  border-left-color: #94a3b8;
+}
 
 .entry-main {
   display: flex;
@@ -106,9 +124,18 @@
   font-weight: 600;
 }
 
-.overdue-badge { background: #fee2e2; color: #dc2626; }
-.soon-badge    { background: #fef3c7; color: #d97706; }
-.repeat-badge  { background: #ede9fe; color: #7c3aed; }
+.overdue-badge {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.soon-badge {
+  background: #fef3c7;
+  color: #d97706;
+}
+.repeat-badge {
+  background: #ede9fe;
+  color: #7c3aed;
+}
 
 // ── Empty states ──────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 <div class="calendar-view">
   <div class="cal-header">
     <h2>📅 Schedule</h2>
-    <span class="cal-date">{{ today | date:'MMMM d, y' }}</span>
+    <span class="cal-date">{{ today | date: 'MMMM d, y' }}</span>
   </div>
 
   <!-- View toggle chips -->
@@ -11,7 +11,9 @@
         class="chip"
         [class.chip--active]="selectedView() === v.key"
         (click)="selectView(v.key)"
-      >{{ v.label }}</button>
+      >
+        {{ v.label }}
+      </button>
     }
   </div>
 
@@ -21,15 +23,24 @@
       <p>Nothing scheduled for this period.</p>
     </div>
   } @else {
-
     <!-- Primary section -->
     @if (primary().length > 0) {
       <section class="section primary-section">
         <h3 class="section-title primary-title">{{ primaryHeading() }}</h3>
         @for (entry of primary(); track trackEntry($index, entry)) {
-          <div class="entry-card primary-card" [class.entry-card--done]="entry.isOccurrenceCompleted">
-            <label class="entry-check" title="{{ entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete' }}">
-              <input type="checkbox" [checked]="entry.isOccurrenceCompleted" (change)="toggleItem(entry, $event)" />
+          <div
+            class="entry-card primary-card"
+            [class.entry-card--done]="entry.isOccurrenceCompleted"
+          >
+            <label
+              class="entry-check"
+              title="{{ entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete' }}"
+            >
+              <input
+                type="checkbox"
+                [checked]="entry.isOccurrenceCompleted"
+                (change)="toggleItem(entry, $event)"
+              />
             </label>
             <div class="entry-body">
               <div class="entry-main">
@@ -37,13 +48,16 @@
                 <span class="entry-list">{{ entry.listName }}</span>
               </div>
               <div class="entry-meta">
-                <span class="badge due-badge" [class.overdue-badge]="dueDateLabel(entry).includes('overdue')">
+                <span
+                  class="badge due-badge"
+                  [class.overdue-badge]="dueDateLabel(entry).includes('overdue')"
+                >
                   {{ dueDateLabel(entry) }}
                 </span>
                 @if (entry.repeatFrequency) {
                   <span class="badge repeat-badge">🔁 {{ repeatLabel(entry) }}</span>
                 }
-                <span class="badge date-badge">{{ entry.dueDate | date:'MMM d' }}</span>
+                <span class="badge date-badge">{{ entry.dueDate | date: 'MMM d' }}</span>
               </div>
               <div class="entry-actions">
                 <button class="action-btn" (click)="openList(entry, $event)">📋 Open List</button>
@@ -60,9 +74,19 @@
         <h3 class="section-title secondary-title">{{ secondaryHeading() }}</h3>
         <p class="secondary-note">Not urgent — just on the horizon</p>
         @for (entry of secondary(); track trackEntry($index, entry)) {
-          <div class="entry-card secondary-card" [class.entry-card--done]="entry.isOccurrenceCompleted">
-            <label class="entry-check" title="{{ entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete' }}">
-              <input type="checkbox" [checked]="entry.isOccurrenceCompleted" (change)="toggleItem(entry, $event)" />
+          <div
+            class="entry-card secondary-card"
+            [class.entry-card--done]="entry.isOccurrenceCompleted"
+          >
+            <label
+              class="entry-check"
+              title="{{ entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete' }}"
+            >
+              <input
+                type="checkbox"
+                [checked]="entry.isOccurrenceCompleted"
+                (change)="toggleItem(entry, $event)"
+              />
             </label>
             <div class="entry-body">
               <div class="entry-main">
@@ -74,7 +98,7 @@
                 @if (entry.repeatFrequency) {
                   <span class="badge repeat-badge">🔁 {{ repeatLabel(entry) }}</span>
                 }
-                <span class="badge date-badge">{{ entry.dueDate | date:'MMM d' }}</span>
+                <span class="badge date-badge">{{ entry.dueDate | date: 'MMM d' }}</span>
               </div>
               <div class="entry-actions">
                 <button class="action-btn" (click)="openList(entry, $event)">📋 Open List</button>
@@ -90,9 +114,19 @@
       <section class="section undated-section">
         <h3 class="section-title undated-title">📝 No Due Date</h3>
         @for (entry of undated(); track trackEntry($index, entry)) {
-          <div class="entry-card undated-card" [class.entry-card--done]="entry.isOccurrenceCompleted">
-            <label class="entry-check" title="{{ entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete' }}">
-              <input type="checkbox" [checked]="entry.isOccurrenceCompleted" (change)="toggleItem(entry, $event)" />
+          <div
+            class="entry-card undated-card"
+            [class.entry-card--done]="entry.isOccurrenceCompleted"
+          >
+            <label
+              class="entry-check"
+              title="{{ entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete' }}"
+            >
+              <input
+                type="checkbox"
+                [checked]="entry.isOccurrenceCompleted"
+                (change)="toggleItem(entry, $event)"
+              />
             </label>
             <div class="entry-body">
               <div class="entry-main">

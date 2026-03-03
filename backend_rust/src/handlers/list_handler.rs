@@ -5,9 +5,9 @@ use mongodb::bson::{doc, oid::ObjectId};
 
 use crate::db::AppState;
 use crate::models::{
-    AddItemRequest, CloneListRequest, CompleteOccurrenceRequest, CreateListRequest, JoinListRequest,
-    ListItem, ReorderItemsRequest, SubItem, ToggleItemRequest, UpdateItemRequest, UpdateListRequest,
-    UserList,
+    AddItemRequest, CloneListRequest, CompleteOccurrenceRequest, CreateListRequest,
+    JoinListRequest, ListItem, ReorderItemsRequest, SubItem, ToggleItemRequest, UpdateItemRequest,
+    UpdateListRequest, UserList,
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -153,8 +153,12 @@ pub async fn update_list(
         }
     }
     match &req.repeat_frequency {
-        Some(rf) if rf.is_empty() => { set_doc.insert("repeatFrequency", mongodb::bson::Bson::Null); }
-        Some(rf) => { set_doc.insert("repeatFrequency", rf.as_str()); }
+        Some(rf) if rf.is_empty() => {
+            set_doc.insert("repeatFrequency", mongodb::bson::Bson::Null);
+        }
+        Some(rf) => {
+            set_doc.insert("repeatFrequency", rf.as_str());
+        }
         None => {}
     }
     let update = doc! { "$set": set_doc };

@@ -8,7 +8,9 @@
           [class.cal-btn--active]="showCalendar()"
           (click)="showCalendar.set(!showCalendar())"
           title="View Calendar"
-        >📅 Calendar</button>
+        >
+          📅 Calendar
+        </button>
       }
       <span class="user-name">{{ user()?.name }}</span>
       <button class="icon-btn" title="Back to Apps" (click)="goToApps()">⊞</button>

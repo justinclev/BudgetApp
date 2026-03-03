@@ -3,11 +3,7 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { UserList } from '../../models/list.model';
 import { REPEAT_FREQUENCY_LABELS } from '../../models/list.model';
-import {
-  buildDailyTodoEntries,
-  DailyTodoEntry,
-  DueStatus,
-} from '../../utils/todo-recurrence';
+import { buildDailyTodoEntries, DailyTodoEntry, DueStatus } from '../../utils/todo-recurrence';
 
 @Component({
   selector: 'app-daily-todo',

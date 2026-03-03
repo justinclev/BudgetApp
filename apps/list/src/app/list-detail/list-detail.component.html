@@ -17,7 +17,7 @@
       @if (list()?.listType === 'todo' && (list()?.completeByDate || list()?.repeatFrequency)) {
         <div class="schedule-badge">
           @if (list()?.completeByDate) {
-            <span>📅 {{ list()?.completeByDate | date:'MMM d, y' }}</span>
+            <span>📅 {{ list()?.completeByDate | date: 'MMM d, y' }}</span>
           }
           @if (list()?.repeatFrequency) {
             <span>🔁 {{ scheduleRepeatLabel() }}</span>

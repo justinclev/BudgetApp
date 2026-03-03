@@ -43,7 +43,10 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 
   &:hover {
     background: #f3f4f6;
@@ -71,9 +74,15 @@
   margin: 0 0 8px;
 }
 
-.primary-title   { color: #0f172a; }
-.secondary-title { color: #64748b; }
-.undated-title   { color: #94a3b8; }
+.primary-title {
+  color: #0f172a;
+}
+.secondary-title {
+  color: #64748b;
+}
+.undated-title {
+  color: #94a3b8;
+}
 
 .secondary-note {
   font-size: 12px;
@@ -151,7 +160,9 @@
   padding: 4px 10px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
 
   &:hover {
     background: #f1f5f9;

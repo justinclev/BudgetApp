@@ -55,12 +55,12 @@ export class HomeComponent implements OnInit {
     this.listService
       .createList({ name, listType, ownerId: userId, completeByDate, repeatFrequency })
       .subscribe({
-      next: (created) => {
-        this.lists.update((l) => [created, ...l]);
-        this.showCreate = false;
-        this.router.navigate(['/list', created._id]);
-      },
-    });
+        next: (created) => {
+          this.lists.update((l) => [created, ...l]);
+          this.showCreate = false;
+          this.router.navigate(['/list', created._id]);
+        },
+      });
   }
 
   onListUpdated(updated: UserList): void {

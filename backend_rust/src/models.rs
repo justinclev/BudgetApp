@@ -192,12 +192,24 @@ pub struct ListItem {
     pub id: String,
     pub text: String,
     pub completed: bool,
-    #[serde(rename = "completedByUserId", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "completedByUserId",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub completed_by_user_id: Option<String>,
     /// Date-only string (YYYY-MM-DD) of the most recently completed recurrence occurrence.
-    #[serde(rename = "lastCompletedAt", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "lastCompletedAt",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub last_completed_at: Option<String>,
-    #[serde(rename = "lastCompletedByUserId", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "lastCompletedByUserId",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub last_completed_by_user_id: Option<String>,
     #[serde(
         rename = "createdAt",
@@ -243,7 +255,11 @@ pub struct UserList {
         default
     )]
     pub complete_by_date: Option<chrono::DateTime<chrono::Utc>>,
-    #[serde(rename = "repeatFrequency", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "repeatFrequency",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub repeat_frequency: Option<String>,
 }
 
@@ -254,9 +270,17 @@ pub struct CreateListRequest {
     pub list_type: String,
     #[serde(rename = "ownerId")]
     pub owner_id: String,
-    #[serde(rename = "completeByDate", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "completeByDate",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub complete_by_date: Option<String>,
-    #[serde(rename = "repeatFrequency", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "repeatFrequency",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub repeat_frequency: Option<String>,
 }
 
@@ -265,9 +289,17 @@ pub struct UpdateListRequest {
     pub name: String,
     #[serde(rename = "listType")]
     pub list_type: String,
-    #[serde(rename = "completeByDate", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "completeByDate",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub complete_by_date: Option<String>,
-    #[serde(rename = "repeatFrequency", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "repeatFrequency",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub repeat_frequency: Option<String>,
 }
 
@@ -346,7 +378,11 @@ pub struct TodoOccurrence {
     #[serde(rename = "occurrenceDate")]
     pub occurrence_date: String,
     pub completed: bool,
-    #[serde(rename = "completedByUserId", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "completedByUserId",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub completed_by_user_id: Option<String>,
     #[serde(
         rename = "completedAt",
@@ -357,12 +393,23 @@ pub struct TodoOccurrence {
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[serde(rename = "ownerId")]
     pub owner_id: String,
-    #[serde(rename = "repeatFrequency", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "repeatFrequency",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub repeat_frequency: Option<String>,
     /// Original list completeByDate as YYYY-MM-DD, None means undated list.
-    #[serde(rename = "listDueDate", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "listDueDate",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub list_due_date: Option<String>,
-    #[serde(rename = "createdAt", deserialize_with = "deserialize_datetime_from_bson")]
+    #[serde(
+        rename = "createdAt",
+        deserialize_with = "deserialize_datetime_from_bson"
+    )]
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 

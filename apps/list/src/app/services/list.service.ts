@@ -98,10 +98,10 @@ export class ListService {
     date: string,
     userId?: string,
   ): Observable<UserList> {
-    return this.http.patch<UserList>(
-      `${this.base}/${listId}/items/${itemId}/complete-occurrence`,
-      { date, userId },
-    );
+    return this.http.patch<UserList>(`${this.base}/${listId}/items/${itemId}/complete-occurrence`, {
+      date,
+      userId,
+    });
   }
 
   resetList(id: string): Observable<UserList> {
@@ -134,11 +134,7 @@ export class ListService {
     });
   }
 
-  getOccurrences(
-    userId: string,
-    startDate: string,
-    endDate: string,
-  ): Observable<TodoOccurrence[]> {
+  getOccurrences(userId: string, startDate: string, endDate: string): Observable<TodoOccurrence[]> {
     const params = new HttpParams()
       .set('user_id', userId)
       .set('start_date', startDate)

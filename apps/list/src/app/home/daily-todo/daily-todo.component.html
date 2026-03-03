@@ -1,7 +1,7 @@
 <div class="daily-todo">
   <div class="daily-header">
     <h2>📅 Daily To-Do</h2>
-    <span class="date-label">{{ todayDate | date:'EEEE, MMMM d' }}</span>
+    <span class="date-label">{{ todayDate | date: 'EEEE, MMMM d' }}</span>
   </div>
 
   @if (!hasTodoLists()) {
@@ -15,7 +15,6 @@
       <p>All caught up for today!</p>
     </div>
   } @else {
-
     <!-- Overdue -->
     @if (overdue().length > 0) {
       <section class="section overdue-section">
@@ -56,7 +55,6 @@
         }
       </section>
     }
-
   }
 
   <!-- Coming Soon (always show if any) -->
@@ -95,4 +93,3 @@
     </section>
   }
 </div>
-
