@@ -6,9 +6,15 @@
 // ── Top progress bar ──────────────────────────────────────────────────────────
 
 @keyframes progress-slide {
-  0%   { transform: translateX(-100%); }
-  60%  { transform: translateX(20%); }
-  100% { transform: translateX(110%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  60% {
+    transform: translateX(20%);
+  }
+  100% {
+    transform: translateX(110%);
+  }
 }
 
 .progress-bar-track {
@@ -35,16 +41,15 @@
 // ── Skeleton shimmer ──────────────────────────────────────────────────────────
 
 @keyframes shimmer {
-  from { background-position: -400px 0; }
-  to   { background-position: 400px 0; }
+  from {
+    background-position: -400px 0;
+  }
+  to {
+    background-position: 400px 0;
+  }
 }
 
-$shimmer-bg: linear-gradient(
-  90deg,
-  #f1f5f9 25%,
-  #e2e8f0 50%,
-  #f1f5f9 75%
-);
+$shimmer-bg: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
 
 .skeleton-list {
   display: flex;
@@ -70,8 +75,13 @@ $shimmer-bg: linear-gradient(
   background-size: 800px 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 
-  &--title { width: 60%; }
-  &--sub   { width: 38%; height: 10px; }
+  &--title {
+    width: 60%;
+  }
+  &--sub {
+    width: 38%;
+    height: 10px;
+  }
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -131,7 +141,9 @@ $shimmer-bg: linear-gradient(
     color: #fff;
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 
-    &:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    &:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
   }
 
   &:disabled {

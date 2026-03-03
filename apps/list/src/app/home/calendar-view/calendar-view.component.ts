@@ -143,29 +143,32 @@ export class CalendarViewComponent implements OnChanges {
     this.loading.set(true);
 
     // ── Phase 1: show existing occurrences immediately ──────────────────
-    this.listService.getOccurrences(userId, startDate, endDate).pipe(
-      tap((occurrences) => {
-        this.rawOccurrences = occurrences;
-        this.occurrencesLoaded = true;
-        this.entries.set(this.mapToEntries(occurrences));
-        this.loading.set(false); // skeleton replaced right away
-      }),
-      // ── Phase 2: generate any missing ones, then silently refresh ──────
-      switchMap(() => this.listService.generateOccurrences(userId, startDate, endDate)),
-      switchMap(({ generated }) => {
-        // Only re-fetch if new occurrences were actually created
-        if (generated > 0) {
-          return this.listService.getOccurrences(userId, startDate, endDate);
-        }
-        return [this.rawOccurrences]; // nothing new — skip the extra GET
-      }),
-    ).subscribe({
-      next: (occurrences) => {
-        this.rawOccurrences = occurrences;
-        this.entries.set(this.mapToEntries(occurrences));
-      },
-      error: () => this.loading.set(false),
-    });
+    this.listService
+      .getOccurrences(userId, startDate, endDate)
+      .pipe(
+        tap((occurrences) => {
+          this.rawOccurrences = occurrences;
+          this.occurrencesLoaded = true;
+          this.entries.set(this.mapToEntries(occurrences));
+          this.loading.set(false); // skeleton replaced right away
+        }),
+        // ── Phase 2: generate any missing ones, then silently refresh ──────
+        switchMap(() => this.listService.generateOccurrences(userId, startDate, endDate)),
+        switchMap(({ generated }) => {
+          // Only re-fetch if new occurrences were actually created
+          if (generated > 0) {
+            return this.listService.getOccurrences(userId, startDate, endDate);
+          }
+          return [this.rawOccurrences]; // nothing new — skip the extra GET
+        }),
+      )
+      .subscribe({
+        next: (occurrences) => {
+          this.rawOccurrences = occurrences;
+          this.entries.set(this.mapToEntries(occurrences));
+        },
+        error: () => this.loading.set(false),
+      });
   }
 
   private parseLocalDate(s: string): Date {
@@ -182,12 +185,21 @@ export class CalendarViewComponent implements OnChanges {
     // don't overflow with the rest of the year.
     let maxOffset: number;
     switch (view) {
-      case 'today':  maxOffset = 7;   break;
-      case 'week':   maxOffset = 14;  break;
-      case 'month':  maxOffset = Math.round(
-        (new Date(now.getFullYear(), now.getMonth() + 2, 0).getTime() - now.getTime()) / 86_400_000
-      ); break;
-      default:       maxOffset = 366; break; // year
+      case 'today':
+        maxOffset = 7;
+        break;
+      case 'week':
+        maxOffset = 14;
+        break;
+      case 'month':
+        maxOffset = Math.round(
+          (new Date(now.getFullYear(), now.getMonth() + 2, 0).getTime() - now.getTime()) /
+            86_400_000,
+        );
+        break;
+      default:
+        maxOffset = 366;
+        break; // year
     }
     occurrences = occurrences.filter((occ) => {
       if (!occ.occurrenceDate) return true; // undated always shown
@@ -322,7 +334,7 @@ export class CalendarViewComponent implements OnChanges {
       next: (updated: TodoOccurrence) => {
         // Patch rawOccurrences so switching views reflects the toggle
         this.rawOccurrences = this.rawOccurrences.map((occ) =>
-          occ._id === entry.occurrenceId ? { ...occ, ...updated } : occ
+          occ._id === entry.occurrenceId ? { ...occ, ...updated } : occ,
         );
         const completedBy = updated.completedByName ?? updated.completedByUserId;
         this.entries.update((all) =>
