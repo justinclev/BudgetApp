@@ -721,7 +721,9 @@ $shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
     padding: 28px 36px 32px;
     border-radius: 0 0 0 0; // flush in grid
 
-    .greeting-name { font-size: 30px; }
+    .greeting-name {
+      font-size: 30px;
+    }
   }
 
   // ── Scrollable content: right column, bottom row ────────────────────────────
@@ -778,14 +780,12 @@ $shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
 
     // Replace the top-indicator with a left background highlight
-    &::before { display: none; }
+    &::before {
+      display: none;
+    }
 
     &--active {
-      background: linear-gradient(
-        135deg,
-        rgba($purple-start, 0.1),
-        rgba($purple-end, 0.08)
-      );
+      background: linear-gradient(135deg, rgba($purple-start, 0.1), rgba($purple-end, 0.08));
 
       .tab-label {
         color: $purple-end;
@@ -803,7 +803,9 @@ $shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
     }
   }
 
-  .tab-icon { font-size: 20px; }
+  .tab-icon {
+    font-size: 20px;
+  }
 
   .tab-label {
     font-size: 14px;
