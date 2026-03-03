@@ -1,4 +1,11 @@
 <div class="calendar-view">
+  <!-- ── Loading progress bar ─────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill"></div>
+    </div>
+  }
+
   <div class="cal-header">
     <h2>📅 Schedule</h2>
     <span class="cal-date">{{ today | date: 'MMMM d, y' }}</span>
@@ -11,13 +18,24 @@
         class="chip"
         [class.chip--active]="selectedView() === v.key"
         (click)="selectView(v.key)"
+        [disabled]="loading()"
       >
         {{ v.label }}
       </button>
     }
   </div>
 
-  @if (!hasAny()) {
+  @if (loading()) {
+    <!-- Skeleton shimmer while data loads -->
+    <div class="skeleton-list">
+      @for (n of [1,2,3,4]; track n) {
+        <div class="skeleton-card">
+          <div class="skeleton-line skeleton-line--title"></div>
+          <div class="skeleton-line skeleton-line--sub"></div>
+        </div>
+      }
+    </div>
+  } @else if (!hasAny()) {
     <div class="empty-state">
       <div class="empty-icon">🎉</div>
       <p>Nothing scheduled for this period.</p>
