@@ -1,33 +1,52 @@
 // ── Variables ──────────────────────────────────────────────────────────────
 
 $purple-start: #667eea;
-$purple-end:   #764ba2;
-$tab-h:        66px;
-$header-h:     110px;
-$radius:        16px;
-$shadow-sm:    0 2px 8px rgba(0, 0, 0, 0.07);
-$shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
+$purple-end: #764ba2;
+$tab-h: 66px;
+$header-h: 110px;
+$radius: 16px;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.07);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 // ── Animations ─────────────────────────────────────────────────────────────
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes tab-pop {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.18); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba($purple-start, 0.4); }
-  50%       { box-shadow: 0 0 0 10px rgba($purple-start, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba($purple-start, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba($purple-start, 0);
+  }
 }
 
 // ── Layout ──────────────────────────────────────────────────────────────────
@@ -136,7 +155,9 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
   transition: background 0.15s;
 
-  &:hover { background: rgba(255, 255, 255, 0.32); }
+  &:hover {
+    background: rgba(255, 255, 255, 0.32);
+  }
 }
 
 // ── Main scroll area ────────────────────────────────────────────────────────
@@ -201,7 +222,9 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .pill {
@@ -217,7 +240,9 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
   transition: all 0.15s;
 
-  &:hover { border-color: #94a3b8; }
+  &:hover {
+    border-color: #94a3b8;
+  }
 
   &--active {
     background: linear-gradient(135deg, $purple-start, $purple-end);
@@ -243,10 +268,14 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   cursor: pointer;
   animation: fade-up 0.3s ease both;
-  transition: transform 0.18s, box-shadow 0.18s;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
 
   @for $i from 1 through 20 {
-    &:nth-child(#{$i}) { animation-delay: #{$i * 40}ms; }
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 40}ms;
+    }
   }
 
   &:active {
@@ -259,7 +288,9 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   }
 
   &--full {
-    .card-accent { background: linear-gradient(160deg, #10b981, #059669) !important; }
+    .card-accent {
+      background: linear-gradient(160deg, #10b981, #059669) !important;
+    }
     box-shadow: 0 4px 18px rgba(16, 185, 129, 0.2);
   }
 }
@@ -309,7 +340,9 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
   transition: color 0.15s;
 
-  &:hover { color: #f87171; }
+  &:hover {
+    color: #f87171;
+  }
 }
 
 .card-chips {
@@ -390,11 +423,15 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   padding: 16px;
   cursor: pointer;
   animation: fade-up 0.3s ease both;
-  transition: transform 0.18s, box-shadow 0.18s;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
   border-left: 4px solid $purple-start;
 
   @for $i from 1 through 20 {
-    &:nth-child(#{$i}) { animation-delay: #{$i * 55}ms; }
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 55}ms;
+    }
   }
 
   &:hover {
@@ -402,7 +439,9 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
 
-  &:active { transform: scale(0.98); }
+  &:active {
+    transform: scale(0.98);
+  }
 
   &--complete {
     border-left-color: #10b981;
@@ -463,11 +502,14 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   transform: rotate(-90deg);
 }
 
-.ring-bg { stroke: #f1f5f9; }
+.ring-bg {
+  stroke: #f1f5f9;
+}
 
 .ring-fill {
-  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-              stroke 0.3s ease;
+  transition:
+    stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 0.3s ease;
 }
 
 .ring-pct {
@@ -586,11 +628,15 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
     background: linear-gradient(90deg, $purple-start, $purple-end);
     opacity: 0;
     transform: scaleX(0);
-    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      opacity 0.2s,
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   &--active {
-    .tab-icon { animation: tab-pop 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .tab-icon {
+      animation: tab-pop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
     .tab-label {
       color: $purple-start;
       font-weight: 700;
@@ -634,7 +680,9 @@ $shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
   align-items: center;
   justify-content: center;
   z-index: 25;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   animation: pulse-glow 2.5s ease-in-out infinite;
 
   &:hover {

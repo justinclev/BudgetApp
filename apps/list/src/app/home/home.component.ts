@@ -15,18 +15,18 @@ type Filter = 'all' | 'todo' | 'shopping' | 'other';
 
 const TYPE_GRADIENTS: Record<string, string> = {
   shopping: 'linear-gradient(160deg, #f59e0b, #f97316)',
-  todo:     'linear-gradient(160deg, #10b981, #059669)',
-  other:    'linear-gradient(160deg, #8b5cf6, #6d28d9)',
+  todo: 'linear-gradient(160deg, #10b981, #059669)',
+  other: 'linear-gradient(160deg, #8b5cf6, #6d28d9)',
 };
 const TYPE_COLORS: Record<string, string> = {
   shopping: '#f59e0b',
-  todo:     '#10b981',
-  other:    '#8b5cf6',
+  todo: '#10b981',
+  other: '#8b5cf6',
 };
 const TYPE_EMOJI: Record<string, string> = {
   shopping: '🛒',
-  todo:     '✅',
-  other:    '📝',
+  todo: '✅',
+  other: '📝',
 };
 
 @Component({
@@ -50,10 +50,10 @@ export class HomeComponent implements OnInit {
   activeFilter = signal<Filter>('all');
 
   readonly filters: { key: Filter; label: string }[] = [
-    { key: 'all',      label: '✦ All' },
-    { key: 'todo',     label: '✅ To-Do' },
+    { key: 'all', label: '✦ All' },
+    { key: 'todo', label: '✅ To-Do' },
     { key: 'shopping', label: '🛒 Shopping' },
-    { key: 'other',    label: '📝 Other' },
+    { key: 'other', label: '📝 Other' },
   ];
 
   filteredLists = computed(() => {
@@ -64,7 +64,9 @@ export class HomeComponent implements OnInit {
   todoLists = computed(() => this.lists().filter((l) => l.listType === 'todo'));
 
   totalItems = computed(() => this.lists().reduce((s, l) => s + l.items.length, 0));
-  doneItems  = computed(() => this.lists().reduce((s, l) => s + l.items.filter((i) => i.completed).length, 0));
+  doneItems = computed(() =>
+    this.lists().reduce((s, l) => s + l.items.filter((i) => i.completed).length, 0),
+  );
 
   get greeting(): string {
     const h = new Date().getHours();
@@ -127,9 +129,15 @@ export class HomeComponent implements OnInit {
 
   // ── Card helpers ─────────────────────────────────────────────────────────
 
-  typeGradient(t: string): string { return TYPE_GRADIENTS[t] ?? TYPE_GRADIENTS['other']; }
-  typeColor(t: string): string    { return TYPE_COLORS[t]    ?? TYPE_COLORS['other']; }
-  typeEmoji(t: string): string    { return TYPE_EMOJI[t]     ?? '📝'; }
+  typeGradient(t: string): string {
+    return TYPE_GRADIENTS[t] ?? TYPE_GRADIENTS['other'];
+  }
+  typeColor(t: string): string {
+    return TYPE_COLORS[t] ?? TYPE_COLORS['other'];
+  }
+  typeEmoji(t: string): string {
+    return TYPE_EMOJI[t] ?? '📝';
+  }
 
   doneCount(list: UserList): number {
     return list.items.filter((i) => i.completed).length;

@@ -168,19 +168,36 @@ export class CalendarViewComponent implements OnChanges {
       const existOffset = Math.round((existDate.getTime() - now.getTime()) / 86_400_000);
 
       // Rule 1: today-completed is sacred — never replace it
-      if (existing.completed && existOffset === 0) { continue; }
-      if (occ.completed && occOffset === 0) { best.set(key, occ); continue; }
+      if (existing.completed && existOffset === 0) {
+        continue;
+      }
+      if (occ.completed && occOffset === 0) {
+        best.set(key, occ);
+        continue;
+      }
 
       // Rule 2: prefer incomplete over completed
-      if (!occ.completed && existing.completed) { best.set(key, occ); continue; }
-      if (occ.completed && !existing.completed) { continue; }
+      if (!occ.completed && existing.completed) {
+        best.set(key, occ);
+        continue;
+      }
+      if (occ.completed && !existing.completed) {
+        continue;
+      }
 
       // Rule 3: both same state — prefer earliest upcoming, then least overdue
       const occIsUpcoming = occOffset >= 0;
       const existIsUpcoming = existOffset >= 0;
-      if (occIsUpcoming && !existIsUpcoming) { best.set(key, occ); continue; }
-      if (!occIsUpcoming && existIsUpcoming) { continue; }
-      if (Math.abs(occOffset) < Math.abs(existOffset)) { best.set(key, occ); }
+      if (occIsUpcoming && !existIsUpcoming) {
+        best.set(key, occ);
+        continue;
+      }
+      if (!occIsUpcoming && existIsUpcoming) {
+        continue;
+      }
+      if (Math.abs(occOffset) < Math.abs(existOffset)) {
+        best.set(key, occ);
+      }
     }
     const deduped = Array.from(best.values());
 
@@ -259,7 +276,11 @@ export class CalendarViewComponent implements OnChanges {
           all
             .map((e) =>
               e.occurrenceId === entry.occurrenceId
-                ? { ...e, isOccurrenceCompleted: updated.completed, completedBy: updated.completed ? completedBy : undefined }
+                ? {
+                    ...e,
+                    isOccurrenceCompleted: updated.completed,
+                    completedBy: updated.completed ? completedBy : undefined,
+                  }
                 : e,
             )
             .sort((a, b) => {

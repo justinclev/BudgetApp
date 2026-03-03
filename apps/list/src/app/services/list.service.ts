@@ -81,7 +81,12 @@ export class ListService {
     return this.http.delete<UserList>(`${this.base}/${listId}/items/${itemId}/subitems/${subId}`);
   }
 
-  toggleSubItem(listId: string, itemId: string, subId: string, userId?: string): Observable<UserList> {
+  toggleSubItem(
+    listId: string,
+    itemId: string,
+    subId: string,
+    userId?: string,
+  ): Observable<UserList> {
     const url = userId
       ? `${this.base}/${listId}/items/${itemId}/subitems/${subId}/toggle?user_id=${encodeURIComponent(userId)}`
       : `${this.base}/${listId}/items/${itemId}/subitems/${subId}/toggle`;

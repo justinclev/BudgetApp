@@ -1,5 +1,4 @@
 <div class="page">
-
   <!-- ── Greeting Header ─────────────────────────────────────────── -->
   <header class="greeting-header">
     <div class="greeting-text">
@@ -18,14 +17,12 @@
 
   <!-- ── Main Content ────────────────────────────────────────────── -->
   <main class="main">
-
     @if (loading()) {
       <div class="loading-state">
         <div class="spinner"></div>
         <p>Loading your lists…</p>
       </div>
     } @else {
-
       <!-- ════ LISTS TAB ════ -->
       @if (activeTab() === 'lists') {
         <div class="filter-row">
@@ -34,7 +31,9 @@
               class="pill"
               [class.pill--active]="activeFilter() === f.key"
               (click)="activeFilter.set(f.key)"
-            >{{ f.label }}</button>
+            >
+              {{ f.label }}
+            </button>
           }
         </div>
 
@@ -58,20 +57,28 @@
                   <div class="card-top-row">
                     <span class="card-type-emoji">{{ typeEmoji(list.listType) }}</span>
                     <h3 class="card-name">{{ list.name }}</h3>
-                    <button class="card-delete" (click)="deleteList($event, list)" title="Delete">×</button>
+                    <button class="card-delete" (click)="deleteList($event, list)" title="Delete">
+                      ×
+                    </button>
                   </div>
 
                   <div class="card-chips">
                     @if (list.repeatFrequency) {
-                      <span class="chip chip--repeat">🔁 {{ repeatLabel(list.repeatFrequency) }}</span>
+                      <span class="chip chip--repeat"
+                        >🔁 {{ repeatLabel(list.repeatFrequency) }}</span
+                      >
                     }
                     @if (list.completeByDate) {
-                      <span class="chip chip--due">📅 {{ list.completeByDate | date:'MMM d' }}</span>
+                      <span class="chip chip--due"
+                        >📅 {{ list.completeByDate | date: 'MMM d' }}</span
+                      >
                     }
                   </div>
 
                   <div class="card-footer-row">
-                    <span class="card-count">{{ doneCount(list) }}/{{ list.items.length }} done</span>
+                    <span class="card-count"
+                      >{{ doneCount(list) }}/{{ list.items.length }} done</span
+                    >
                     @if (progressPct(list) === 100) {
                       <span class="card-complete-badge">🎉 Complete!</span>
                     }
@@ -116,10 +123,14 @@
                   </div>
                   <div class="todo-chips">
                     @if (list.repeatFrequency) {
-                      <span class="chip chip--repeat">🔁 {{ repeatLabel(list.repeatFrequency) }}</span>
+                      <span class="chip chip--repeat"
+                        >🔁 {{ repeatLabel(list.repeatFrequency) }}</span
+                      >
                     }
                     @if (list.completeByDate) {
-                      <span class="chip chip--due">📅 {{ list.completeByDate | date:'MMM d' }}</span>
+                      <span class="chip chip--due"
+                        >📅 {{ list.completeByDate | date: 'MMM d' }}</span
+                      >
                     }
                   </div>
                 </div>
@@ -127,8 +138,21 @@
                 <div class="todo-body">
                   <div class="ring-wrap">
                     <svg class="ring-svg" viewBox="0 0 36 36">
-                      <circle class="ring-bg"   cx="18" cy="18" r="15.9" fill="none" stroke-width="3.2"/>
-                      <circle class="ring-fill" cx="18" cy="18" r="15.9" fill="none" stroke-width="3.2"
+                      <circle
+                        class="ring-bg"
+                        cx="18"
+                        cy="18"
+                        r="15.9"
+                        fill="none"
+                        stroke-width="3.2"
+                      />
+                      <circle
+                        class="ring-fill"
+                        cx="18"
+                        cy="18"
+                        r="15.9"
+                        fill="none"
+                        stroke-width="3.2"
                         stroke-dasharray="100"
                         [style.stroke-dashoffset]="ringOffset(list)"
                         [style.stroke]="progressPct(list) === 100 ? '#10b981' : '#667eea'"
@@ -159,21 +183,32 @@
       @if (activeTab() === 'schedule') {
         <app-calendar-view [lists]="lists()" (listUpdated)="onListUpdated($event)" />
       }
-
     }
   </main>
 
   <!-- ── Bottom Tab Bar ──────────────────────────────────────────── -->
   <nav class="tab-bar">
-    <button class="tab" [class.tab--active]="activeTab() === 'lists'" (click)="activeTab.set('lists')">
+    <button
+      class="tab"
+      [class.tab--active]="activeTab() === 'lists'"
+      (click)="activeTab.set('lists')"
+    >
       <span class="tab-icon">🗂️</span>
       <span class="tab-label">Lists</span>
     </button>
-    <button class="tab" [class.tab--active]="activeTab() === 'todos'" (click)="activeTab.set('todos')">
+    <button
+      class="tab"
+      [class.tab--active]="activeTab() === 'todos'"
+      (click)="activeTab.set('todos')"
+    >
       <span class="tab-icon">✅</span>
       <span class="tab-label">Todos</span>
     </button>
-    <button class="tab" [class.tab--active]="activeTab() === 'schedule'" (click)="activeTab.set('schedule')">
+    <button
+      class="tab"
+      [class.tab--active]="activeTab() === 'schedule'"
+      (click)="activeTab.set('schedule')"
+    >
       <span class="tab-icon">📅</span>
       <span class="tab-label">Schedule</span>
     </button>
@@ -185,5 +220,4 @@
   @if (showCreate) {
     <app-create-list-modal (create)="createList($event)" (cancel)="showCreate = false" />
   }
-
 </div>

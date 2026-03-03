@@ -933,11 +933,7 @@ pub async fn toggle_sub_item(
         doc! { "_id": object_id }
     };
 
-    let list = match data
-        .lists_collection
-        .find_one(list_filter, None)
-        .await
-    {
+    let list = match data.lists_collection.find_one(list_filter, None).await {
         Ok(Some(l)) => l,
         Ok(None) => {
             return HttpResponse::NotFound()

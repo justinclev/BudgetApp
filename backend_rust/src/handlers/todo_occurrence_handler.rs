@@ -104,12 +104,10 @@ pub async fn generate_occurrences(
         }
 
         // Pre-compute the list's start NaiveDate and due-date label
-        let list_start_naive: Option<NaiveDate> = list
-            .complete_by_date
-            .map(|dt| dt.date_naive());
+        let list_start_naive: Option<NaiveDate> = list.complete_by_date.map(|dt| dt.date_naive());
 
-        let list_due_date_str: Option<String> = list_start_naive
-            .map(|d| d.format("%Y-%m-%d").to_string());
+        let list_due_date_str: Option<String> =
+            list_start_naive.map(|d| d.format("%Y-%m-%d").to_string());
 
         let mut current = range_start;
         while current <= range_end {
@@ -275,8 +273,7 @@ pub async fn toggle_occurrence(
     let oid = match ObjectId::parse_str(&id_str) {
         Ok(id) => id,
         Err(_) => {
-            return HttpResponse::BadRequest()
-                .json(serde_json::json!({ "message": "invalid id" }))
+            return HttpResponse::BadRequest().json(serde_json::json!({ "message": "invalid id" }))
         }
     };
 
@@ -326,7 +323,11 @@ pub async fn toggle_occurrence(
     let completed_by_name: Option<String> = if new_completed {
         if let Some(uid) = &req.user_id {
             if let Ok(Some(oid)) = ObjectId::parse_str(uid).map(Some) {
-                match data.users_collection.find_one(doc! { "_id": oid }, None).await {
+                match data
+                    .users_collection
+                    .find_one(doc! { "_id": oid }, None)
+                    .await
+                {
                     Ok(Some(user)) => Some(user.name),
                     _ => Some(uid.clone()),
                 }
