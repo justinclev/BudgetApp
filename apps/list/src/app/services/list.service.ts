@@ -81,11 +81,11 @@ export class ListService {
     return this.http.delete<UserList>(`${this.base}/${listId}/items/${itemId}/subitems/${subId}`);
   }
 
-  toggleSubItem(listId: string, itemId: string, subId: string): Observable<UserList> {
-    return this.http.patch<UserList>(
-      `${this.base}/${listId}/items/${itemId}/subitems/${subId}/toggle`,
-      {},
-    );
+  toggleSubItem(listId: string, itemId: string, subId: string, userId?: string): Observable<UserList> {
+    const url = userId
+      ? `${this.base}/${listId}/items/${itemId}/subitems/${subId}/toggle?user_id=${encodeURIComponent(userId)}`
+      : `${this.base}/${listId}/items/${itemId}/subitems/${subId}/toggle`;
+    return this.http.patch<UserList>(url, {});
   }
 
   toggleItem(listId: string, itemId: string, userId?: string): Observable<UserList> {

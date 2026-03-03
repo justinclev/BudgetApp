@@ -89,6 +89,7 @@ export interface TodoOccurrence {
   occurrenceDate: string;
   completed: boolean;
   completedByUserId?: string;
+  completedByName?: string;
   completedAt?: string;
   ownerId: string;
   repeatFrequency?: RepeatFrequency;

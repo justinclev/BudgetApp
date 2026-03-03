@@ -89,6 +89,8 @@ export interface CalendarEntry {
   isUndated: boolean;
   /** true = this particular occurrence has been completed by the user today */
   isOccurrenceCompleted: boolean;
+  /** Display name of whoever completed this occurrence, if completed. */
+  completedBy?: string;
   /** YYYY-MM-DD of the occurrence being represented (for toggle calls). */
   occurrenceDateStr: string;
   repeatFrequency?: RepeatFrequency;

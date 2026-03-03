@@ -1,140 +1,648 @@
+// ── Variables ──────────────────────────────────────────────────────────────
+
+$purple-start: #667eea;
+$purple-end:   #764ba2;
+$tab-h:        66px;
+$header-h:     110px;
+$radius:        16px;
+$shadow-sm:    0 2px 8px rgba(0, 0, 0, 0.07);
+$shadow-md:    0 4px 16px rgba(0, 0, 0, 0.1);
+
+// ── Animations ─────────────────────────────────────────────────────────────
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes tab-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba($purple-start, 0.4); }
+  50%       { box-shadow: 0 0 0 10px rgba($purple-start, 0); }
+}
+
+// ── Layout ──────────────────────────────────────────────────────────────────
+
 .page {
   min-height: 100svh;
-  background: #f8fafc;
+  max-width: 540px;
+  margin: 0 auto;
+  background: #f1f5f9;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.top-bar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 16px 20px;
+// ── Greeting Header ─────────────────────────────────────────────────────────
+
+.greeting-header {
+  background: linear-gradient(135deg, $purple-start 0%, $purple-end 100%);
+  padding: 20px 20px 28px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  // decorative blob
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    pointer-events: none;
+  }
 }
 
-.app-title {
-  font-size: 18px;
-  font-weight: 700;
+.greeting-text {
+  flex: 1;
+  min-width: 0;
 }
 
-.header-actions {
+.greeting-sub {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.8;
+  margin: 0 0 2px;
+  letter-spacing: 0.02em;
+}
+
+.greeting-name {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.header-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-top: 4px;
 }
 
-.user-name {
+.stats-pill {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 5px 12px;
   font-size: 13px;
-  opacity: 0.85;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: white;
+
+  small {
+    font-weight: 400;
+    opacity: 0.75;
+    font-size: 11px;
+  }
+}
+
+.stat-sep {
+  opacity: 0.5;
 }
 
 .icon-btn {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   font-size: 18px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
+  &:hover { background: rgba(255, 255, 255, 0.32); }
 }
+
+// ── Main scroll area ────────────────────────────────────────────────────────
 
 .main {
   flex: 1;
-  padding: 20px 16px 100px;
+  overflow-y: auto;
+  padding: 18px 16px calc(#{$tab-h} + 80px);
+  -webkit-overflow-scrolling: touch;
 }
 
-.center-msg {
+// ── Loading ─────────────────────────────────────────────────────────────────
+
+.loading-state {
   text-align: center;
-  padding: 60px 0;
+  padding: 80px 20px;
   color: #64748b;
+  font-size: 14px;
 }
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: $purple-start;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto 14px;
+}
+
+// ── Empty State ─────────────────────────────────────────────────────────────
 
 .empty-state {
   text-align: center;
-  padding: 80px 20px;
+  padding: 80px 20px 40px;
+  animation: fade-up 0.4s ease;
 
   h2 {
     font-size: 20px;
     font-weight: 700;
-    color: #0f172a;
+    color: #1e293b;
     margin: 0 0 8px;
   }
 
   p {
-    color: #64748b;
     font-size: 14px;
+    color: #64748b;
   }
 }
 
 .empty-icon {
-  font-size: 56px;
+  font-size: 60px;
   margin-bottom: 16px;
 }
 
-.list-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+// ── Filter Pills ────────────────────────────────────────────────────────────
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+
+  &:hover { border-color: #94a3b8; }
+
+  &--active {
+    background: linear-gradient(135deg, $purple-start, $purple-end);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba($purple-start, 0.35);
+  }
+}
+
+// ── List Feed & Cards ───────────────────────────────────────────────────────
+
+.list-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list-card {
+  background: #fff;
+  border-radius: $radius;
+  box-shadow: $shadow-sm;
+  display: flex;
+  overflow: hidden;
+  cursor: pointer;
+  animation: fade-up 0.3s ease both;
+  transition: transform 0.18s, box-shadow 0.18s;
+
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 40}ms; }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &--full {
+    .card-accent { background: linear-gradient(160deg, #10b981, #059669) !important; }
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.2);
+  }
+}
+
+.card-accent {
+  width: 5px;
+  flex-shrink: 0;
+}
+
+.card-body {
+  flex: 1;
+  padding: 14px 14px 12px;
+  min-width: 0;
+}
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.card-type-emoji {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.card-name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-delete {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+
+  &:hover { color: #f87171; }
+}
+
+.card-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+
+  &--repeat {
+    background: #f3e8ff;
+    color: #7c3aed;
+  }
+
+  &--due {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+}
+
+.card-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card-count {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.card-complete-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #059669;
+  background: #d1fae5;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.progress-track {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &--full {
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  }
+}
+
+// ── Todo Feed & Cards ───────────────────────────────────────────────────────
+
+.todo-feed {
+  display: flex;
+  flex-direction: column;
   gap: 14px;
 }
 
-.fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
+.todo-card {
+  background: #fff;
+  border-radius: $radius;
+  box-shadow: $shadow-sm;
+  padding: 16px;
+  cursor: pointer;
+  animation: fade-up 0.3s ease both;
+  transition: transform 0.18s, box-shadow 0.18s;
+  border-left: 4px solid $purple-start;
+
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 55}ms; }
+  }
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &:active { transform: scale(0.98); }
+
+  &--complete {
+    border-left-color: #10b981;
+    background: linear-gradient(to right, #f0fdf4 0%, #fff 60%);
+  }
+}
+
+.todo-header {
+  margin-bottom: 14px;
+}
+
+.todo-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.todo-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.todo-name {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todo-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.todo-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+// SVG Ring Progress
+.ring-wrap {
+  flex-shrink: 0;
   width: 60px;
   height: 60px;
+  position: relative;
+}
+
+.ring-svg {
+  width: 60px;
+  height: 60px;
+  transform: rotate(-90deg);
+}
+
+.ring-bg { stroke: #f1f5f9; }
+
+.ring-fill {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              stroke 0.3s ease;
+}
+
+.ring-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+
+  small {
+    font-size: 9px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-top: 1px;
+  }
+}
+
+// Item previews
+.item-preview-list {
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item-preview {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #374151;
+
+  &--done {
+    .item-dot {
+      background: #10b981;
+      border-color: #10b981;
+    }
+    .item-text {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+  }
+}
+
+.item-dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  font-size: 32px;
+  border: 1.5px solid #cbd5e1;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-more {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+  padding-left: 14px;
+}
+
+// ── Bottom Tab Bar ───────────────────────────────────────────────────────────
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 540px;
+  height: $tab-h;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: stretch;
+  z-index: 30;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
   border: none;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  cursor: pointer;
+  padding: 10px 0;
+  position: relative;
+  transition: all 0.2s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: linear-gradient(90deg, $purple-start, $purple-end);
+    opacity: 0;
+    transform: scaleX(0);
+    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &--active {
+    .tab-icon { animation: tab-pop 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .tab-label {
+      color: $purple-start;
+      font-weight: 700;
+    }
+
+    &::before {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+}
+
+.tab-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.tab-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  transition: color 0.2s;
+}
+
+// ── FAB ──────────────────────────────────────────────────────────────────────
+
+.fab {
+  position: fixed;
+  bottom: calc(#{$tab-h} + 16px);
+  right: 20px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $purple-start, $purple-end);
+  color: white;
+  font-size: 30px;
+  border: none;
+  box-shadow: 0 6px 20px rgba($purple-start, 0.5);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 20;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  z-index: 25;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: pulse-glow 2.5s ease-in-out infinite;
 
   &:hover {
-    transform: scale(1.08);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-  }
-}
-
-.cal-btn {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1) rotate(45deg);
+    box-shadow: 0 8px 28px rgba($purple-start, 0.65);
   }
 
-  &--active {
-    background: white;
-    color: #764ba2;
-    border-color: white;
+  &:active {
+    transform: scale(0.95);
   }
 }

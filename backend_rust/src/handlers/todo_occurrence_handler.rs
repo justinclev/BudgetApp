@@ -294,23 +294,69 @@ pub async fn toggle_occurrence(
         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
     };
 
+    // Verify the requesting user owns or is authorized on the parent list
+    if let Some(uid) = &req.user_id {
+        let list_oid = match ObjectId::parse_str(&current.list_id) {
+            Ok(id) => id,
+            Err(_) => {
+                return HttpResponse::BadRequest()
+                    .json(serde_json::json!({ "message": "invalid list id on occurrence" }))
+            }
+        };
+        let list_filter = doc! {
+            "_id": list_oid,
+            "$or": [
+                { "ownerId": uid },
+                { "authorizedUsers": uid }
+            ]
+        };
+        match data.lists_collection.find_one(list_filter, None).await {
+            Ok(Some(_)) => {} // authorized
+            Ok(None) => {
+                return HttpResponse::Forbidden()
+                    .json(serde_json::json!({ "message": "not authorized to update this list" }))
+            }
+            Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
+        }
+    }
+
     let new_completed = !current.completed;
+
+    // Resolve the user's display name for the completed-by attribution
+    let completed_by_name: Option<String> = if new_completed {
+        if let Some(uid) = &req.user_id {
+            if let Ok(Some(oid)) = ObjectId::parse_str(uid).map(Some) {
+                match data.users_collection.find_one(doc! { "_id": oid }, None).await {
+                    Ok(Some(user)) => Some(user.name),
+                    _ => Some(uid.clone()),
+                }
+            } else {
+                Some(uid.clone())
+            }
+        } else {
+            None
+        }
+    } else {
+        None
+    };
 
     let update = if new_completed {
         let user_id_str = req.user_id.as_deref().unwrap_or("").to_string();
-        doc! {
-            "$set": {
-                "completed": true,
-                "completedByUserId": user_id_str,
-                "completedAt": mongodb::bson::DateTime::from_millis(
-                    Utc::now().timestamp_millis()
-                ),
-            }
+        let mut set_doc = doc! {
+            "completed": true,
+            "completedByUserId": &user_id_str,
+            "completedAt": mongodb::bson::DateTime::from_millis(
+                Utc::now().timestamp_millis()
+            ),
+        };
+        if let Some(name) = &completed_by_name {
+            set_doc.insert("completedByName", name.as_str());
         }
+        doc! { "$set": set_doc }
     } else {
         doc! {
             "$set": { "completed": false },
-            "$unset": { "completedByUserId": "", "completedAt": "" }
+            "$unset": { "completedByUserId": "", "completedAt": "", "completedByName": "" }
         }
     };
 

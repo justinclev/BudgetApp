@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import {
   UserList,
+  SubItem,
   TodoOccurrence,
   REPEAT_FREQUENCY_LABELS,
   RepeatFrequency,
@@ -146,7 +147,44 @@ export class CalendarViewComponent implements OnChanges {
     now.setHours(0, 0, 0, 0);
     const view = this.selectedView();
 
-    const entries: CalendarEntry[] = occurrences.map((occ) => {
+    // Deduplicate repeating items: for each unique (listId, itemId) keep only the
+    // single most-relevant occurrence.
+    // Rules (in order):
+    //   1. A completed occurrence for TODAY always wins — it was scratched off today
+    //      and must remain visible (with who did it) for the rest of the day.
+    //   2. Prefer incomplete over completed (find the next actionable instance).
+    //   3. Among same state, prefer earliest upcoming; fall back to least overdue.
+    const best = new Map<string, TodoOccurrence>();
+    for (const occ of occurrences) {
+      const key = `${occ.listId}-${occ.itemId}`;
+      const existing = best.get(key);
+      if (!existing) {
+        best.set(key, occ);
+        continue;
+      }
+      const occDate = this.parseLocalDate(occ.occurrenceDate);
+      const existDate = this.parseLocalDate(existing.occurrenceDate);
+      const occOffset = Math.round((occDate.getTime() - now.getTime()) / 86_400_000);
+      const existOffset = Math.round((existDate.getTime() - now.getTime()) / 86_400_000);
+
+      // Rule 1: today-completed is sacred — never replace it
+      if (existing.completed && existOffset === 0) { continue; }
+      if (occ.completed && occOffset === 0) { best.set(key, occ); continue; }
+
+      // Rule 2: prefer incomplete over completed
+      if (!occ.completed && existing.completed) { best.set(key, occ); continue; }
+      if (occ.completed && !existing.completed) { continue; }
+
+      // Rule 3: both same state — prefer earliest upcoming, then least overdue
+      const occIsUpcoming = occOffset >= 0;
+      const existIsUpcoming = existOffset >= 0;
+      if (occIsUpcoming && !existIsUpcoming) { best.set(key, occ); continue; }
+      if (!occIsUpcoming && existIsUpcoming) { continue; }
+      if (Math.abs(occOffset) < Math.abs(existOffset)) { best.set(key, occ); }
+    }
+    const deduped = Array.from(best.values());
+
+    const entries: CalendarEntry[] = deduped.map((occ) => {
       const isUndated = !occ.listDueDate;
       const occDate = this.parseLocalDate(occ.occurrenceDate);
       const offset = Math.round((occDate.getTime() - now.getTime()) / 86_400_000);
@@ -170,22 +208,27 @@ export class CalendarViewComponent implements OnChanges {
         }
       }
 
+      // Look up real ListItem from the lists input to get actual subItems
+      const realItem = this.lists
+        .find((l) => l._id === occ.listId)
+        ?.items.find((i) => i.id === occ.itemId);
+
       return {
         occurrenceId: occ._id,
         listId: occ.listId,
         listName: occ.listName,
-        // Minimal ListItem shape — calendar only uses id and text
         item: {
           id: occ.itemId,
           text: occ.itemText,
           completed: occ.completed,
           createdAt: '',
-          subItems: [],
+          subItems: realItem?.subItems ?? [],
         } as any,
         dueDate: isUndated ? null : occDate,
         isPrimary,
         isUndated,
         isOccurrenceCompleted: occ.completed,
+        completedBy: occ.completedByName ?? occ.completedByUserId,
         occurrenceDateStr: occ.occurrenceDate,
         repeatFrequency: occ.repeatFrequency as RepeatFrequency | undefined,
       };
@@ -211,11 +254,12 @@ export class CalendarViewComponent implements OnChanges {
 
     this.listService.toggleOccurrence(entry.occurrenceId, userId).subscribe({
       next: (updated: TodoOccurrence) => {
+        const completedBy = updated.completedByName ?? updated.completedByUserId;
         this.entries.update((all) =>
           all
             .map((e) =>
               e.occurrenceId === entry.occurrenceId
-                ? { ...e, isOccurrenceCompleted: updated.completed }
+                ? { ...e, isOccurrenceCompleted: updated.completed, completedBy: updated.completed ? completedBy : undefined }
                 : e,
             )
             .sort((a, b) => {
@@ -225,6 +269,24 @@ export class CalendarViewComponent implements OnChanges {
                 return a.isOccurrenceCompleted ? 1 : -1;
               return (a.dueDate?.getTime() ?? 0) - (b.dueDate?.getTime() ?? 0);
             }),
+        );
+      },
+    });
+  }
+
+  toggleSubItem(entry: CalendarEntry, subItem: SubItem, event: Event): void {
+    event.stopPropagation();
+    const userId = this.auth.user()?.id;
+    this.listService.toggleSubItem(entry.listId, entry.item.id, subItem.id, userId).subscribe({
+      next: (updatedList: UserList) => {
+        const updatedItem = updatedList.items.find((i) => i.id === entry.item.id);
+        if (!updatedItem) return;
+        this.entries.update((all) =>
+          all.map((e) =>
+            e.occurrenceId === entry.occurrenceId
+              ? { ...e, item: { ...e.item, subItems: updatedItem.subItems } }
+              : e,
+          ),
         );
       },
     });
@@ -246,6 +308,13 @@ export class CalendarViewComponent implements OnChanges {
     if (diff === 0) return 'Today';
     if (diff === 1) return 'Tomorrow';
     return `In ${diff} days`;
+  }
+
+  completedByLabel(entry: CalendarEntry): string {
+    if (!entry.completedBy) return '';
+    const currentUserId = this.auth.user()?.id;
+    if (entry.completedBy === currentUserId) return 'You';
+    return entry.completedBy;
   }
 
   repeatLabel(entry: CalendarEntry): string {

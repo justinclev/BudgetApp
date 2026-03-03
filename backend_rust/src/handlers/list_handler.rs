@@ -911,21 +911,37 @@ pub async fn delete_sub_item(
 pub async fn toggle_sub_item(
     data: web::Data<AppState>,
     path: web::Path<(String, String, String)>,
+    query: web::Query<std::collections::HashMap<String, String>>,
 ) -> impl Responder {
     let (list_id_str, item_id, sub_id) = path.into_inner();
+    let user_id = query.get("user_id").cloned();
     let object_id = match ObjectId::parse_str(&list_id_str) {
         Ok(oid) => oid,
         Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
     };
+
+    // Build the filter — if user_id provided, enforce ownership/authorization
+    let list_filter = if let Some(uid) = &user_id {
+        doc! {
+            "_id": object_id,
+            "$or": [
+                { "ownerId": uid },
+                { "authorizedUsers": uid }
+            ]
+        }
+    } else {
+        doc! { "_id": object_id }
+    };
+
     let list = match data
         .lists_collection
-        .find_one(doc! { "_id": object_id }, None)
+        .find_one(list_filter, None)
         .await
     {
         Ok(Some(l)) => l,
         Ok(None) => {
             return HttpResponse::NotFound()
-                .json(serde_json::json!({ "message": "List not found" }))
+                .json(serde_json::json!({ "message": "List not found or not authorized" }))
         }
         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
     };

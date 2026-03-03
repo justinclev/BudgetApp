@@ -385,6 +385,12 @@ pub struct TodoOccurrence {
     )]
     pub completed_by_user_id: Option<String>,
     #[serde(
+        rename = "completedByName",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub completed_by_name: Option<String>,
+    #[serde(
         rename = "completedAt",
         skip_serializing_if = "Option::is_none",
         deserialize_with = "deserialize_option_datetime_from_bson",
