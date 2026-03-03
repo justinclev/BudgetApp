@@ -1,6 +1,5 @@
 <div class="vs-overlay" (click)="onOverlayClick($event)">
   <div class="vs-sheet">
-
     <!-- Header -->
     <div class="vs-header">
       <span class="vs-title">🎙️ Voice Assistants</span>
@@ -20,7 +19,6 @@
 
     <!-- Platforms -->
     <div class="vs-platforms">
-
       <!-- ── Google Home ─────────────────────────────────────────────── -->
       <div class="vs-platform" [class.vs-platform--open]="isOpen('google')">
         <button class="vs-platform-header" (click)="toggle('google')">
@@ -33,9 +31,14 @@
           <div class="vs-platform-body">
             <ol class="vs-steps">
               <li>Open the <strong>Google Home</strong> app on your phone</li>
-              <li>Tap <strong>＋</strong> → <strong>Set up device</strong> → <strong>Works with Google</strong></li>
+              <li>
+                Tap <strong>＋</strong> → <strong>Set up device</strong> →
+                <strong>Works with Google</strong>
+              </li>
               <li>Search for <strong>Budget App</strong> and tap it</li>
-              <li>Tap <strong>Link account</strong> and sign in with your Budget App credentials</li>
+              <li>
+                Tap <strong>Link account</strong> and sign in with your Budget App credentials
+              </li>
               <li>✅ Say <em>"Hey Google, add milk to my shopping list"</em></li>
             </ol>
           </div>
@@ -53,7 +56,10 @@
         @if (isOpen('alexa')) {
           <div class="vs-platform-body">
             <ol class="vs-steps">
-              <li>Open the <strong>Alexa</strong> app → tap <strong>More</strong> → <strong>Skills &amp; Games</strong></li>
+              <li>
+                Open the <strong>Alexa</strong> app → tap <strong>More</strong> →
+                <strong>Skills &amp; Games</strong>
+              </li>
               <li>Search for <strong>Budget App</strong> and tap it</li>
               <li>Tap <strong>Enable to Use</strong></li>
               <li>Sign in with your Budget App account when prompted</li>
@@ -88,15 +94,27 @@
             }
             <ol class="vs-steps">
               <li>Open <strong>Shortcuts</strong> on iPhone → tap <strong>＋</strong></li>
-              <li>Add Action → search <strong>Get Contents of URL</strong> → set URL to <code>{{ commandUrl }}</code> · Method: <strong>POST</strong> · JSON</li>
-              <li>Add <code>token</code> = your token above, <code>intent</code> = <em>add_item</em>, <code>list_name</code> and <code>item_text</code> as <strong>Ask Each Time</strong></li>
-              <li>Name it (e.g. <em>"Add to list"</em>) and assign it to Siri — repeat for other commands</li>
+              <li>
+                Add Action → search <strong>Get Contents of URL</strong> → set URL to
+                <code>{{ commandUrl }}</code> · Method: <strong>POST</strong> · JSON
+              </li>
+              <li>
+                Add <code>token</code> = your token above, <code>intent</code> = <em>add_item</em>,
+                <code>list_name</code> and <code>item_text</code> as <strong>Ask Each Time</strong>
+              </li>
+              <li>
+                Name it (e.g. <em>"Add to list"</em>) and assign it to Siri — repeat for other
+                commands
+              </li>
             </ol>
-            <p class="vs-tip">💡 Siri requires a one-time shortcut per command. Use <em>check_off_item</em>, <em>create_list</em> and <em>complete_todo</em> as other intent values.</p>
+            <p class="vs-tip">
+              💡 Siri requires a one-time shortcut per command. Use <em>check_off_item</em>,
+              <em>create_list</em> and <em>complete_todo</em> as other intent values.
+            </p>
           </div>
         }
       </div>
-
-    </div><!-- /vs-platforms -->
+    </div>
+    <!-- /vs-platforms -->
   </div>
 </div>

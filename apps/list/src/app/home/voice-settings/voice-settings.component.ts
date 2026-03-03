@@ -23,15 +23,21 @@ export class VoiceSettingsComponent implements OnInit {
   copied = signal(false);
   expanded = signal<Platform | null>(null);
 
-  readonly commandUrl = (environment.production
-    ? environment.apiUrl
-    : 'https://budgetapp-ma3x.onrender.com/api') + '/voice/command';
+  readonly commandUrl =
+    (environment.production ? environment.apiUrl : 'https://budgetapp-ma3x.onrender.com/api') +
+    '/voice/command';
 
   ngOnInit(): void {
     const userId = this.auth.user()?.id ?? '';
-    if (!userId) { this.loading.set(false); return; }
+    if (!userId) {
+      this.loading.set(false);
+      return;
+    }
     this.listService.getVoiceToken(userId).subscribe({
-      next: (res) => { this.token.set(res.token); this.loading.set(false); },
+      next: (res) => {
+        this.token.set(res.token);
+        this.loading.set(false);
+      },
       error: () => this.loading.set(false),
     });
   }

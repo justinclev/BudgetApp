@@ -167,7 +167,11 @@ pub struct User {
     )]
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
     /// Personal API token used by voice assistants — generated on first request.
-    #[serde(rename = "voiceToken", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "voiceToken",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub voice_token: Option<String>,
 }
 

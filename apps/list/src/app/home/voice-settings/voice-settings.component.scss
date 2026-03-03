@@ -63,7 +63,10 @@
   align-items: center;
   justify-content: center;
   transition: background 0.15s;
-  &:hover { background: rgba(255, 255, 255, 0.18); color: #e2e8f0; }
+  &:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #e2e8f0;
+  }
 }
 
 // ── Commands Quick Reference ─────────────────────────────────────────────────
@@ -122,12 +125,22 @@
   cursor: pointer;
   text-align: left;
   transition: background 0.15s;
-  &:hover { background: rgba(255, 255, 255, 0.04); }
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
 }
 
-.vs-platform-icon { font-size: 1.1rem; flex-shrink: 0; }
-.vs-platform-name { flex: 1; }
-.vs-chevron       { font-size: 0.65rem; color: #64748b; }
+.vs-platform-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.vs-platform-name {
+  flex: 1;
+}
+.vs-chevron {
+  font-size: 0.65rem;
+  color: #64748b;
+}
 
 // ── Badges ────────────────────────────────────────────────────────────────────
 
@@ -160,8 +173,14 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // ── Steps ─────────────────────────────────────────────────────────────────────
@@ -178,9 +197,14 @@
     color: #94a3b8;
     line-height: 1.5;
 
-    strong { color: #e2e8f0; }
-    em     { color: #a78bfa; font-style: normal; }
-    code   {
+    strong {
+      color: #e2e8f0;
+    }
+    em {
+      color: #a78bfa;
+      font-style: normal;
+    }
+    code {
       background: rgba(167, 139, 250, 0.12);
       color: #a78bfa;
       font-size: 0.72rem;
@@ -247,7 +271,9 @@
   border-radius: 8px;
   cursor: pointer;
   transition: opacity 0.15s;
-  &:hover { opacity: 0.85; }
+  &:hover {
+    opacity: 0.85;
+  }
 }
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
@@ -255,15 +281,24 @@
 .vs-skeleton {
   height: 58px;
   border-radius: 10px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   margin-bottom: 12px;
 }
 
 @keyframes shimmer {
-  0%   { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 // ── Desktop ───────────────────────────────────────────────────────────────────
@@ -277,10 +312,11 @@
     border-radius: 16px;
     width: min(520px, 95vw);
     max-height: 85dvh;
-    &::before { display: none; }
+    &::before {
+      display: none;
+    }
   }
 }
-
 
 .vs-header {
   display: flex;
@@ -311,7 +347,10 @@
   justify-content: center;
   transition: background 0.15s;
 
-  &:hover { background: rgba(255, 255, 255, 0.18); color: #e2e8f0; }
+  &:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #e2e8f0;
+  }
 }
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -368,7 +407,9 @@
   cursor: pointer;
   transition: opacity 0.15s;
 
-  &:hover { opacity: 0.85; }
+  &:hover {
+    opacity: 0.85;
+  }
 }
 
 .vs-hint {
@@ -393,14 +434,23 @@
 .vs-skeleton {
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
 
 @keyframes shimmer {
-  0%   { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 // ── Intents ─────────────────────────────────────────────────────────────────
@@ -483,8 +533,14 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // ── Steps ───────────────────────────────────────────────────────────────────
@@ -501,10 +557,18 @@
     color: #94a3b8;
     line-height: 1.5;
 
-    strong { color: #e2e8f0; }
-    em     { color: #a78bfa; font-style: normal; }
-    a      { color: #667eea; text-underline-offset: 2px; }
-    code   {
+    strong {
+      color: #e2e8f0;
+    }
+    em {
+      color: #a78bfa;
+      font-style: normal;
+    }
+    a {
+      color: #667eea;
+      text-underline-offset: 2px;
+    }
+    code {
       background: rgba(167, 139, 250, 0.12);
       color: #a78bfa;
       font-size: 0.72rem;
@@ -548,7 +612,10 @@
   cursor: pointer;
   transition: background 0.15s;
 
-  &:hover { background: rgba(255, 255, 255, 0.18); color: #e2e8f0; }
+  &:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #e2e8f0;
+  }
 }
 
 .vs-pre {
@@ -588,6 +655,8 @@
     width: min(520px, 95vw);
     max-height: 85dvh;
 
-    &::before { display: none; }
+    &::before {
+      display: none;
+    }
   }
 }

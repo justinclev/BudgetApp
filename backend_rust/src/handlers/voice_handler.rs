@@ -477,7 +477,11 @@ pub async fn direct_command(
 
     // Resolve userId: prefer token (from query param or body), fall back to raw userId
     let token_from_query = query.get("token").cloned().unwrap_or_default();
-    let token = if !token_from_query.is_empty() { token_from_query } else { req.token.clone() };
+    let token = if !token_from_query.is_empty() {
+        token_from_query
+    } else {
+        req.token.clone()
+    };
 
     let user_id = if !token.is_empty() {
         match resolve_user_id_from_token(&data, &token).await {
@@ -492,7 +496,8 @@ pub async fn direct_command(
     } else {
         return HttpResponse::Unauthorized().json(DirectCommandResponse {
             success: false,
-            message: "Provide your voice token: POST with \"token\" field or ?token= query param.".to_string(),
+            message: "Provide your voice token: POST with \"token\" field or ?token= query param."
+                .to_string(),
         });
     };
 
@@ -556,10 +561,7 @@ pub async fn direct_command(
 //     request.context.System.user.accessToken
 // ══════════════════════════════════════════════════════════════════════════
 
-pub async fn alexa_webhook(
-    data: web::Data<AppState>,
-    body: web::Json<Value>,
-) -> impl Responder {
+pub async fn alexa_webhook(data: web::Data<AppState>, body: web::Json<Value>) -> impl Responder {
     let body = body.into_inner();
 
     let request_type = body
@@ -578,31 +580,31 @@ pub async fn alexa_webhook(
     }
 
     if request_type != "IntentRequest" {
-        return HttpResponse::Ok()
-            .json(alexa_response("I didn't understand that request.", true));
+        return HttpResponse::Ok().json(alexa_response("I didn't understand that request.", true));
     }
 
     // Extract userId from Account Linking token (set up in Alexa Developer Console)
-    let user_id = match body
-        .pointer("/context/System/user/accessToken")
-        .and_then(|v| v.as_str())
-    {
-        Some(token) if !token.is_empty() => {
-            match resolve_user_id_from_token(&data, token).await {
+    let user_id =
+        match body
+            .pointer("/context/System/user/accessToken")
+            .and_then(|v| v.as_str())
+        {
+            Some(token) if !token.is_empty() => {
+                match resolve_user_id_from_token(&data, token).await {
                 Some(id) => id,
                 None => return HttpResponse::Ok().json(alexa_response(
                     "Your voice token is invalid. Please regenerate it in the Budget App under Settings → Voice Assistants.",
                     true,
                 )),
             }
-        }
-        _ => {
-            return HttpResponse::Ok().json(alexa_response(
+            }
+            _ => {
+                return HttpResponse::Ok().json(alexa_response(
                 "To get started, open Budget App, go to Settings, tap Voice Assistants, and follow the Alexa setup steps.",
                 true,
             ));
-        }
-    };
+            }
+        };
 
     let intent_name = body
         .pointer("/request/intent/name")
@@ -693,31 +695,29 @@ fn alexa_response(text: &str, end_session: bool) -> Value {
 //     originalDetectIntentRequest.payload.user.accessToken
 // ══════════════════════════════════════════════════════════════════════════
 
-pub async fn google_webhook(
-    data: web::Data<AppState>,
-    body: web::Json<Value>,
-) -> impl Responder {
+pub async fn google_webhook(data: web::Data<AppState>, body: web::Json<Value>) -> impl Responder {
     let body = body.into_inner();
 
     // userId from Account Linking token
-    let user_id = match body
-        .pointer("/originalDetectIntentRequest/payload/user/accessToken")
-        .and_then(|v| v.as_str())
-    {
-        Some(token) if !token.is_empty() => {
-            match resolve_user_id_from_token(&data, token).await {
+    let user_id =
+        match body
+            .pointer("/originalDetectIntentRequest/payload/user/accessToken")
+            .and_then(|v| v.as_str())
+        {
+            Some(token) if !token.is_empty() => {
+                match resolve_user_id_from_token(&data, token).await {
                 Some(id) => id,
                 None => return HttpResponse::Ok().json(google_response(
                     "Your voice token is invalid. Please regenerate it in the Budget App under Settings → Voice Assistants.",
                 )),
             }
-        }
-        _ => {
-            return HttpResponse::Ok().json(google_response(
+            }
+            _ => {
+                return HttpResponse::Ok().json(google_response(
                 "To get started, open Budget App, go to Settings, tap Voice Assistants, and follow the Google setup steps.",
             ));
-        }
-    };
+            }
+        };
 
     let intent_name = body
         .pointer("/queryResult/intent/displayName")
@@ -924,11 +924,14 @@ pub async fn voice_oauth_generate_code(
         }
     };
 
-    let user = match data.users_collection.find_one(doc! { "_id": user_oid }, None).await {
+    let user = match data
+        .users_collection
+        .find_one(doc! { "_id": user_oid }, None)
+        .await
+    {
         Ok(Some(u)) => u,
         Ok(None) => {
-            return HttpResponse::NotFound()
-                .json(serde_json::json!({ "error": "user not found" }))
+            return HttpResponse::NotFound().json(serde_json::json!({ "error": "user not found" }))
         }
         Err(e) => {
             return HttpResponse::InternalServerError()
@@ -953,10 +956,13 @@ pub async fn voice_oauth_generate_code(
     let code = format!("{}{}", ObjectId::new().to_hex(), ObjectId::new().to_hex());
     let expires_at = Utc::now().timestamp_millis() + 5 * 60 * 1000;
 
-    oauth_codes
-        .lock()
-        .unwrap()
-        .insert(code.clone(), VoiceAuthEntry { user_id: req.user_id, expires_at });
+    oauth_codes.lock().unwrap().insert(
+        code.clone(),
+        VoiceAuthEntry {
+            user_id: req.user_id,
+            expires_at,
+        },
+    );
 
     let redirect_url = format!("{}?code={}&state={}", req.redirect_uri, code, req.state);
     HttpResponse::Ok().json(serde_json::json!({ "redirect_url": redirect_url }))
@@ -1017,7 +1023,11 @@ pub async fn voice_oauth_token(
         }
     };
 
-    let user = match data.users_collection.find_one(doc! { "_id": user_oid }, None).await {
+    let user = match data
+        .users_collection
+        .find_one(doc! { "_id": user_oid }, None)
+        .await
+    {
         Ok(Some(u)) => u,
         _ => {
             return HttpResponse::InternalServerError()

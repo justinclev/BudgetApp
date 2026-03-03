@@ -12,9 +12,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at 20% 30%, rgba(102, 126, 234, 0.18) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 70%, rgba(118, 75, 162, 0.14) 0%, transparent 60%),
-              #0f0f1a;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(102, 126, 234, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 70%, rgba(118, 75, 162, 0.14) 0%, transparent 60%), #0f0f1a;
   padding: 24px 16px;
 }
 
@@ -108,10 +108,16 @@
   padding: 12px 28px;
   border-radius: 12px;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+  transition:
+    opacity 0.15s,
+    transform 0.1s;
 
-  &:hover  { opacity: 0.88; }
-  &:active { transform: scale(0.97); }
+  &:hover {
+    opacity: 0.88;
+  }
+  &:active {
+    transform: scale(0.97);
+  }
 
   &--secondary {
     background: rgba(255, 255, 255, 0.08);
@@ -123,10 +129,18 @@
 // ── Animations ───────────────────────────────────────────────────────────────
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pop-in {
-  from { transform: scale(0.4); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
