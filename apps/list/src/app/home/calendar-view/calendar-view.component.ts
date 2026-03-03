@@ -64,11 +64,11 @@ export class CalendarViewComponent implements OnChanges {
   secondaryHeading = computed<string>(() => {
     switch (this.selectedView()) {
       case 'today':
-        return '🔜 Due This Week';
+        return '🔜 Upcoming';
       case 'week':
-        return '🔜 Due Next Week';
+        return '🔜 Upcoming';
       case 'month':
-        return '🔜 Due Next Month';
+        return '🔜 Upcoming';
       default:
         return '';
     }
@@ -181,31 +181,13 @@ export class CalendarViewComponent implements OnChanges {
     now.setHours(0, 0, 0, 0);
     const view = this.selectedView();
 
-    // Trim to the window the current view cares about so secondary sections
-    // don't overflow with the rest of the year.
-    let maxOffset: number;
-    switch (view) {
-      case 'today':
-        maxOffset = 7;
-        break;
-      case 'week':
-        maxOffset = 14;
-        break;
-      case 'month':
-        maxOffset = Math.round(
-          (new Date(now.getFullYear(), now.getMonth() + 2, 0).getTime() - now.getTime()) /
-            86_400_000,
-        );
-        break;
-      default:
-        maxOffset = 366;
-        break; // year
-    }
+    // Show everything through the end of the year — no clipping.
+    // Past (overdue) items are always included.
     occurrences = occurrences.filter((occ) => {
       if (!occ.occurrenceDate) return true; // undated always shown
       const d = this.parseLocalDate(occ.occurrenceDate);
       const offset = Math.round((d.getTime() - now.getTime()) / 86_400_000);
-      return offset <= maxOffset; // always include past (overdue)
+      return offset <= 366; // full year ahead + any overdue
     });
 
     // Deduplicate repeating items: for each unique (listId, itemId) keep only the
