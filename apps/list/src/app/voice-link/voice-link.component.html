@@ -1,0 +1,44 @@
+<div class="vl-page">
+  <div class="vl-card">
+
+    <!-- Loading -->
+    @if (state() === 'loading') {
+      <div class="vl-state">
+        <div class="vl-spinner"></div>
+        <p class="vl-title">Connecting to {{ platformName() }}…</p>
+        <p class="vl-sub">Just a moment</p>
+      </div>
+    }
+
+    <!-- Success — briefly shown before redirect -->
+    @if (state() === 'success') {
+      <div class="vl-state vl-state--success">
+        <div class="vl-check">✓</div>
+        <p class="vl-title">Account Linked!</p>
+        <p class="vl-sub">Returning to {{ platformName() }}…</p>
+      </div>
+    }
+
+    <!-- Not logged in -->
+    @if (state() === 'not-logged-in') {
+      <div class="vl-state">
+        <div class="vl-icon">{{ platformIcon() }}</div>
+        <p class="vl-title">Link Budget App to {{ platformName() }}</p>
+        <p class="vl-sub">You need to be logged into Budget App first.</p>
+        <button class="vl-btn" (click)="openApp()">Open Budget App &amp; Log In</button>
+        <p class="vl-hint">After logging in, return to {{ platformName() }} and tap Enable again — it will link automatically.</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (state() === 'error') {
+      <div class="vl-state vl-state--error">
+        <div class="vl-icon">⚠️</div>
+        <p class="vl-title">Something went wrong</p>
+        <p class="vl-sub">{{ errorMsg() }}</p>
+        <button class="vl-btn vl-btn--secondary" (click)="openApp()">Back to Budget App</button>
+      </div>
+    }
+
+  </div>
+</div>

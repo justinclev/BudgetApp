@@ -9,6 +9,7 @@ import {
   CreateListForm,
 } from './create-list-modal/create-list-modal.component';
 import { CalendarViewComponent } from './calendar-view/calendar-view.component';
+import { VoiceSettingsComponent } from './voice-settings/voice-settings.component';
 
 type Tab = 'lists' | 'todos' | 'schedule';
 type Filter = 'all' | 'todo' | 'shopping' | 'other';
@@ -32,7 +33,7 @@ const TYPE_EMOJI: Record<string, string> = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [DatePipe, CreateListModalComponent, CalendarViewComponent],
+  imports: [DatePipe, CreateListModalComponent, CalendarViewComponent, VoiceSettingsComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -45,6 +46,7 @@ export class HomeComponent implements OnInit {
   lists = signal<UserList[]>([]);
   loading = signal(true);
   showCreate = false;
+  showVoiceSettings = false;
 
   activeTab = signal<Tab>('lists');
   activeFilter = signal<Filter>('all');

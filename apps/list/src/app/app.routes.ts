@@ -18,5 +18,12 @@ export const routes: Routes = [
     loadComponent: () => import('./share/share.component').then((m) => m.ShareComponent),
     canActivate: [authGuard],
   },
+  {
+    // OAuth Account Linking callback — must be public (no auth guard)
+    // Google / Alexa redirects here after the user taps "Enable Skill/Action"
+    path: 'voice-link',
+    loadComponent: () =>
+      import('./voice-link/voice-link.component').then((m) => m.VoiceLinkComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

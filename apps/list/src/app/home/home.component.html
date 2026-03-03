@@ -11,6 +11,7 @@
         <span class="stat-sep">·</span>
         <span>{{ lists().length }}<small> lists</small></span>
       </div>
+      <button class="icon-btn" title="Voice Assistants" (click)="showVoiceSettings = true">🎙️</button>
       <button class="icon-btn" title="Back to Apps" (click)="goToApps()">⊞</button>
     </div>
   </header>
@@ -222,5 +223,9 @@
 
   @if (showCreate) {
     <app-create-list-modal (create)="createList($event)" (cancel)="showCreate = false" />
+  }
+
+  @if (showVoiceSettings) {
+    <app-voice-settings (close)="showVoiceSettings = false" />
   }
 </div>

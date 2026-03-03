@@ -10,7 +10,7 @@ use std::env;
 
 use handlers::{
     debt_handler, generated_transaction_handler, health_handler, list_handler, todo_occurrence_handler,
-    transaction_handler, user_handler,
+    transaction_handler, user_handler, voice_handler,
 };
 
 #[actix_web::main]
@@ -21,6 +21,9 @@ async fn main() -> std::io::Result<()> {
 
     // Initialize DB
     let app_state = db::init_db().await;
+
+    // Shared in-memory store for short-lived OAuth authorization codes
+    let oauth_codes = voice_handler::VoiceOAuthCodes::default();
 
     println!("Server starting on port {}", port);
 
@@ -34,6 +37,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(cors)
             .app_data(web::Data::new(app_state.clone()))
+            .app_data(web::Data::new(oauth_codes.clone()))
             .route("/", web::get().to(health_handler::health_check))
             // Debt Routes
             .route("/api/debts", web::get().to(debt_handler::get_debts))
@@ -165,6 +169,17 @@ async fn main() -> std::io::Result<()> {
                 "/api/todo-occurrences/{id}/toggle",
                 web::patch().to(todo_occurrence_handler::toggle_occurrence),
             )
+            // ── Voice Assistant Routes ───────────────────────────────────────
+            // OAuth Account Linking (used by Alexa + Google for "Enable Skill/Action")
+            .route("/api/voice/oauth/authorize", web::get().to(voice_handler::voice_oauth_authorize))
+            .route("/api/voice/oauth/code",      web::post().to(voice_handler::voice_oauth_generate_code))
+            .route("/api/voice/oauth/token",     web::post().to(voice_handler::voice_oauth_token))
+            // Token retrieval (used by app UI + Siri Shortcuts)
+            .route("/api/voice/token",   web::get().to(voice_handler::get_or_create_token))
+            // Webhook endpoints
+            .route("/api/voice/command", web::post().to(voice_handler::direct_command))
+            .route("/api/voice/alexa",   web::post().to(voice_handler::alexa_webhook))
+            .route("/api/voice/google",  web::post().to(voice_handler::google_webhook))
     })
     .bind(format!("0.0.0.0:{}", port))?
     .run()

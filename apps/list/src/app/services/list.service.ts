@@ -16,6 +16,7 @@ import {
 export class ListService {
   private base = `${environment.apiUrl}/lists`;
   private occBase = `${environment.apiUrl}/todo-occurrences`;
+  private voiceBase = `${environment.apiUrl}/voice`;
 
   /** Tracks which generate requests have already been fired this session. */
   private generatedRanges = new Set<string>();
@@ -157,5 +158,10 @@ export class ListService {
 
   toggleOccurrence(occurrenceId: string, userId?: string): Observable<TodoOccurrence> {
     return this.http.patch<TodoOccurrence>(`${this.occBase}/${occurrenceId}/toggle`, { userId });
+  }
+
+  getVoiceToken(userId: string): Observable<{ token: string }> {
+    const params = new HttpParams().set('user_id', userId);
+    return this.http.get<{ token: string }>(`${this.voiceBase}/token`, { params });
   }
 }
