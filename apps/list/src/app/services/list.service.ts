@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   UserList,
@@ -16,6 +16,9 @@ import {
 export class ListService {
   private base = `${environment.apiUrl}/lists`;
   private occBase = `${environment.apiUrl}/todo-occurrences`;
+
+  /** Tracks which generate requests have already been fired this session. */
+  private generatedRanges = new Set<string>();
 
   constructor(private http: HttpClient) {}
 
@@ -132,6 +135,11 @@ export class ListService {
     startDate: string,
     endDate: string,
   ): Observable<{ generated: number }> {
+    const cacheKey = `${userId}|${startDate}|${endDate}`;
+    if (this.generatedRanges.has(cacheKey)) {
+      return of({ generated: 0 });
+    }
+    this.generatedRanges.add(cacheKey);
     return this.http.post<{ generated: number }>(`${this.occBase}/generate`, {
       userId,
       startDate,

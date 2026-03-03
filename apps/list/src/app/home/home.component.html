@@ -180,9 +180,12 @@
       }
 
       <!-- ════ SCHEDULE TAB ════ -->
-      @if (activeTab() === 'schedule') {
-        <app-calendar-view [lists]="lists()" (listUpdated)="onListUpdated($event)" />
-      }
+      <!-- Always mounted so it pre-fetches while the user is on other tabs -->
+      <app-calendar-view
+        [hidden]="activeTab() !== 'schedule'"
+        [lists]="lists()"
+        (listUpdated)="onListUpdated($event)"
+      />
     }
   </main>
 

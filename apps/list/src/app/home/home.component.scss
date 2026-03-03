@@ -694,3 +694,156 @@ $shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
     transform: scale(0.95);
   }
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── Desktop Layout (≥ 768px) ──────────────────────────────────────────────────
+// Mobile styles are preserved untouched. Desktop uses CSS Grid to turn the
+// bottom tab bar into a left sidebar, without any HTML changes.
+// ══════════════════════════════════════════════════════════════════════════════
+
+@media (min-width: 768px) {
+  // ── Page shell: two-column grid ────────────────────────────────────────────
+  .page {
+    max-width: 1400px;
+    height: 100svh;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 230px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'sidebar header'
+      'sidebar main';
+  }
+
+  // ── Greeting header: right column, top row ──────────────────────────────────
+  .greeting-header {
+    grid-area: header;
+    padding: 28px 36px 32px;
+    border-radius: 0 0 0 0; // flush in grid
+
+    .greeting-name { font-size: 30px; }
+  }
+
+  // ── Scrollable content: right column, bottom row ────────────────────────────
+  .main {
+    grid-area: main;
+    padding: 28px 36px 32px;
+    overflow-y: auto;
+  }
+
+  // ── Sidebar: left column spanning all rows ──────────────────────────────────
+  .tab-bar {
+    grid-area: sidebar;
+    // Reset mobile-specific positioning
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: none;
+    height: 100%;
+    // Vertical flex layout
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    // Borders & shadows
+    border-top: none;
+    border-right: 1px solid #e2e8f0;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
+    background: #fff;
+    padding: 0 0 24px;
+    overflow-y: auto;
+
+    // Brand logo at top of sidebar
+    &::before {
+      content: '💰 Budget';
+      display: block;
+      padding: 28px 24px 20px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 16px;
+    }
+  }
+
+  // ── Sidebar tabs: horizontal icon+label rows ────────────────────────────────
+  .tab {
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px 20px;
+    margin: 0 12px 2px;
+    gap: 14px;
+    border-radius: 12px;
+
+    // Replace the top-indicator with a left background highlight
+    &::before { display: none; }
+
+    &--active {
+      background: linear-gradient(
+        135deg,
+        rgba($purple-start, 0.1),
+        rgba($purple-end, 0.08)
+      );
+
+      .tab-label {
+        color: $purple-end;
+        font-weight: 700;
+      }
+
+      .tab-icon {
+        // keep the pop animation but don't replay on every render
+        animation: tab-pop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+
+    &:not(.tab--active):hover {
+      background: #f8fafc;
+    }
+  }
+
+  .tab-icon { font-size: 20px; }
+
+  .tab-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  // ── Cards: 2-column grids on desktop ────────────────────────────────────────
+  .list-feed {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .todo-feed {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  // ── Filter pills: no overflow-scroll needed ─────────────────────────────────
+  .filter-row {
+    overflow-x: visible;
+    flex-wrap: wrap;
+  }
+
+  // ── FAB: reposition — above viewport bottom-right, clear of sidebar ─────────
+  .fab {
+    bottom: 32px;
+    right: 36px;
+    // Remove mobile calculation that accounted for tab-bar height
+  }
+
+  // ── Widen 3-column grids on very large screens (≥ 1200px) ──────────────────
+  @media (min-width: 1200px) {
+    .list-feed,
+    .todo-feed {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
