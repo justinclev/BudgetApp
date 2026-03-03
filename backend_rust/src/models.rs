@@ -192,6 +192,13 @@ pub struct ListItem {
     pub id: String,
     pub text: String,
     pub completed: bool,
+    #[serde(rename = "completedByUserId", skip_serializing_if = "Option::is_none", default)]
+    pub completed_by_user_id: Option<String>,
+    /// Date-only string (YYYY-MM-DD) of the most recently completed recurrence occurrence.
+    #[serde(rename = "lastCompletedAt", skip_serializing_if = "Option::is_none", default)]
+    pub last_completed_at: Option<String>,
+    #[serde(rename = "lastCompletedByUserId", skip_serializing_if = "Option::is_none", default)]
+    pub last_completed_by_user_id: Option<String>,
     #[serde(
         rename = "createdAt",
         deserialize_with = "deserialize_datetime_from_bson"
@@ -229,6 +236,15 @@ pub struct UserList {
         deserialize_with = "deserialize_datetime_from_bson"
     )]
     pub created_at: chrono::DateTime<chrono::Utc>,
+    #[serde(
+        rename = "completeByDate",
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_option_datetime_from_bson",
+        default
+    )]
+    pub complete_by_date: Option<chrono::DateTime<chrono::Utc>>,
+    #[serde(rename = "repeatFrequency", skip_serializing_if = "Option::is_none", default)]
+    pub repeat_frequency: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -238,6 +254,10 @@ pub struct CreateListRequest {
     pub list_type: String,
     #[serde(rename = "ownerId")]
     pub owner_id: String,
+    #[serde(rename = "completeByDate", skip_serializing_if = "Option::is_none", default)]
+    pub complete_by_date: Option<String>,
+    #[serde(rename = "repeatFrequency", skip_serializing_if = "Option::is_none", default)]
+    pub repeat_frequency: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -245,6 +265,10 @@ pub struct UpdateListRequest {
     pub name: String,
     #[serde(rename = "listType")]
     pub list_type: String,
+    #[serde(rename = "completeByDate", skip_serializing_if = "Option::is_none", default)]
+    pub complete_by_date: Option<String>,
+    #[serde(rename = "repeatFrequency", skip_serializing_if = "Option::is_none", default)]
+    pub repeat_frequency: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -276,8 +300,86 @@ pub struct JoinListRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct ToggleItemRequest {
+    #[serde(rename = "userId", default)]
+    pub user_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CompleteOccurrenceRequest {
+    /// YYYY-MM-DD date of the occurrence being toggled.
+    pub date: String,
+    #[serde(rename = "userId", default)]
+    pub user_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CloneListRequest {
     #[serde(rename = "ownerId")]
     pub owner_id: String,
     pub name: Option<String>,
+}
+
+// ── Todo Occurrence Models ─────────────────────────────────────────────────
+
+/// A concrete calendar occurrence of a todo list item for a specific date.
+/// Stored in the `todo_occurrences` collection.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TodoOccurrence {
+    #[serde(
+        rename = "_id",
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_oid_as_hex",
+        deserialize_with = "deserialize_oid_from_hex",
+        default
+    )]
+    pub id: Option<ObjectId>,
+    #[serde(rename = "listId")]
+    pub list_id: String,
+    #[serde(rename = "itemId")]
+    pub item_id: String,
+    #[serde(rename = "itemText")]
+    pub item_text: String,
+    #[serde(rename = "listName")]
+    pub list_name: String,
+    /// YYYY-MM-DD of this occurrence.
+    #[serde(rename = "occurrenceDate")]
+    pub occurrence_date: String,
+    pub completed: bool,
+    #[serde(rename = "completedByUserId", skip_serializing_if = "Option::is_none", default)]
+    pub completed_by_user_id: Option<String>,
+    #[serde(
+        rename = "completedAt",
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_option_datetime_from_bson",
+        default
+    )]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[serde(rename = "ownerId")]
+    pub owner_id: String,
+    #[serde(rename = "repeatFrequency", skip_serializing_if = "Option::is_none", default)]
+    pub repeat_frequency: Option<String>,
+    /// Original list completeByDate as YYYY-MM-DD, None means undated list.
+    #[serde(rename = "listDueDate", skip_serializing_if = "Option::is_none", default)]
+    pub list_due_date: Option<String>,
+    #[serde(rename = "createdAt", deserialize_with = "deserialize_datetime_from_bson")]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GenerateOccurrencesRequest {
+    #[serde(rename = "userId")]
+    pub user_id: String,
+    /// YYYY-MM-DD inclusive start of the date window to generate.
+    #[serde(rename = "startDate")]
+    pub start_date: String,
+    /// YYYY-MM-DD inclusive end.
+    #[serde(rename = "endDate")]
+    pub end_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ToggleOccurrenceRequest {
+    #[serde(rename = "userId", default)]
+    pub user_id: Option<String>,
 }

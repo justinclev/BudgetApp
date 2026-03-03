@@ -51,6 +51,11 @@ label {
   }
 }
 
+label.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 .modal-actions {
   display: flex;
   gap: 12px;
@@ -84,4 +89,10 @@ label {
     opacity: 0.45;
     cursor: not-allowed;
   }
+}
+
+.opt {
+  font-weight: 400;
+  color: #94a3b8;
+  margin-left: 4px;
 }

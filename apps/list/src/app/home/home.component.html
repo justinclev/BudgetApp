@@ -2,6 +2,14 @@
   <header class="top-bar">
     <span class="app-title">📋 My Lists</span>
     <div class="header-actions">
+      @if (hasTodoLists()) {
+        <button
+          class="cal-btn"
+          [class.cal-btn--active]="showCalendar()"
+          (click)="showCalendar.set(!showCalendar())"
+          title="View Calendar"
+        >📅 Calendar</button>
+      }
       <span class="user-name">{{ user()?.name }}</span>
       <button class="icon-btn" title="Back to Apps" (click)="goToApps()">⊞</button>
     </div>
@@ -10,6 +18,8 @@
   <main class="main">
     @if (loading()) {
       <div class="center-msg">Loading…</div>
+    } @else if (showCalendar()) {
+      <app-calendar-view [lists]="lists()" (listUpdated)="onListUpdated($event)" />
     } @else if (lists().length === 0) {
       <div class="empty-state">
         <div class="empty-icon">📋</div>

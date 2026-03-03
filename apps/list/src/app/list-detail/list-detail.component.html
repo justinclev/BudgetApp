@@ -1,18 +1,30 @@
 <div class="page">
   <header class="top-bar">
     <button class="back-btn" (click)="goHome()">‹</button>
-    @if (editingName()) {
-      <input
-        class="name-input"
-        [(ngModel)]="editName"
-        (blur)="saveName()"
-        (keydown.enter)="saveName()"
-        autofocus
-        maxlength="60"
-      />
-    } @else {
-      <h1 class="title" (click)="startEditName()">{{ list()?.name }}</h1>
-    }
+    <div class="title-block">
+      @if (editingName()) {
+        <input
+          class="name-input"
+          [(ngModel)]="editName"
+          (blur)="saveName()"
+          (keydown.enter)="saveName()"
+          autofocus
+          maxlength="60"
+        />
+      } @else {
+        <h1 class="title" (click)="startEditName()">{{ list()?.name }}</h1>
+      }
+      @if (list()?.listType === 'todo' && (list()?.completeByDate || list()?.repeatFrequency)) {
+        <div class="schedule-badge">
+          @if (list()?.completeByDate) {
+            <span>📅 {{ list()?.completeByDate | date:'MMM d, y' }}</span>
+          }
+          @if (list()?.repeatFrequency) {
+            <span>🔁 {{ scheduleRepeatLabel() }}</span>
+          }
+        </div>
+      }
+    </div>
     <button class="icon-btn" (click)="showMenu = !showMenu">⋯</button>
   </header>
 
@@ -21,6 +33,9 @@
       <div class="menu" (click)="$event.stopPropagation()">
         <button (click)="copyShareLink()">🔗 Copy Share Link</button>
         <button (click)="showMenu = false; showMembers = true">👥 Members</button>
+        @if (list()?.listType === 'todo') {
+          <button (click)="openSchedule()">📅 Schedule</button>
+        }
         <button (click)="resetList()">🔄 Reset All Items</button>
         <button (click)="cloneList()">📋 Clone List</button>
         <button class="danger" (click)="deleteList()">🗑 Delete List</button>
@@ -112,5 +127,32 @@
       (close)="showMembers = false"
       (removeMember)="removeMember($event)"
     />
+  }
+
+  @if (showSchedule) {
+    <div class="panel-overlay" (click)="showSchedule = false">
+      <div class="panel" (click)="$event.stopPropagation()">
+        <div class="panel-header">
+          <h3>📅 Schedule</h3>
+          <button class="panel-close" (click)="showSchedule = false">×</button>
+        </div>
+        <label class="sched-label">
+          Due Date <span class="sched-opt">(optional)</span>
+          <input type="date" class="sched-input" [(ngModel)]="scheduleDate" />
+        </label>
+        <label class="sched-label">
+          Repeats <span class="sched-opt">(optional)</span>
+          <select class="sched-input" [(ngModel)]="scheduleRepeat">
+            <option value="">Does not repeat</option>
+            @for (opt of repeatOptions; track opt[0]) {
+              <option [value]="opt[0]">{{ opt[1] }}</option>
+            }
+          </select>
+        </label>
+        <div class="panel-actions">
+          <button class="btn-save" (click)="saveSchedule()">Save</button>
+        </div>
+      </div>
+    </div>
   }
 </div>

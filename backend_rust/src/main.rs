@@ -9,8 +9,8 @@ use dotenv::dotenv;
 use std::env;
 
 use handlers::{
-    debt_handler, generated_transaction_handler, health_handler, list_handler, transaction_handler,
-    user_handler,
+    debt_handler, generated_transaction_handler, health_handler, list_handler, todo_occurrence_handler,
+    transaction_handler, user_handler,
 };
 
 #[actix_web::main]
@@ -135,6 +135,10 @@ async fn main() -> std::io::Result<()> {
                 web::patch().to(list_handler::toggle_item),
             )
             .route(
+                "/api/lists/{id}/items/{item_id}/complete-occurrence",
+                web::patch().to(list_handler::complete_occurrence),
+            )
+            .route(
                 "/api/lists/{id}/reset",
                 web::post().to(list_handler::reset_list),
             )
@@ -148,6 +152,19 @@ async fn main() -> std::io::Result<()> {
             .route("/api/users", web::post().to(user_handler::create_user))
             // Auth Routes
             .route("/api/auth/google", web::post().to(user_handler::google_auth))
+            // Todo Occurrence Routes
+            .route(
+                "/api/todo-occurrences/generate",
+                web::post().to(todo_occurrence_handler::generate_occurrences),
+            )
+            .route(
+                "/api/todo-occurrences",
+                web::get().to(todo_occurrence_handler::get_occurrences),
+            )
+            .route(
+                "/api/todo-occurrences/{id}/toggle",
+                web::patch().to(todo_occurrence_handler::toggle_occurrence),
+            )
     })
     .bind(format!("0.0.0.0:{}", port))?
     .run()

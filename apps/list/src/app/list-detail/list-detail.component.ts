@@ -12,17 +12,18 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AuthService } from '../services/auth.service';
 import { ListService } from '../services/list.service';
-import { UserList, ListItem, SubItem } from '../models/list.model';
+import { UserList, ListItem, SubItem, RepeatFrequency, REPEAT_FREQUENCY_LABELS } from '../models/list.model';
 import { ListItemComponent, SubSaveEvent } from './list-item/list-item.component';
 import { MembersPanelComponent } from './members-panel/members-panel.component';
 
 @Component({
   selector: 'app-list-detail',
   standalone: true,
-  imports: [FormsModule, DragDropModule, ListItemComponent, MembersPanelComponent],
+  imports: [FormsModule, DragDropModule, DatePipe, ListItemComponent, MembersPanelComponent],
   templateUrl: './list-detail.component.html',
   styleUrl: './list-detail.component.scss',
 })
@@ -48,6 +49,12 @@ export class ListDetailComponent implements OnInit {
   newItemText = '';
   expandedItems = signal<Set<string>>(new Set());
   newSubTexts = signal<Record<string, string | undefined>>({});
+
+  // Schedule editor (todo lists only)
+  showSchedule = false;
+  scheduleDate = '';
+  scheduleRepeat: RepeatFrequency | '' = '';
+  readonly repeatOptions = Object.entries(REPEAT_FREQUENCY_LABELS) as [RepeatFrequency, string][];
 
   private listId = '';
 
@@ -109,7 +116,8 @@ export class ListDetailComponent implements OnInit {
   // ── Item interactions ────────────────────────────────────────────────────
 
   toggleItem(item: ListItem): void {
-    this.listService.toggleItem(this.listId, item.id).subscribe({
+    const userId = this.auth.user()?.id;
+    this.listService.toggleItem(this.listId, item.id, userId).subscribe({
       next: (updated) => this.list.set(updated),
     });
   }
@@ -231,6 +239,44 @@ export class ListDetailComponent implements OnInit {
     this.listService.updateSubItemText(this.listId, parent.id, sub.id, text).subscribe({
       next: (updated) => this.list.set(updated),
     });
+  }
+
+  // ── Schedule (todo lists) ─────────────────────────────────────────────
+
+  openSchedule(): void {
+    this.showMenu = false;
+    const list = this.list();
+    // Pre-populate editor with existing values
+    this.scheduleDate = list?.completeByDate
+      ? new Date(list.completeByDate).toISOString().slice(0, 10)
+      : '';
+    this.scheduleRepeat = (list?.repeatFrequency as RepeatFrequency | '') ?? '';
+    this.showSchedule = true;
+  }
+
+  saveSchedule(): void {
+    const list = this.list();
+    if (!list) return;
+    const req = {
+      name: list.name,
+      listType: list.listType,
+      completeByDate: this.scheduleDate
+        ? new Date(this.scheduleDate).toISOString()
+        : '',
+      repeatFrequency: this.scheduleRepeat || '',
+    };
+    this.listService.updateList(this.listId, req).subscribe({
+      next: (updated) => {
+        this.list.set(updated);
+        this.showSchedule = false;
+        this.showToast('Schedule saved');
+      },
+    });
+  }
+
+  scheduleRepeatLabel(): string {
+    const f = this.list()?.repeatFrequency;
+    return f ? REPEAT_FREQUENCY_LABELS[f] : '';
   }
 
   // ── List actions ─────────────────────────────────────────────────────────

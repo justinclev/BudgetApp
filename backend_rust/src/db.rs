@@ -1,4 +1,4 @@
-use crate::models::{Debt, RecurringTransaction, User, UserList, UserTransactions};
+use crate::models::{Debt, RecurringTransaction, TodoOccurrence, User, UserList, UserTransactions};
 use mongodb::{bson::doc, options::ClientOptions, Client, Collection};
 use std::env;
 
@@ -9,6 +9,7 @@ pub struct AppState {
     pub generated_transactions_collection: Collection<UserTransactions>,
     pub lists_collection: Collection<UserList>,
     pub users_collection: Collection<User>,
+    pub todo_occurrences_collection: Collection<TodoOccurrence>,
 }
 
 pub async fn init_db() -> AppState {
@@ -24,6 +25,18 @@ pub async fn init_db() -> AppState {
     let generated_transactions_collection = db.collection::<UserTransactions>("transactions");
     let lists_collection = db.collection::<UserList>("lists");
     let users_collection = db.collection::<User>("users");
+    let todo_occurrences_collection = db.collection::<TodoOccurrence>("todo_occurrences");
+
+    // Unique index prevents duplicate occurrences for the same item on the same date
+    let occ_index = mongodb::IndexModel::builder()
+        .keys(doc! { "listId": 1, "itemId": 1, "occurrenceDate": 1 })
+        .options(
+            mongodb::options::IndexOptions::builder()
+                .unique(true)
+                .build(),
+        )
+        .build();
+    let _ = todo_occurrences_collection.create_index(occ_index, None).await;
 
     // ── Users: unique email index + seed dev accounts ──────────────────────────
     let email_index = mongodb::IndexModel::builder()
@@ -170,5 +183,6 @@ pub async fn init_db() -> AppState {
         generated_transactions_collection,
         lists_collection,
         users_collection,
+        todo_occurrences_collection,
     }
 }

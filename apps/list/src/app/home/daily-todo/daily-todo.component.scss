@@ -1,0 +1,131 @@
+.daily-todo {
+  padding: 0 0 24px;
+}
+
+.daily-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+  }
+}
+
+.date-label {
+  font-size: 13px;
+  color: #64748b;
+}
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+
+.section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 10px;
+}
+
+.overdue-title { color: #dc2626; }
+.today-title   { color: #16a34a; }
+.soon-title    { color: #d97706; }
+.undated-title { color: #64748b; }
+
+// ── Cards ─────────────────────────────────────────────────────────────────────
+
+.entry-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.1s, box-shadow 0.1s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.overdue-card { border-left-color: #dc2626; }
+.today-card   { border-left-color: #16a34a; }
+.soon-card    { border-left-color: #d97706; }
+.undated-card { border-left-color: #94a3b8; }
+
+.entry-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.entry-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+  flex: 1;
+}
+
+.entry-list {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.entry-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+// ── Badges ────────────────────────────────────────────────────────────────────
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.overdue-badge { background: #fee2e2; color: #dc2626; }
+.soon-badge    { background: #fef3c7; color: #d97706; }
+.repeat-badge  { background: #ede9fe; color: #7c3aed; }
+
+// ── Empty states ──────────────────────────────────────────────────────────────
+
+.empty-state,
+.all-done {
+  text-align: center;
+  padding: 48px 20px;
+
+  p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.empty-icon,
+.done-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}

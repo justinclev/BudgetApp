@@ -5,8 +5,9 @@ use mongodb::bson::{doc, oid::ObjectId};
 
 use crate::db::AppState;
 use crate::models::{
-    AddItemRequest, CloneListRequest, CreateListRequest, JoinListRequest, ListItem,
-    ReorderItemsRequest, SubItem, UpdateItemRequest, UpdateListRequest, UserList,
+    AddItemRequest, CloneListRequest, CompleteOccurrenceRequest, CreateListRequest, JoinListRequest,
+    ListItem, ReorderItemsRequest, SubItem, ToggleItemRequest, UpdateItemRequest, UpdateListRequest,
+    UserList,
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -64,6 +65,11 @@ pub async fn create_list(
     body: web::Json<CreateListRequest>,
 ) -> impl Responder {
     let req = body.into_inner();
+    let complete_by_date = req
+        .complete_by_date
+        .as_deref()
+        .and_then(|s| chrono::DateTime::parse_from_rfc3339(s).ok())
+        .map(|dt| dt.with_timezone(&chrono::Utc));
     let new_list = UserList {
         id: None,
         name: req.name,
@@ -74,6 +80,8 @@ pub async fn create_list(
         items: vec![],
         share_token: new_share_token(),
         created_at: Utc::now(),
+        complete_by_date,
+        repeat_frequency: req.repeat_frequency,
     };
 
     match data.lists_collection.insert_one(new_list, None).await {
@@ -133,7 +141,23 @@ pub async fn update_list(
     };
 
     let req = body.into_inner();
-    let update = doc! { "$set": { "name": &req.name, "listType": &req.list_type } };
+    let mut set_doc = doc! { "name": &req.name, "listType": &req.list_type };
+    if let Some(cbd) = &req.complete_by_date {
+        if cbd.is_empty() {
+            set_doc.insert("completeByDate", mongodb::bson::Bson::Null);
+        } else if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(cbd) {
+            set_doc.insert(
+                "completeByDate",
+                mongodb::bson::DateTime::from_millis(dt.timestamp_millis()),
+            );
+        }
+    }
+    match &req.repeat_frequency {
+        Some(rf) if rf.is_empty() => { set_doc.insert("repeatFrequency", mongodb::bson::Bson::Null); }
+        Some(rf) => { set_doc.insert("repeatFrequency", rf.as_str()); }
+        None => {}
+    }
+    let update = doc! { "$set": set_doc };
 
     match data
         .lists_collection
@@ -191,10 +215,14 @@ pub async fn add_item(
         Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
     };
 
+    let req = body.into_inner();
     let new_item = ListItem {
         id: new_id(),
-        text: body.into_inner().text,
+        text: req.text,
         completed: false,
+        completed_by_user_id: None,
+        last_completed_at: None,
+        last_completed_by_user_id: None,
         created_at: Utc::now(),
         sub_items: vec![],
     };
@@ -401,6 +429,7 @@ pub async fn update_item_text(
 pub async fn toggle_item(
     data: web::Data<AppState>,
     path: web::Path<(String, String)>,
+    body: web::Json<ToggleItemRequest>,
 ) -> impl Responder {
     let (list_id_str, item_id) = path.into_inner();
     let object_id = match ObjectId::parse_str(&list_id_str) {
@@ -408,7 +437,7 @@ pub async fn toggle_item(
         Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
     };
 
-    // Fetch the list to get current state of the item
+    // Fetch current state
     let list = match data
         .lists_collection
         .find_one(doc! { "_id": object_id }, None)
@@ -429,10 +458,101 @@ pub async fn toggle_item(
         .map(|i| i.completed)
         .unwrap_or(false);
 
-    let update = doc! {
-        "$set": { "items.$[elem].completed": !current_completed }
+    let new_completed = !current_completed;
+
+    let mut set_fields = doc! { "items.$[elem].completed": new_completed };
+    if new_completed {
+        // Record who completed it
+        if let Some(uid) = &body.user_id {
+            set_fields.insert("items.$[elem].completedByUserId", uid.as_str());
+        }
+    } else {
+        // Clear the completed-by when un-completing
+        set_fields.insert("items.$[elem].completedByUserId", mongodb::bson::Bson::Null);
+    }
+
+    let update = doc! { "$set": set_fields };
+    let array_filters = vec![doc! { "elem.id": { "$eq": &item_id } }];
+    let options = mongodb::options::FindOneAndUpdateOptions::builder()
+        .array_filters(array_filters)
+        .build();
+
+    match data
+        .lists_collection
+        .find_one_and_update(doc! { "_id": object_id }, update, options)
+        .await
+    {
+        Ok(Some(_)) => match data
+            .lists_collection
+            .find_one(doc! { "_id": object_id }, None)
+            .await
+        {
+            Ok(Some(list)) => HttpResponse::Ok().json(list),
+            _ => HttpResponse::InternalServerError().body("Failed to retrieve updated list"),
+        },
+        Ok(None) => {
+            HttpResponse::NotFound().json(serde_json::json!({ "message": "List not found" }))
+        }
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
+}
+
+// ── PATCH /api/lists/:id/items/:item_id/complete-occurrence ───────────────
+// Toggles completion of a single recurrence occurrence identified by `date`
+// (YYYY-MM-DD). If lastCompletedAt already equals `date`, clears it (un-complete).
+// Does NOT touch item.completed so the recurring item reappears on future dates.
+
+pub async fn complete_occurrence(
+    data: web::Data<AppState>,
+    path: web::Path<(String, String)>,
+    body: web::Json<CompleteOccurrenceRequest>,
+) -> impl Responder {
+    let (list_id_str, item_id) = path.into_inner();
+    let object_id = match ObjectId::parse_str(&list_id_str) {
+        Ok(oid) => oid,
+        Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
+    };
+    let req = body.into_inner();
+
+    // Fetch current state to check whether we're toggling on or off
+    let list = match data
+        .lists_collection
+        .find_one(doc! { "_id": object_id }, None)
+        .await
+    {
+        Ok(Some(l)) => l,
+        Ok(None) => {
+            return HttpResponse::NotFound()
+                .json(serde_json::json!({ "message": "List not found" }))
+        }
+        Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
     };
 
+    let already_done = list
+        .items
+        .iter()
+        .find(|i| i.id == item_id)
+        .and_then(|i| i.last_completed_at.as_deref())
+        .map(|d| d == req.date)
+        .unwrap_or(false);
+
+    let (new_date, new_user): (mongodb::bson::Bson, mongodb::bson::Bson) = if already_done {
+        (mongodb::bson::Bson::Null, mongodb::bson::Bson::Null)
+    } else {
+        let user_val = req
+            .user_id
+            .as_deref()
+            .map(|u| mongodb::bson::Bson::String(u.to_string()))
+            .unwrap_or(mongodb::bson::Bson::Null);
+        (mongodb::bson::Bson::String(req.date), user_val)
+    };
+
+    let update = doc! {
+        "$set": {
+            "items.$[elem].lastCompletedAt": new_date,
+            "items.$[elem].lastCompletedByUserId": new_user,
+        }
+    };
     let array_filters = vec![doc! { "elem.id": { "$eq": &item_id } }];
     let options = mongodb::options::FindOneAndUpdateOptions::builder()
         .array_filters(array_filters)
@@ -481,6 +601,9 @@ pub async fn reset_list(data: web::Data<AppState>, path: web::Path<String>) -> i
                             "$$item",
                             {
                                 "completed": false,
+                                "completedByUserId": "$$REMOVE",
+                                "lastCompletedAt": "$$REMOVE",
+                                "lastCompletedByUserId": "$$REMOVE",
                                 "subItems": {
                                     "$map": {
                                         "input": { "$ifNull": ["$$item.subItems", []] },
@@ -554,6 +677,9 @@ pub async fn clone_list(
             id: new_id(),
             text: item.text,
             completed: false,
+            completed_by_user_id: None,
+            last_completed_at: None,
+            last_completed_by_user_id: None,
             created_at: Utc::now(),
             sub_items: item
                 .sub_items
@@ -578,6 +704,8 @@ pub async fn clone_list(
         items: cloned_items,
         share_token: new_share_token(),
         created_at: Utc::now(),
+        complete_by_date: source.complete_by_date,
+        repeat_frequency: source.repeat_frequency,
     };
 
     match data.lists_collection.insert_one(new_list, None).await {

@@ -116,3 +116,25 @@
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
   }
 }
+
+.cal-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  &--active {
+    background: white;
+    color: #764ba2;
+    border-color: white;
+  }
+}

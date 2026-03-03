@@ -9,11 +9,13 @@ import {
   UpdateItemRequest,
   UpdateListRequest,
   JoinListRequest,
+  TodoOccurrence,
 } from '../models/list.model';
 
 @Injectable({ providedIn: 'root' })
 export class ListService {
   private base = `${environment.apiUrl}/lists`;
+  private occBase = `${environment.apiUrl}/todo-occurrences`;
 
   constructor(private http: HttpClient) {}
 
@@ -86,8 +88,20 @@ export class ListService {
     );
   }
 
-  toggleItem(listId: string, itemId: string): Observable<UserList> {
-    return this.http.patch<UserList>(`${this.base}/${listId}/items/${itemId}/toggle`, {});
+  toggleItem(listId: string, itemId: string, userId?: string): Observable<UserList> {
+    return this.http.patch<UserList>(`${this.base}/${listId}/items/${itemId}/toggle`, { userId });
+  }
+
+  completeOccurrence(
+    listId: string,
+    itemId: string,
+    date: string,
+    userId?: string,
+  ): Observable<UserList> {
+    return this.http.patch<UserList>(
+      `${this.base}/${listId}/items/${itemId}/complete-occurrence`,
+      { date, userId },
+    );
   }
 
   resetList(id: string): Observable<UserList> {
@@ -104,5 +118,35 @@ export class ListService {
 
   joinListByShareToken(token: string, req: JoinListRequest): Observable<UserList> {
     return this.http.post<UserList>(`${this.base}/share/${token}/join`, req);
+  }
+
+  // ── Todo Occurrence API ───────────────────────────────────────────────────
+
+  generateOccurrences(
+    userId: string,
+    startDate: string,
+    endDate: string,
+  ): Observable<{ generated: number }> {
+    return this.http.post<{ generated: number }>(`${this.occBase}/generate`, {
+      userId,
+      startDate,
+      endDate,
+    });
+  }
+
+  getOccurrences(
+    userId: string,
+    startDate: string,
+    endDate: string,
+  ): Observable<TodoOccurrence[]> {
+    const params = new HttpParams()
+      .set('user_id', userId)
+      .set('start_date', startDate)
+      .set('end_date', endDate);
+    return this.http.get<TodoOccurrence[]>(this.occBase, { params });
+  }
+
+  toggleOccurrence(occurrenceId: string, userId?: string): Observable<TodoOccurrence> {
+    return this.http.patch<TodoOccurrence>(`${this.occBase}/${occurrenceId}/toggle`, { userId });
   }
 }

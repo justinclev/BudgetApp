@@ -1,0 +1,98 @@
+<div class="daily-todo">
+  <div class="daily-header">
+    <h2>📅 Daily To-Do</h2>
+    <span class="date-label">{{ todayDate | date:'EEEE, MMMM d' }}</span>
+  </div>
+
+  @if (!hasTodoLists()) {
+    <div class="empty-state">
+      <div class="empty-icon">✅</div>
+      <p>No to-do lists yet. Create one to get started!</p>
+    </div>
+  } @else if (totalCount() === 0 && overdue().length === 0 && todayEntries().length === 0) {
+    <div class="all-done">
+      <div class="done-icon">🎉</div>
+      <p>All caught up for today!</p>
+    </div>
+  } @else {
+
+    <!-- Overdue -->
+    @if (overdue().length > 0) {
+      <section class="section overdue-section">
+        <h3 class="section-title overdue-title">⚠️ Overdue</h3>
+        @for (entry of overdue(); track trackEntry($index, entry)) {
+          <div class="entry-card overdue-card" (click)="goToList(entry.listId)">
+            <div class="entry-main">
+              <span class="entry-text">{{ entry.item.text }}</span>
+              <span class="entry-list">{{ entry.listName }}</span>
+            </div>
+            <div class="entry-meta">
+              <span class="badge overdue-badge">{{ overdueLabel(entry) }}</span>
+              @if (entry.repeatFrequency) {
+                <span class="badge repeat-badge">🔁 {{ repeatLabel(entry) }}</span>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Due Today -->
+    @if (todayEntries().length > 0) {
+      <section class="section today-section">
+        <h3 class="section-title today-title">✅ Due Today</h3>
+        @for (entry of todayEntries(); track trackEntry($index, entry)) {
+          <div class="entry-card today-card" (click)="goToList(entry.listId)">
+            <div class="entry-main">
+              <span class="entry-text">{{ entry.item.text }}</span>
+              <span class="entry-list">{{ entry.listName }}</span>
+            </div>
+            <div class="entry-meta">
+              @if (entry.repeatFrequency) {
+                <span class="badge repeat-badge">🔁 {{ repeatLabel(entry) }}</span>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+  }
+
+  <!-- Coming Soon (always show if any) -->
+  @if (soon().length > 0) {
+    <section class="section soon-section">
+      <h3 class="section-title soon-title">🔜 Coming Soon</h3>
+      @for (entry of soon(); track trackEntry($index, entry)) {
+        <div class="entry-card soon-card" (click)="goToList(entry.listId)">
+          <div class="entry-main">
+            <span class="entry-text">{{ entry.item.text }}</span>
+            <span class="entry-list">{{ entry.listName }}</span>
+          </div>
+          <div class="entry-meta">
+            <span class="badge soon-badge">{{ soonLabel(entry) }}</span>
+            @if (entry.repeatFrequency) {
+              <span class="badge repeat-badge">🔁 {{ repeatLabel(entry) }}</span>
+            }
+          </div>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- Undated -->
+  @if (undated().length > 0) {
+    <section class="section undated-section">
+      <h3 class="section-title undated-title">📝 No Due Date</h3>
+      @for (entry of undated(); track trackEntry($index, entry)) {
+        <div class="entry-card undated-card" (click)="goToList(entry.listId)">
+          <div class="entry-main">
+            <span class="entry-text">{{ entry.item.text }}</span>
+            <span class="entry-list">{{ entry.listName }}</span>
+          </div>
+        </div>
+      }
+    </section>
+  }
+</div>
+

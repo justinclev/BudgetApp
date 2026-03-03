@@ -8,11 +8,12 @@ import {
   CreateListModalComponent,
   CreateListForm,
 } from './create-list-modal/create-list-modal.component';
+import { CalendarViewComponent } from './calendar-view/calendar-view.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ListCardComponent, CreateListModalComponent],
+  imports: [ListCardComponent, CreateListModalComponent, CalendarViewComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -25,6 +26,9 @@ export class HomeComponent implements OnInit {
   lists = signal<UserList[]>([]);
   loading = signal(true);
   showCreate = false;
+  showCalendar = signal(false);
+
+  hasTodoLists = signal(false);
 
   ngOnInit(): void {
     this.loadLists();
@@ -35,6 +39,7 @@ export class HomeComponent implements OnInit {
     this.listService.getLists(userId).subscribe({
       next: (data) => {
         this.lists.set(data);
+        this.hasTodoLists.set(data.some((l) => l.listType === 'todo'));
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -45,15 +50,21 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/list', list._id]);
   }
 
-  createList({ name, listType }: CreateListForm): void {
+  createList({ name, listType, completeByDate, repeatFrequency }: CreateListForm): void {
     const userId = this.user()?.id ?? '';
-    this.listService.createList({ name, listType, ownerId: userId }).subscribe({
+    this.listService
+      .createList({ name, listType, ownerId: userId, completeByDate, repeatFrequency })
+      .subscribe({
       next: (created) => {
         this.lists.update((l) => [created, ...l]);
         this.showCreate = false;
         this.router.navigate(['/list', created._id]);
       },
     });
+  }
+
+  onListUpdated(updated: UserList): void {
+    this.lists.update((all) => all.map((l) => (l._id === updated._id ? updated : l)));
   }
 
   deleteList(event: MouseEvent, list: UserList): void {
