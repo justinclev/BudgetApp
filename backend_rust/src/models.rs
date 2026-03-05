@@ -166,6 +166,66 @@ pub struct User {
         default
     )]
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+    /// Personal webhook API key used to authenticate IFTTT → BudgetFlow requests.
+    /// Generated on demand; `None` until the user visits the Integrations page.
+    #[serde(rename = "webhookApiKey", skip_serializing_if = "Option::is_none", default)]
+    pub webhook_api_key: Option<String>,
+}
+
+// ── Integration Models ─────────────────────────────────────────────────────
+
+/// JSON body sent by IFTTT to the webhook fulfillment endpoint.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct IftttWebhookRequest {
+    /// Action identifier.
+    /// Supported: `add_todo_item`, `add_item`, `create_list`,
+    ///            `mark_todo_done`, `mark_item_done`,
+    ///            `add_expense`, `check_balance`
+    pub action: String,
+
+    // ── List / item targeting ────────────────────────────────────────────
+    /// MongoDB hex ObjectId of the target list  (preferred over `list_name`).
+    #[serde(rename = "listId", default)]
+    pub list_id: Option<String>,
+    /// Human-readable list name used when `list_id` is not provided.
+    #[serde(rename = "listName", default)]
+    pub list_name: Option<String>,
+    /// Item text / name.
+    #[serde(default)]
+    pub text: Option<String>,
+    /// `"todo"` | `"shopping"` | `"general"` — used by `create_list`.
+    #[serde(rename = "listType", default)]
+    pub list_type: Option<String>,
+
+    // ── Todo recurrence fields ───────────────────────────────────────────
+    /// RFC-3339 or YYYY-MM-DD due/complete-by date.
+    #[serde(rename = "completeByDate", default)]
+    pub complete_by_date: Option<String>,
+    /// Recurrence frequency: `daily`, `weekly`, `biweekly`, `monthly`, `yearly`, etc.
+    #[serde(rename = "repeatFrequency", default)]
+    pub repeat_frequency: Option<String>,
+
+    // ── Occurrence / item targeting for mark-done actions ────────────────
+    /// MongoDB hex ObjectId of a `todo_occurrence` document.
+    #[serde(rename = "occurrenceId", default)]
+    pub occurrence_id: Option<String>,
+    /// MongoDB hex ObjectId of a list item (for `mark_item_done`).
+    #[serde(rename = "itemId", default)]
+    pub item_id: Option<String>,
+    /// YYYY-MM-DD date of the occurrence to mark done (used when `occurrence_id` absent).
+    #[serde(default)]
+    pub date: Option<String>,
+
+    // ── Expense fields ───────────────────────────────────────────────────
+    /// Optional spending category (used by `add_expense`).
+    #[serde(default)]
+    pub category: Option<String>,
+    /// Optional monetary amount in dollars.
+    #[serde(default)]
+    pub amount: Option<f64>,
+    /// Arbitrary free-text note.
+    #[serde(default)]
+    pub note: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

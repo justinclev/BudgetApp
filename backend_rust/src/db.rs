@@ -49,6 +49,18 @@ pub async fn init_db() -> AppState {
         .build();
     let _ = users_collection.create_index(email_index, None).await;
 
+    // ── Users: sparse unique index on webhookApiKey for fast O(1) webhook auth ───
+    let webhook_key_index = mongodb::IndexModel::builder()
+        .keys(doc! { "webhookApiKey": 1 })
+        .options(
+            mongodb::options::IndexOptions::builder()
+                .unique(true)
+                .sparse(true) // only indexes documents where the field exists
+                .build(),
+        )
+        .build();
+    let _ = users_collection.create_index(webhook_key_index, None).await;
+
     // Seed Alice (upsert so re-deploys are safe)
     let alice_oid = mongodb::bson::oid::ObjectId::parse_str("507f1f77bcf86cd799439011").unwrap();
     let _ = users_collection

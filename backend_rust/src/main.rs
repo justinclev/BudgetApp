@@ -9,7 +9,8 @@ use dotenv::dotenv;
 use std::env;
 
 use handlers::{
-    debt_handler, generated_transaction_handler, health_handler, list_handler, todo_occurrence_handler,
+    debt_handler, generated_transaction_handler, health_handler, integration_handler,
+    list_handler, todo_occurrence_handler,
     transaction_handler, user_handler,
 };
 
@@ -164,6 +165,15 @@ async fn main() -> std::io::Result<()> {
             .route(
                 "/api/todo-occurrences/{id}/toggle",
                 web::patch().to(todo_occurrence_handler::toggle_occurrence),
+            )
+            // Integration Routes (IFTTT / Google Home webhook)
+            .route(
+                "/api/integrations/generate-key",
+                web::post().to(integration_handler::generate_webhook_key),
+            )
+            .route(
+                "/api/integrations/ifttt-webhook",
+                web::post().to(integration_handler::ifttt_webhook),
             )
     })
     .bind(format!("0.0.0.0:{}", port))?

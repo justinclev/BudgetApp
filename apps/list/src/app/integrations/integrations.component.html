@@ -1,0 +1,182 @@
+<div class="integrations-page">
+
+  <!-- ── Page header ──────────────────────────────────────────────────────── -->
+  <header class="page-header">
+    <h1>Google Home Integration</h1>
+    <p class="subtitle">
+      Control BudgetFlow with your voice via Google Home and IFTTT.
+    </p>
+  </header>
+
+  <!-- ── How it works ─────────────────────────────────────────────────────── -->
+  <section class="card how-it-works">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>
+        <span class="step-number">1</span>
+        <div>
+          <strong>Generate your personal Webhook API Key</strong> below.
+          This key is unique to your account and authenticates requests from IFTTT.
+        </div>
+      </li>
+      <li>
+        <span class="step-number">2</span>
+        <div>
+          <strong>Create an IFTTT Applet.</strong>
+          Use <em>Google Assistant</em> as the trigger ("If you say…") and
+          <em>Webhooks</em> as the action.
+        </div>
+      </li>
+      <li>
+        <span class="step-number">3</span>
+        <div>
+          <strong>Configure the Webhooks action</strong> with:
+          <ul class="webhook-config">
+            <li><strong>URL:</strong> <code>{{ webhookUrl }}</code></li>
+            <li><strong>Method:</strong> POST</li>
+            <li><strong>Content Type:</strong> application/json</li>
+            <li>
+              <strong>Body:</strong>
+              <code>&#123;"action": "add_todo_item", "listName": "Chores", "text": "Clean bathroom", "repeatFrequency": "weekly"&#125;</code>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <span class="step-number">4</span>
+        <div>
+          <strong>Add your API key</strong> to the Webhooks action as the
+          <code>Authorization</code> header value:
+          <code>Bearer YOUR_API_KEY</code>.
+        </div>
+      </li>
+    </ol>
+
+    <!-- Supported actions table -->
+    <div class="supported-actions">
+      <h3>Supported Actions</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>Required Fields</th>
+            <th>Optional Fields</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>add_todo_item</code></td>
+            <td><code>text</code>, <code>listId</code> or <code>listName</code></td>
+            <td><code>completeByDate</code>, <code>repeatFrequency</code></td>
+          </tr>
+          <tr>
+            <td><code>add_item</code></td>
+            <td><code>text</code>, <code>listId</code> or <code>listName</code></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><code>create_list</code></td>
+            <td><code>text</code> (list name)</td>
+            <td><code>listType</code>, <code>completeByDate</code>, <code>repeatFrequency</code></td>
+          </tr>
+          <tr>
+            <td><code>mark_todo_done</code></td>
+            <td><code>occurrenceId</code>, OR <code>text</code> + <code>date</code></td>
+            <td><code>listId</code>, <code>listName</code></td>
+          </tr>
+          <tr>
+            <td><code>mark_item_done</code></td>
+            <td><code>listId</code> or <code>listName</code>, plus <code>text</code> or <code>itemId</code></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><code>add_expense</code></td>
+            <td><code>amount</code></td>
+            <td><code>category</code></td>
+          </tr>
+          <tr>
+            <td><code>check_balance</code></td>
+            <td>—</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Field Reference</h3>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>action</code></td><td>string</td><td>One of the actions above</td></tr>
+          <tr><td><code>listId</code></td><td>string</td><td>MongoDB ObjectId of the list (fastest)</td></tr>
+          <tr><td><code>listName</code></td><td>string</td><td>Case-insensitive search (use when listId unknown)</td></tr>
+          <tr><td><code>text</code></td><td>string</td><td>Item text, list name for <code>create_list</code>, or item search text</td></tr>
+          <tr><td><code>listType</code></td><td>string</td><td><code>"todo"</code> | <code>"shopping"</code> | <code>"general"</code> (default: <code>"todo"</code>)</td></tr>
+          <tr><td><code>completeByDate</code></td><td>string</td><td>YYYY-MM-DD or RFC3339</td></tr>
+          <tr><td><code>repeatFrequency</code></td><td>string</td><td><code>daily</code> | <code>weekly</code> | <code>biweekly</code> | <code>monthly</code> | <code>yearly</code></td></tr>
+          <tr><td><code>occurrenceId</code></td><td>string</td><td>MongoDB ObjectId of a todo_occurrence document</td></tr>
+          <tr><td><code>itemId</code></td><td>string</td><td>List item's <code>id</code> field (hex string, not the list's _id)</td></tr>
+          <tr><td><code>date</code></td><td>string</td><td>YYYY-MM-DD for occurrence lookup</td></tr>
+          <tr><td><code>amount</code></td><td>number</td><td>Dollar amount for <code>add_expense</code></td></tr>
+          <tr><td><code>category</code></td><td>string</td><td>Expense category</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Webhook URL ───────────────────────────────────────────────────────── -->
+  <section class="card webhook-url-section">
+    <h2>Your Webhook URL</h2>
+    <p class="hint">Paste this URL into the IFTTT Webhooks action.</p>
+    <div class="copy-row">
+      <code class="value-box url-box">{{ webhookUrl }}</code>
+      <button class="btn-secondary" (click)="copyUrl()">Copy URL</button>
+    </div>
+  </section>
+
+  <!-- ── API Key generator ─────────────────────────────────────────────────── -->
+  <section class="card api-key-section">
+    <h2>Your Webhook API Key</h2>
+    <p class="hint">
+      This key authenticates IFTTT to act on your behalf.
+      Keep it secret — anyone with this key can trigger actions in your account.
+    </p>
+
+    <!-- Error banner -->
+    @if (errorMessage()) {
+      <div class="error-banner" role="alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <!-- Key display -->
+    @if (apiKey()) {
+      <div class="copy-row">
+        <code class="value-box key-box">{{ apiKey() }}</code>
+        <button class="btn-secondary" (click)="copyKey()">
+          {{ copied() ? '✓ Copied!' : 'Copy Key' }}
+        </button>
+      </div>
+      <p class="regenerate-hint">
+        Generating a new key will immediately invalidate the old one.
+      </p>
+    }
+
+    <!-- Generate button -->
+    <button
+      class="btn-primary"
+      (click)="generateKey()"
+      [disabled]="generating()"
+    >
+      @if (generating()) {
+        <span class="spinner"></span> Generating…
+      } @else if (apiKey()) {
+        🔄 Regenerate Key
+      } @else {
+        🔑 Generate Webhook API Key
+      }
+    </button>
+  </section>
+
+</div>

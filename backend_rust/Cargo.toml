@@ -14,3 +14,4 @@ chrono = { version = "0.4", features = ["serde"] }
 dotenv = "0.15"
 futures = "0.3"
 reqwest = { version = "0.11", features = ["json"] }
+uuid = { version = "1", features = ["v4"] }

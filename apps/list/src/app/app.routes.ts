@@ -18,5 +18,13 @@ export const routes: Routes = [
     loadComponent: () => import('./share/share.component').then((m) => m.ShareComponent),
     canActivate: [authGuard],
   },
+  {
+    path: 'integrations',
+    loadComponent: () =>
+      import('./integrations/integrations.component').then(
+        (m) => m.IntegrationsComponent
+      ),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: '' },
 ];
