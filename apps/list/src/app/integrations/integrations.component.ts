@@ -1,10 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
-import {
-  IntegrationsService,
-  GenerateKeyResponse,
-} from '../services/integrations.service';
+import { IntegrationsService, GenerateKeyResponse } from '../services/integrations.service';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -47,9 +44,7 @@ export class IntegrationsComponent {
         this.generating.set(false);
       },
       error: (err) => {
-        this.errorMessage.set(
-          err?.error?.error ?? 'Failed to generate key. Please try again.'
-        );
+        this.errorMessage.set(err?.error?.error ?? 'Failed to generate key. Please try again.');
         this.generating.set(false);
       },
     });

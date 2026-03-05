@@ -4,6 +4,7 @@ BudgetFlow supports voice commands via Google Home using the IFTTT Webhook worka
 (Google deprecated Conversational Actions in June 2023).
 
 **Architecture:**
+
 1. User generates a personal Webhook API Key inside the app (`/integrations` page).
 2. User configures an IFTTT Applet — Google Assistant trigger → Webhooks action.
 3. When the user speaks, IFTTT POSTs to the Rust backend with the key in the `Authorization` header.
@@ -46,71 +47,85 @@ IFTTT Pro ($2.99/mo) is required if you want more than 2 applets.
 4. Click **Then That** → search **Webhooks** → **Make a web request**
 5. Configure the Webhooks action:
 
-| Field | Value |
-|---|---|
-| **URL** | `https://your-domain.com/api/integrations/ifttt-webhook` |
-| **Method** | `POST` |
-| **Content Type** | `application/json` |
-| **Additional Headers** | `Authorization: Bearer YOUR_API_KEY_HERE` |
-| **Body** | See examples below |
+| Field                  | Value                                                    |
+| ---------------------- | -------------------------------------------------------- |
+| **URL**                | `https://your-domain.com/api/integrations/ifttt-webhook` |
+| **Method**             | `POST`                                                   |
+| **Content Type**       | `application/json`                                       |
+| **Additional Headers** | `Authorization: Bearer YOUR_API_KEY_HERE`                |
+| **Body**               | See examples below                                       |
 
 ---
 
 ## Step 5 — Applet body examples
 
 ### Add an item to a list (spoken item name)
-Trigger phrase: *"Add $$ to my groceries list"*
+
+Trigger phrase: _"Add $$ to my groceries list"_
+
 ```json
-{"action": "add_item", "listName": "Groceries", "text": "{{TextField}}"}
+{ "action": "add_item", "listName": "Groceries", "text": "{{TextField}}" }
 ```
 
 ### Add a recurring todo item
-Trigger phrase: *"Add weekly chore $$"*
+
+Trigger phrase: _"Add weekly chore $$"_
+
 ```json
 {
-  "action": "add_todo_item",
-  "listName": "Chores",
-  "text": "{{TextField}}",
-  "repeatFrequency": "weekly"
+	"action": "add_todo_item",
+	"listName": "Chores",
+	"text": "{{TextField}}",
+	"repeatFrequency": "weekly"
 }
 ```
 
 ### Add a todo item with a due date
-Trigger phrase: *"Add task $$ due this Friday"*
+
+Trigger phrase: _"Add task $$ due this Friday"_
+
 ```json
 {
-  "action": "add_todo_item",
-  "listName": "Tasks",
-  "text": "{{TextField}}",
-  "completeByDate": "2026-03-06"
+	"action": "add_todo_item",
+	"listName": "Tasks",
+	"text": "{{TextField}}",
+	"completeByDate": "2026-03-06"
 }
 ```
 
 ### Create a new list
-Trigger phrase: *"Create a list called $$"*
+
+Trigger phrase: _"Create a list called $$"_
+
 ```json
-{"action": "create_list", "text": "{{TextField}}", "listType": "todo"}
+{ "action": "create_list", "text": "{{TextField}}", "listType": "todo" }
 ```
 
 ### Mark a todo occurrence as done (by text + today's date)
-Trigger phrase: *"Mark $$ as done"*
+
+Trigger phrase: _"Mark $$ as done"_
+
 ```json
 {
-  "action": "mark_todo_done",
-  "listName": "Chores",
-  "text": "{{TextField}}",
-  "date": "{{CreatedAt | date:'yyyy-MM-dd'}}"
+	"action": "mark_todo_done",
+	"listName": "Chores",
+	"text": "{{TextField}}",
+	"date": "{{CreatedAt | date:'yyyy-MM-dd'}}"
 }
 ```
 
 ### Mark a shopping list item as done
-Trigger phrase: *"I got $$"*
+
+Trigger phrase: _"I got $$"_
+
 ```json
-{"action": "mark_item_done", "listName": "Groceries", "text": "{{TextField}}"}
+{ "action": "mark_item_done", "listName": "Groceries", "text": "{{TextField}}" }
 ```
 
 ### Log an expense
-Trigger phrase: *"I spent $$ dollars on food"*
+
+Trigger phrase: _"I spent $$ dollars on food"_
+
 ```json
 {"action": "add_expense", "category": "food", "amount": {{TextField}}}
 ```
@@ -119,32 +134,32 @@ Trigger phrase: *"I spent $$ dollars on food"*
 
 ## Supported Actions — Full Reference
 
-| Action | Required | Optional |
-|---|---|---|
-| `add_todo_item` | `text`, `listId` or `listName` | `completeByDate`, `repeatFrequency` |
-| `add_item` | `text`, `listId` or `listName` | — |
-| `create_list` | `text` (list name) | `listType`, `completeByDate`, `repeatFrequency` |
-| `mark_todo_done` | `occurrenceId` — OR — `text` + `date` | `listId`, `listName` |
-| `mark_item_done` | `listId` or `listName`, plus `text` or `itemId` | — |
-| `add_expense` | `amount` | `category` |
-| `check_balance` | — | — |
+| Action           | Required                                        | Optional                                        |
+| ---------------- | ----------------------------------------------- | ----------------------------------------------- |
+| `add_todo_item`  | `text`, `listId` or `listName`                  | `completeByDate`, `repeatFrequency`             |
+| `add_item`       | `text`, `listId` or `listName`                  | —                                               |
+| `create_list`    | `text` (list name)                              | `listType`, `completeByDate`, `repeatFrequency` |
+| `mark_todo_done` | `occurrenceId` — OR — `text` + `date`           | `listId`, `listName`                            |
+| `mark_item_done` | `listId` or `listName`, plus `text` or `itemId` | —                                               |
+| `add_expense`    | `amount`                                        | `category`                                      |
+| `check_balance`  | —                                               | —                                               |
 
 ### Field Reference
 
-| Field | Type | Notes |
-|---|---|---|
-| `action` | string | One of the actions above |
-| `listId` | string | MongoDB ObjectId of the list (fastest lookup) |
-| `listName` | string | Case-insensitive name search (use when `listId` is unknown) |
-| `text` | string | Item text, list name for `create_list`, or search text |
-| `listType` | string | `"todo"` \| `"shopping"` \| `"general"` (default: `"todo"`) |
-| `completeByDate` | string | YYYY-MM-DD or RFC3339 |
-| `repeatFrequency` | string | `daily` \| `weekly` \| `biweekly` \| `monthly` \| `yearly` |
-| `occurrenceId` | string | MongoDB ObjectId of a `todo_occurrence` document |
-| `itemId` | string | List item's `id` field (not the list's `_id`) |
-| `date` | string | YYYY-MM-DD for occurrence lookup |
-| `amount` | number | Dollar amount for `add_expense` |
-| `category` | string | Expense category |
+| Field             | Type   | Notes                                                       |
+| ----------------- | ------ | ----------------------------------------------------------- |
+| `action`          | string | One of the actions above                                    |
+| `listId`          | string | MongoDB ObjectId of the list (fastest lookup)               |
+| `listName`        | string | Case-insensitive name search (use when `listId` is unknown) |
+| `text`            | string | Item text, list name for `create_list`, or search text      |
+| `listType`        | string | `"todo"` \| `"shopping"` \| `"general"` (default: `"todo"`) |
+| `completeByDate`  | string | YYYY-MM-DD or RFC3339                                       |
+| `repeatFrequency` | string | `daily` \| `weekly` \| `biweekly` \| `monthly` \| `yearly`  |
+| `occurrenceId`    | string | MongoDB ObjectId of a `todo_occurrence` document            |
+| `itemId`          | string | List item's `id` field (not the list's `_id`)               |
+| `date`            | string | YYYY-MM-DD for occurrence lookup                            |
+| `amount`          | number | Dollar amount for `add_expense`                             |
+| `category`        | string | Expense category                                            |
 
 ---
 
@@ -177,12 +192,12 @@ curl -X POST https://your-domain.com/api/integrations/ifttt-webhook \
 
 ## Relevant Source Files
 
-| File | Purpose |
-|---|---|
-| `backend_rust/src/handlers/integration_handler.rs` | Rust handler — key generation + webhook dispatch |
-| `backend_rust/src/models.rs` | `IftttWebhookRequest` struct + `User.webhookApiKey` field |
-| `backend_rust/src/db.rs` | Sparse unique index on `users.webhookApiKey` |
-| `backend_rust/src/main.rs` | Route registration |
-| `apps/list/src/app/integrations/integrations.component.ts` | Angular component |
-| `apps/list/src/app/services/integrations.service.ts` | Angular HTTP service |
-| `apps/list/src/app/app.routes.ts` | `/integrations` route |
+| File                                                       | Purpose                                                   |
+| ---------------------------------------------------------- | --------------------------------------------------------- |
+| `backend_rust/src/handlers/integration_handler.rs`         | Rust handler — key generation + webhook dispatch          |
+| `backend_rust/src/models.rs`                               | `IftttWebhookRequest` struct + `User.webhookApiKey` field |
+| `backend_rust/src/db.rs`                                   | Sparse unique index on `users.webhookApiKey`              |
+| `backend_rust/src/main.rs`                                 | Route registration                                        |
+| `apps/list/src/app/integrations/integrations.component.ts` | Angular component                                         |
+| `apps/list/src/app/services/integrations.service.ts`       | Angular HTTP service                                      |
+| `apps/list/src/app/app.routes.ts`                          | `/integrations` route                                     |

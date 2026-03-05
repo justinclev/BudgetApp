@@ -198,7 +198,9 @@ code {
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, opacity 0.15s;
+  transition:
+    background 0.15s,
+    opacity 0.15s;
 
   &:hover:not(:disabled) {
     background: #4f46e5;
@@ -252,7 +254,9 @@ code {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ── Responsive ───────────────────────────────────────────────────────────────

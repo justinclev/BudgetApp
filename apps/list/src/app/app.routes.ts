@@ -21,9 +21,7 @@ export const routes: Routes = [
   {
     path: 'integrations',
     loadComponent: () =>
-      import('./integrations/integrations.component').then(
-        (m) => m.IntegrationsComponent
-      ),
+      import('./integrations/integrations.component').then((m) => m.IntegrationsComponent),
     canActivate: [authGuard],
   },
   { path: '**', redirectTo: '' },

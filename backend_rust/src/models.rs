@@ -168,7 +168,11 @@ pub struct User {
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
     /// Personal webhook API key used to authenticate IFTTT → BudgetFlow requests.
     /// Generated on demand; `None` until the user visits the Integrations page.
-    #[serde(rename = "webhookApiKey", skip_serializing_if = "Option::is_none", default)]
+    #[serde(
+        rename = "webhookApiKey",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
     pub webhook_api_key: Option<String>,
 }
 

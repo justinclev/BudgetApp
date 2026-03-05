@@ -19,10 +19,6 @@ export class IntegrationsService {
    */
   generateWebhookKey(userId: string): Observable<GenerateKeyResponse> {
     const params = new HttpParams().set('user_id', userId);
-    return this.http.post<GenerateKeyResponse>(
-      `${this.base}/generate-key`,
-      {},
-      { params }
-    );
+    return this.http.post<GenerateKeyResponse>(`${this.base}/generate-key`, {}, { params });
   }
 }
