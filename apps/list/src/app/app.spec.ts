@@ -61,4 +61,3 @@ describe('AuthService (list app)', () => {
     expect(service.isAuthenticated()).toBeFalse();
   });
 });
-

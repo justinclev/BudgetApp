@@ -21,19 +21,14 @@ describe('authGuard (list app)', () => {
     routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     TestBed.configureTestingModule({
-      providers: [
-        provideZonelessChangeDetection(),
-        { provide: Router, useValue: routerSpy },
-      ],
+      providers: [provideZonelessChangeDetection(), { provide: Router, useValue: routerSpy }],
     });
   });
 
   afterEach(() => clearAuthCookie());
 
   function runGuard(): boolean | Promise<boolean> {
-    return TestBed.runInInjectionContext(() =>
-      authGuard({} as any, {} as any),
-    ) as boolean;
+    return TestBed.runInInjectionContext(() => authGuard({} as any, {} as any)) as boolean;
   }
 
   it('returns true when user is authenticated', () => {

@@ -1,8 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ListService } from './list.service';
@@ -225,9 +222,7 @@ describe('ListService', () => {
 
   it('getOccurrences — GET /todo-occurrences with query params', () => {
     svc.getOccurrences('u1', '2024-01-01', '2024-01-31').subscribe();
-    const req = http.expectOne(
-      `${OCC_BASE}?user_id=u1&start_date=2024-01-01&end_date=2024-01-31`,
-    );
+    const req = http.expectOne(`${OCC_BASE}?user_id=u1&start_date=2024-01-01&end_date=2024-01-31`);
     expect(req.request.method).toBe('GET');
     req.flush([]);
   });

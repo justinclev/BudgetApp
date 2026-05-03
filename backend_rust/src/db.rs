@@ -15,10 +15,10 @@ pub struct AppState {
 }
 
 pub async fn init_db() -> Result<AppState, Box<dyn std::error::Error>> {
-    let mongo_uri = env::var("MONGO_URI")
-        .map_err(|_| "MONGO_URI environment variable must be set")?;
-    let jwt_secret = env::var("JWT_SECRET")
-        .map_err(|_| "JWT_SECRET environment variable must be set")?;
+    let mongo_uri =
+        env::var("MONGO_URI").map_err(|_| "MONGO_URI environment variable must be set")?;
+    let jwt_secret =
+        env::var("JWT_SECRET").map_err(|_| "JWT_SECRET environment variable must be set")?;
 
     if jwt_secret.len() < 32 {
         return Err("JWT_SECRET must be at least 32 characters".into());
@@ -48,7 +48,9 @@ pub async fn init_db() -> Result<AppState, Box<dyn std::error::Error>> {
                 .build(),
         )
         .build();
-    let _ = todo_occurrences_collection.create_index(occ_index, None).await;
+    let _ = todo_occurrences_collection
+        .create_index(occ_index, None)
+        .await;
 
     // Unique email per user
     let email_index = mongodb::IndexModel::builder()
@@ -65,7 +67,9 @@ pub async fn init_db() -> Result<AppState, Box<dyn std::error::Error>> {
     let _ = debts_collection.drop_index("name_1", None).await;
     let _ = debts_collection.drop_index("name_1_user_id_1", None).await;
     let _ = transactions_collection.drop_index("name_1", None).await;
-    let _ = transactions_collection.drop_index("name_1_user_id_1", None).await;
+    let _ = transactions_collection
+        .drop_index("name_1_user_id_1", None)
+        .await;
 
     let name_user_index = mongodb::IndexModel::builder()
         .keys(doc! { "name": 1, "createdByUserId": 1 })
@@ -75,8 +79,12 @@ pub async fn init_db() -> Result<AppState, Box<dyn std::error::Error>> {
                 .build(),
         )
         .build();
-    let _ = debts_collection.create_index(name_user_index.clone(), None).await;
-    let _ = transactions_collection.create_index(name_user_index, None).await;
+    let _ = debts_collection
+        .create_index(name_user_index.clone(), None)
+        .await;
+    let _ = transactions_collection
+        .create_index(name_user_index, None)
+        .await;
 
     // Unique shareToken on lists
     let share_token_index = mongodb::IndexModel::builder()

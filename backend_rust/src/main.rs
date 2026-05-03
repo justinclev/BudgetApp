@@ -10,8 +10,8 @@ use dotenv::dotenv;
 use std::env;
 
 use handlers::{
-    debt_handler, generated_transaction_handler, health_handler, list_handler, todo_occurrence_handler,
-    transaction_handler, user_handler,
+    debt_handler, generated_transaction_handler, health_handler, list_handler,
+    todo_occurrence_handler, transaction_handler, user_handler,
 };
 
 #[actix_web::main]
@@ -159,8 +159,14 @@ async fn main() -> std::io::Result<()> {
             .route("/api/users/{id}", web::get().to(user_handler::get_user))
             .route("/api/users", web::post().to(user_handler::create_user))
             // Auth Routes
-            .route("/api/auth/google", web::post().to(user_handler::google_auth))
-            .route("/api/auth/dev-login", web::post().to(user_handler::dev_login))
+            .route(
+                "/api/auth/google",
+                web::post().to(user_handler::google_auth),
+            )
+            .route(
+                "/api/auth/dev-login",
+                web::post().to(user_handler::dev_login),
+            )
             // Todo Occurrence Routes
             .route(
                 "/api/todo-occurrences/generate",

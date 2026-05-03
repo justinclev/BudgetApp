@@ -1,9 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { authGuard } from './auth.guard';
@@ -41,9 +38,7 @@ describe('authGuard (dashboard app)', () => {
   });
 
   function runGuard(): boolean {
-    return TestBed.runInInjectionContext(() =>
-      authGuard({} as any, {} as any),
-    ) as boolean;
+    return TestBed.runInInjectionContext(() => authGuard({} as any, {} as any)) as boolean;
   }
 
   it('returns true when user is authenticated (cookie present)', () => {

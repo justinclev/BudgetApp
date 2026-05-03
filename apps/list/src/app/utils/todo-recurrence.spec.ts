@@ -139,8 +139,9 @@ describe('nextOccurrenceOnOrAfter', () => {
   const start = d('2024-01-01');
 
   it('returns start date if fromDate === start', () =>
-    expect(nextOccurrenceOnOrAfter(start, 'daily', d('2024-01-01'))?.toDateString())
-      .toBe(d('2024-01-01').toDateString()));
+    expect(nextOccurrenceOnOrAfter(start, 'daily', d('2024-01-01'))?.toDateString()).toBe(
+      d('2024-01-01').toDateString(),
+    ));
 
   it('returns the correct next weekly occurrence', () => {
     const result = nextOccurrenceOnOrAfter(start, 'weekly', d('2024-01-02'));
