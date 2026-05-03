@@ -45,12 +45,12 @@ The app will be available at `http://localhost:4200`.
 
 ## Available Scripts
 
-| Script | Description |
-|---|---|
-| `npm start` | Start dev server on port 4200 |
-| `npm run build` | Production build into `dist/` |
-| `npm test` | Run unit tests with Karma |
-| `npm run lint` | Lint with ESLint + angular-eslint |
+| Script          | Description                       |
+| --------------- | --------------------------------- |
+| `npm start`     | Start dev server on port 4200     |
+| `npm run build` | Production build into `dist/`     |
+| `npm test`      | Run unit tests with Karma         |
+| `npm run lint`  | Lint with ESLint + angular-eslint |
 
 ## Docker
 

@@ -14,25 +14,25 @@ Original Express/TypeScript backend that backed the early versions of the Budget
 
 ## API Routes
 
-| Method | Path | Description |
-|---|---|---|
-| GET | `/` | Health check |
-| GET | `/api/recurring-transactions` | List recurring transactions |
-| POST | `/api/recurring-transactions` | Create a recurring transaction |
-| PUT | `/api/recurring-transactions/:id` | Update a recurring transaction |
-| DELETE | `/api/recurring-transactions/:id` | Delete a recurring transaction |
-| GET | `/api/recurring-transactions/check-name/:name` | Check name uniqueness |
-| GET | `/api/debts` | List debts |
-| POST | `/api/debts` | Create a debt |
-| PUT | `/api/debts/:id` | Update a debt |
-| DELETE | `/api/debts/:id` | Delete a debt |
-| GET | `/api/debts/check-name/:name` | Check name uniqueness |
+| Method | Path                                           | Description                    |
+| ------ | ---------------------------------------------- | ------------------------------ |
+| GET    | `/`                                            | Health check                   |
+| GET    | `/api/recurring-transactions`                  | List recurring transactions    |
+| POST   | `/api/recurring-transactions`                  | Create a recurring transaction |
+| PUT    | `/api/recurring-transactions/:id`              | Update a recurring transaction |
+| DELETE | `/api/recurring-transactions/:id`              | Delete a recurring transaction |
+| GET    | `/api/recurring-transactions/check-name/:name` | Check name uniqueness          |
+| GET    | `/api/debts`                                   | List debts                     |
+| POST   | `/api/debts`                                   | Create a debt                  |
+| PUT    | `/api/debts/:id`                               | Update a debt                  |
+| DELETE | `/api/debts/:id`                               | Delete a debt                  |
+| GET    | `/api/debts/check-name/:name`                  | Check name uniqueness          |
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3000` | Port to listen on |
+| Variable    | Default                            | Description               |
+| ----------- | ---------------------------------- | ------------------------- |
+| `PORT`      | `3000`                             | Port to listen on         |
 | `MONGO_URI` | `mongodb://mongo:27017/budget-app` | MongoDB connection string |
 
 ## Development

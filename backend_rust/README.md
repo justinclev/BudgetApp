@@ -15,35 +15,35 @@ Primary REST API for the Budget App, built with Actix-web and MongoDB. Handles a
 
 ## API Routes
 
-| Method | Path | Description |
-|---|---|---|
-| GET | `/` | Health check |
-| POST | `/api/users/login` | Authenticate and receive a JWT |
-| GET | `/api/debts` | List debts for the authenticated user |
-| POST | `/api/debts` | Create a debt |
-| PUT | `/api/debts/:id` | Update a debt |
-| DELETE | `/api/debts/:id` | Delete a debt |
-| GET | `/api/debts/check-name/:name` | Check debt name uniqueness |
-| GET | `/api/recurring-transactions` | List recurring transactions |
-| POST | `/api/recurring-transactions` | Create a recurring transaction |
-| PUT | `/api/recurring-transactions/:id` | Update a recurring transaction |
-| DELETE | `/api/recurring-transactions/:id` | Delete a recurring transaction |
-| GET | `/api/lists` | List all lists the user owns or is a member of |
-| POST | `/api/lists` | Create a list |
-| PUT | `/api/lists/:id` | Update list metadata |
-| DELETE | `/api/lists/:id` | Delete a list |
-| GET | `/api/generated-transactions` | List generated transactions |
-| GET | `/api/todo-occurrences` | List todo occurrences |
+| Method | Path                              | Description                                    |
+| ------ | --------------------------------- | ---------------------------------------------- |
+| GET    | `/`                               | Health check                                   |
+| POST   | `/api/users/login`                | Authenticate and receive a JWT                 |
+| GET    | `/api/debts`                      | List debts for the authenticated user          |
+| POST   | `/api/debts`                      | Create a debt                                  |
+| PUT    | `/api/debts/:id`                  | Update a debt                                  |
+| DELETE | `/api/debts/:id`                  | Delete a debt                                  |
+| GET    | `/api/debts/check-name/:name`     | Check debt name uniqueness                     |
+| GET    | `/api/recurring-transactions`     | List recurring transactions                    |
+| POST   | `/api/recurring-transactions`     | Create a recurring transaction                 |
+| PUT    | `/api/recurring-transactions/:id` | Update a recurring transaction                 |
+| DELETE | `/api/recurring-transactions/:id` | Delete a recurring transaction                 |
+| GET    | `/api/lists`                      | List all lists the user owns or is a member of |
+| POST   | `/api/lists`                      | Create a list                                  |
+| PUT    | `/api/lists/:id`                  | Update list metadata                           |
+| DELETE | `/api/lists/:id`                  | Delete a list                                  |
+| GET    | `/api/generated-transactions`     | List generated transactions                    |
+| GET    | `/api/todo-occurrences`           | List todo occurrences                          |
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `MONGO_URI` | Yes | — | MongoDB connection string |
-| `PORT` | No | `3000` | Port the server listens on |
-| `JWT_SECRET` | Yes | — | Secret key for signing JWTs |
-| `ALLOWED_ORIGIN` | Production | — | CORS allowed origin |
-| `DEV_MODE` | No | `false` | Set to `true` to allow any CORS origin (local dev only) |
+| Variable         | Required   | Default | Description                                             |
+| ---------------- | ---------- | ------- | ------------------------------------------------------- |
+| `MONGO_URI`      | Yes        | —       | MongoDB connection string                               |
+| `PORT`           | No         | `3000`  | Port the server listens on                              |
+| `JWT_SECRET`     | Yes        | —       | Secret key for signing JWTs                             |
+| `ALLOWED_ORIGIN` | Production | —       | CORS allowed origin                                     |
+| `DEV_MODE`       | No         | `false` | Set to `true` to allow any CORS origin (local dev only) |
 
 > In production (`DEV_MODE` is not `true`), `ALLOWED_ORIGIN` **must** be set or the server will refuse to start.
 

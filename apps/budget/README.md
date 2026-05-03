@@ -43,21 +43,21 @@ The app will be available at `http://localhost:4200` (proxied to the backend via
 
 ## Available Scripts
 
-| Script | Description |
-|---|---|
-| `npm start` | Start dev server on port 4200 |
-| `npm run build` | Production build into `dist/` |
-| `npm test` | Run unit tests with Karma |
-| `npm run lint` | Lint with ESLint + angular-eslint |
+| Script          | Description                       |
+| --------------- | --------------------------------- |
+| `npm start`     | Start dev server on port 4200     |
+| `npm run build` | Production build into `dist/`     |
+| `npm test`      | Run unit tests with Karma         |
+| `npm run lint`  | Lint with ESLint + angular-eslint |
 
 ## Proxy Configuration
 
-| File | Used when |
-|---|---|
-| `proxy.conf.json` | Default local dev (`ng serve`) |
-| `proxy.conf.local.json` | Local override |
+| File                     | Used when                      |
+| ------------------------ | ------------------------------ |
+| `proxy.conf.json`        | Default local dev (`ng serve`) |
+| `proxy.conf.local.json`  | Local override                 |
 | `proxy.conf.docker.json` | Docker Compose dev environment |
-| `proxy.conf.prod.json` | Production build |
+| `proxy.conf.prod.json`   | Production build               |
 
 ## Docker
 
