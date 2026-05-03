@@ -1,0 +1,36 @@
+<div class="modal-overlay" (click)="cancel.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2>New List</h2>
+    <label>
+      Name
+      <input [(ngModel)]="name" placeholder="My grocery run…" maxlength="60" autofocus />
+    </label>
+    <label>
+      Type
+      <select [(ngModel)]="listType">
+        <option value="shopping">🛒 Shopping</option>
+        <option value="todo">✅ To-Do</option>
+        <option value="other">📝 Other</option>
+      </select>
+    </label>
+    @if (listType === 'todo') {
+      <label>
+        Due Date <span class="opt">(optional)</span>
+        <input type="date" [ngModel]="completeByDate" (ngModelChange)="onDateChange($event)" />
+      </label>
+      <label [class.disabled]="!completeByDate">
+        Repeats <span class="opt">(requires a due date)</span>
+        <select [(ngModel)]="repeatFrequency" [disabled]="!completeByDate">
+          <option value="">Does not repeat</option>
+          @for (opt of repeatOptions; track opt[0]) {
+            <option [value]="opt[0]">{{ opt[1] }}</option>
+          }
+        </select>
+      </label>
+    }
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancel.emit()">Cancel</button>
+      <button class="btn-create" (click)="submit()" [disabled]="!name.trim()">Create</button>
+    </div>
+  </div>
+</div>

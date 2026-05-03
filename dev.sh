@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define ports to clear
-PORTS=(3000 4200 27017)
+PORTS=(3000 4200 4201 4202 27017)
 
 # Determine which environment to use
 ENV="${1:-local}"  # Default to 'local' if not specified
@@ -18,7 +18,7 @@ echo "🔧 Environment: $ENV"
 
 echo "🧹 Forcefully stopping containers..."
 # Force remove the specific containers for this project
-docker rm -f budget-app_frontend_1 budget-app_backend_1 budget-app_mongo_1 2>/dev/null || true
+docker rm -f budget-app_frontend-dashboard_1 budget-app_frontend-budget_1 budget-app_frontend-list_1 budget-app_backend_1 budget-app_mongo_1 2>/dev/null || true
 
 # Also run standard down to clean up networks
 docker-compose down --remove-orphans 2>/dev/null || true

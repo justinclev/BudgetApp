@@ -1,0 +1,26 @@
+<div class="panel-overlay" (click)="close.emit()">
+  <div class="panel" (click)="$event.stopPropagation()">
+    <div class="panel-header">
+      <h2>Members</h2>
+      <button class="panel-close" (click)="close.emit()">×</button>
+    </div>
+    <ul class="member-list">
+      @for (uid of list.authorizedUsers; track uid) {
+        <li class="member-row">
+          <span class="member-avatar">{{ uid[0].toUpperCase() }}</span>
+          <span class="member-email">
+            {{ uid }}
+            @if (uid === list.ownerId) {
+              <span class="owner-badge">owner</span>
+            }
+          </span>
+          @if (isOwner && uid !== list.ownerId) {
+            <button class="member-remove" (click)="removeMember.emit(uid)" title="Remove member">
+              ×
+            </button>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<div class="list-card" (click)="open.emit()">
+  <div class="card-top">
+    <span class="card-badge" [style.background]="typeColor">{{ typeLabel }}</span>
+    <button class="card-delete" (click)="delete.emit($event)" title="Delete list">×</button>
+  </div>
+  <h3 class="card-name">{{ list.name }}</h3>
+  <p class="card-meta">
+    {{ list.items.length }} item{{ list.items.length === 1 ? '' : 's' }} · {{ doneCount }} done
+  </p>
+  <div class="card-progress">
+    <div class="progress-bar" [style.width]="progressPct + '%'"></div>
+  </div>
+</div>

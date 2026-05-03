@@ -1,0 +1,31 @@
+# ── Rust ───────────────────────────────────────────────────────────────────
+backend_rust/target/
+
+# ── Node / Angular ─────────────────────────────────────────────────────────
+node_modules/
+apps/*/node_modules/
+backend/node_modules/
+scripts/node_modules/
+
+# Angular build output
+apps/*/dist/
+apps/*/.angular/
+
+# ── Environment / secrets ───────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+apps/*/src/environments/environment.prod.ts
+
+# ── OS / Editor ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/settings.json
+
+# ── Logs ────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── Docker volumes ──────────────────────────────────────────────────────────
+mongo-data/

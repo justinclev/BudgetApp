@@ -1,0 +1,10 @@
+{
+	"installCommand": "(cd apps/dashboard && npm ci) && (cd apps/budget && npm ci) && (cd apps/list && npm ci)",
+	"buildCommand": "bash build.sh",
+	"outputDirectory": "dist",
+	"rewrites": [
+		{ "source": "/budget/:path*", "destination": "/budget/index.html" },
+		{ "source": "/list/:path*", "destination": "/list/index.html" },
+		{ "source": "/:path*", "destination": "/index.html" }
+	]
+}

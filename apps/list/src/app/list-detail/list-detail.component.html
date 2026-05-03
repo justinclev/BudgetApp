@@ -1,0 +1,158 @@
+<div class="page">
+  <header class="top-bar">
+    <button class="back-btn" (click)="goHome()">‹</button>
+    <div class="title-block">
+      @if (editingName()) {
+        <input
+          class="name-input"
+          [(ngModel)]="editName"
+          (blur)="saveName()"
+          (keydown.enter)="saveName()"
+          autofocus
+          maxlength="60"
+        />
+      } @else {
+        <h1 class="title" (click)="startEditName()">{{ list()?.name }}</h1>
+      }
+      @if (list()?.listType === 'todo' && (list()?.completeByDate || list()?.repeatFrequency)) {
+        <div class="schedule-badge">
+          @if (list()?.completeByDate) {
+            <span>📅 {{ list()?.completeByDate | date: 'MMM d, y' }}</span>
+          }
+          @if (list()?.repeatFrequency) {
+            <span>🔁 {{ scheduleRepeatLabel() }}</span>
+          }
+        </div>
+      }
+    </div>
+    <button class="icon-btn" (click)="showMenu = !showMenu">⋯</button>
+  </header>
+
+  @if (showMenu) {
+    <div class="menu-overlay" (click)="showMenu = false">
+      <div class="menu" (click)="$event.stopPropagation()">
+        <button (click)="copyShareLink()">🔗 Copy Share Link</button>
+        <button (click)="showMenu = false; showMembers = true">👥 Members</button>
+        @if (list()?.listType === 'todo') {
+          <button (click)="openSchedule()">📅 Schedule</button>
+        }
+        <button (click)="resetList()">🔄 Reset All Items</button>
+        <button (click)="cloneList()">📋 Clone List</button>
+        <button class="danger" (click)="deleteList()">🗑 Delete List</button>
+      </div>
+    </div>
+  }
+
+  <main class="main">
+    @if (loading()) {
+      <div class="center-msg">Loading…</div>
+    } @else {
+      <!-- Pending items — draggable -->
+      <ul class="item-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
+        @for (item of pendingItems(); track item.id; let i = $index) {
+          <li class="item" cdkDrag (cdkDragStarted)="onDragStart(item)">
+            <app-list-item
+              [item]="item"
+              [isExpanded]="isExpanded(item.id)"
+              [newSubText]="newSubTexts()[item.id] ?? ''"
+              (toggle)="toggleItem(item)"
+              (delete)="deleteItem(item)"
+              (saveText)="saveItemText(item, $event)"
+              (enterPressed)="focusNewInput()"
+              (deleteOnEmpty)="deleteItemAndFocusPrev(item, i)"
+              (expandToggle)="toggleExpand(item.id)"
+              (subToggle)="toggleSubItem(item, $event)"
+              (subDelete)="deleteSubItem(item, $event)"
+              (subSaveText)="saveSubItemText(item, $event)"
+              (subDeleteOnEmpty)="deleteSubItem(item, $event)"
+              (newSubTextChange)="setNewSubText(item.id, $event)"
+              (addSubItem)="addSubItem(item, $event)"
+            />
+          </li>
+        }
+      </ul>
+
+      <!-- New item row -->
+      <ul class="item-list">
+        <li class="item new-row">
+          <span class="new-plus">+</span>
+          <input
+            #newInput
+            class="item-input new-input"
+            [(ngModel)]="newItemText"
+            placeholder="List item"
+            maxlength="200"
+            (keydown)="onNewItemKeydown($event)"
+          />
+        </li>
+      </ul>
+
+      <!-- Done items -->
+      @if (doneItems().length > 0) {
+        <ul class="item-list done-list">
+          @for (item of doneItems(); track item.id; let i = $index) {
+            <li class="item done">
+              <app-list-item
+                [item]="item"
+                [isExpanded]="isExpanded(item.id)"
+                [newSubText]="newSubTexts()[item.id] ?? ''"
+                (toggle)="toggleItem(item)"
+                (delete)="deleteItem(item)"
+                (saveText)="saveItemText(item, $event)"
+                (enterPressed)="focusNewInput()"
+                (deleteOnEmpty)="deleteItemAndFocusPrev(item, pendingItems().length + i)"
+                (expandToggle)="toggleExpand(item.id)"
+                (subToggle)="toggleSubItem(item, $event)"
+                (subDelete)="deleteSubItem(item, $event)"
+                (subSaveText)="saveSubItemText(item, $event)"
+                (subDeleteOnEmpty)="deleteSubItem(item, $event)"
+                (newSubTextChange)="setNewSubText(item.id, $event)"
+                (addSubItem)="addSubItem(item, $event)"
+              />
+            </li>
+          }
+        </ul>
+      }
+    }
+  </main>
+
+  @if (toast()) {
+    <div class="toast">{{ toast() }}</div>
+  }
+
+  @if (showMembers && list()) {
+    <app-members-panel
+      [list]="list()!"
+      [isOwner]="isOwner()"
+      (close)="showMembers = false"
+      (removeMember)="removeMember($event)"
+    />
+  }
+
+  @if (showSchedule) {
+    <div class="panel-overlay" (click)="showSchedule = false">
+      <div class="panel" (click)="$event.stopPropagation()">
+        <div class="panel-header">
+          <h3>📅 Schedule</h3>
+          <button class="panel-close" (click)="showSchedule = false">×</button>
+        </div>
+        <label class="sched-label">
+          Due Date <span class="sched-opt">(optional)</span>
+          <input type="date" class="sched-input" [(ngModel)]="scheduleDate" />
+        </label>
+        <label class="sched-label">
+          Repeats <span class="sched-opt">(optional)</span>
+          <select class="sched-input" [(ngModel)]="scheduleRepeat">
+            <option value="">Does not repeat</option>
+            @for (opt of repeatOptions; track opt[0]) {
+              <option [value]="opt[0]">{{ opt[1] }}</option>
+            }
+          </select>
+        </label>
+        <div class="panel-actions">
+          <button class="btn-save" (click)="saveSchedule()">Save</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

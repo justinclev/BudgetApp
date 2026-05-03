@@ -1,0 +1,190 @@
+<div class="calendar-view">
+  <!-- ── Loading progress bar ─────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill"></div>
+    </div>
+  }
+
+  <div class="cal-header">
+    <h2>📅 Schedule</h2>
+    <span class="cal-date">{{ today | date: 'MMMM d, y' }}</span>
+  </div>
+
+  <!-- View toggle chips -->
+  <div class="chip-bar">
+    @for (v of views; track v.key) {
+      <button
+        class="chip"
+        [class.chip--active]="selectedView() === v.key"
+        (click)="selectView(v.key)"
+        [disabled]="loading()"
+      >
+        {{ v.label }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <!-- Skeleton shimmer while data loads -->
+    <div class="skeleton-list">
+      @for (n of [1, 2, 3, 4]; track n) {
+        <div class="skeleton-card">
+          <div class="skeleton-line skeleton-line--title"></div>
+          <div class="skeleton-line skeleton-line--sub"></div>
+        </div>
+      }
+    </div>
+  } @else if (!hasAny()) {
+    <div class="empty-state">
+      <div class="empty-icon">🎉</div>
+      <p>Nothing scheduled for this period.</p>
+    </div>
+  } @else {
+    <!-- Primary section -->
+    @if (primary().length > 0) {
+      <section class="section primary-section">
+        <h3 class="section-title primary-title">{{ primaryHeading() }}</h3>
+        @for (entry of primary(); track trackEntry($index, entry)) {
+          <div
+            class="entry-card primary-card"
+            [class.entry-card--done]="entry.isOccurrenceCompleted"
+            (click)="toggleItem(entry, $event)"
+            [attr.aria-label]="entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete'"
+          >
+            <div class="entry-body">
+              <div class="entry-main">
+                <span class="entry-text">{{ entry.item.text }}</span>
+                <span class="entry-list">{{ entry.listName }}</span>
+              </div>
+              @if (entry.isOccurrenceCompleted && entry.completedBy) {
+                <div class="completed-by">✓ Done by {{ completedByLabel(entry) }}</div>
+              }
+              <div class="entry-meta">
+                <span
+                  class="badge due-badge"
+                  [class.overdue-badge]="dueDateLabel(entry).includes('overdue')"
+                >
+                  {{ dueDateLabel(entry) }}
+                </span>
+                @if (entry.repeatFrequency) {
+                  <span class="badge repeat-badge">🔁 {{ repeatLabel(entry) }}</span>
+                }
+                <span class="badge date-badge">{{ entry.dueDate | date: 'MMM d' }}</span>
+              </div>
+              @if (entry.item.subItems.length) {
+                <ul class="sub-items">
+                  @for (sub of entry.item.subItems; track sub.id) {
+                    <li
+                      class="sub-item"
+                      [class.sub-item--done]="sub.completed"
+                      (click)="toggleSubItem(entry, sub, $event)"
+                    >
+                      <span class="sub-dot"></span>
+                      <span class="sub-item-text">{{ sub.text }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+              <div class="entry-actions">
+                <button class="action-btn" (click)="openList(entry, $event)">📋 Open List</button>
+              </div>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Secondary section (not shown for 'year' view) -->
+    @if (secondary().length > 0 && selectedView() !== 'year') {
+      <section class="section secondary-section">
+        <h3 class="section-title secondary-title">{{ secondaryHeading() }}</h3>
+        <p class="secondary-note">Not urgent — just on the horizon</p>
+        @for (entry of secondary(); track trackEntry($index, entry)) {
+          <div
+            class="entry-card secondary-card"
+            [class.entry-card--done]="entry.isOccurrenceCompleted"
+            (click)="toggleItem(entry, $event)"
+            [attr.aria-label]="entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete'"
+          >
+            <div class="entry-body">
+              <div class="entry-main">
+                <span class="entry-text">{{ entry.item.text }}</span>
+                <span class="entry-list">{{ entry.listName }}</span>
+              </div>
+              @if (entry.isOccurrenceCompleted && entry.completedBy) {
+                <div class="completed-by">✓ Done by {{ completedByLabel(entry) }}</div>
+              }
+              <div class="entry-meta">
+                <span class="badge due-badge soon-badge">{{ dueDateLabel(entry) }}</span>
+                @if (entry.repeatFrequency) {
+                  <span class="badge repeat-badge">🔁 {{ repeatLabel(entry) }}</span>
+                }
+                <span class="badge date-badge">{{ entry.dueDate | date: 'MMM d' }}</span>
+              </div>
+              @if (entry.item.subItems.length) {
+                <ul class="sub-items">
+                  @for (sub of entry.item.subItems; track sub.id) {
+                    <li
+                      class="sub-item"
+                      [class.sub-item--done]="sub.completed"
+                      (click)="toggleSubItem(entry, sub, $event)"
+                    >
+                      <span class="sub-dot"></span>
+                      <span class="sub-item-text">{{ sub.text }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+              <div class="entry-actions">
+                <button class="action-btn" (click)="openList(entry, $event)">📋 Open List</button>
+              </div>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Undated section -->
+    @if (undated().length > 0) {
+      <section class="section undated-section">
+        <h3 class="section-title undated-title">📝 No Due Date</h3>
+        @for (entry of undated(); track trackEntry($index, entry)) {
+          <div
+            class="entry-card undated-card"
+            [class.entry-card--done]="entry.isOccurrenceCompleted"
+            (click)="toggleItem(entry, $event)"
+            [attr.aria-label]="entry.isOccurrenceCompleted ? 'Mark incomplete' : 'Mark complete'"
+          >
+            <div class="entry-body">
+              <div class="entry-main">
+                <span class="entry-text">{{ entry.item.text }}</span>
+                <span class="entry-list">{{ entry.listName }}</span>
+              </div>
+              @if (entry.isOccurrenceCompleted && entry.completedBy) {
+                <div class="completed-by">✓ Done by {{ completedByLabel(entry) }}</div>
+              }
+              @if (entry.item.subItems.length) {
+                <ul class="sub-items">
+                  @for (sub of entry.item.subItems; track sub.id) {
+                    <li
+                      class="sub-item"
+                      [class.sub-item--done]="sub.completed"
+                      (click)="toggleSubItem(entry, sub, $event)"
+                    >
+                      <span class="sub-dot"></span>
+                      <span class="sub-item-text">{{ sub.text }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+              <div class="entry-actions">
+                <button class="action-btn" (click)="openList(entry, $event)">📋 Open List</button>
+              </div>
+            </div>
+          </div>
+        }
+      </section>
+    }
+  }
+</div>
