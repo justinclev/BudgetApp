@@ -1,59 +1,88 @@
-# Frontend
+# Budget Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.6.
+Angular 20 application for personal budget management. Provides views for tracking debts, recurring transactions, and individual transactions, plus a loan comparison calculator.
 
-## Development server
+## Tech Stack
 
-To start a local development server, run:
+- **Angular 20** with standalone components
+- **Angular Material** — UI component library
+- **RxJS** — reactive data streams
+- **Karma / Jasmine** — unit testing
+
+## Features
+
+- **Dashboard** — overview of debts and recurring transactions
+- **Debt Management** — list, create, edit, and delete debts with interest rate and payment tracking
+- **Loan Comparison** — side-by-side comparison of loan payoff strategies
+- **Recurring Transactions** — manage scheduled income/expense entries
+- **Transaction History** — view generated transactions linked to debts and recurring items
+
+## Development
+
+### Prerequisites
+
+- Node.js 18+
+- Angular CLI (`npm install -g @angular/cli`)
+- `backend_rust` service running on port 3000
+
+### Install dependencies
 
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-````bash
-ng generate component component-name
-```m
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Start dev server
 
 ```bash
-ng generate --help
-````
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+The app will be available at `http://localhost:4200` (proxied to the backend via `proxy.conf.json`).
 
-## Running unit tests
+> **Docker:** When running via `docker-compose`, the app is served on port **4201**.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Available Scripts
+
+| Script | Description |
+|---|---|
+| `npm start` | Start dev server on port 4200 |
+| `npm run build` | Production build into `dist/` |
+| `npm test` | Run unit tests with Karma |
+| `npm run lint` | Lint with ESLint + angular-eslint |
+
+## Proxy Configuration
+
+| File | Used when |
+|---|---|
+| `proxy.conf.json` | Default local dev (`ng serve`) |
+| `proxy.conf.local.json` | Local override |
+| `proxy.conf.docker.json` | Docker Compose dev environment |
+| `proxy.conf.prod.json` | Production build |
+
+## Docker
 
 ```bash
-ng test
+# Development (hot-reload)
+docker compose up frontend-budget
+
+# Production image
+docker build -t budget-frontend .
 ```
 
-## Running end-to-end tests
+## Project Structure
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+src/app/
+├── dashboard/                  # Home dashboard view
+├── debt-detail/                # Debt create/edit form
+├── list-debt/                  # Debt list view
+├── loan-comparison/            # Loan comparison calculator
+├── recurring-transaction-detail/
+├── list-recurring-transaction/
+├── list-transactions/
+├── transaction-detail/
+├── models/                     # Shared TypeScript interfaces
+├── services/                   # HTTP services (debt, transaction, auth, etc.)
+├── interceptors/               # HTTP interceptors (auth token)
+└── shared/                     # Shared components
+```
