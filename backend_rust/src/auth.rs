@@ -47,9 +47,15 @@ pub fn sign_token(user_id: &str, email: &str, secret: &str) -> Result<String, St
         .as_secs()
         + TOKEN_EXPIRY_SECS;
 
-    let claims = Claims { sub: user_id.to_string(), email: email.to_string(), exp };
+    let claims = Claims {
+        sub: user_id.to_string(),
+        email: email.to_string(),
+        exp,
+    };
     let payload_b64 = URL_SAFE_NO_PAD.encode(
-        serde_json::to_string(&claims).map_err(|e| e.to_string())?.as_bytes(),
+        serde_json::to_string(&claims)
+            .map_err(|e| e.to_string())?
+            .as_bytes(),
     );
 
     let signing_input = format!("{}.{}", HEADER_B64, payload_b64);
@@ -81,8 +87,8 @@ pub fn verify_token(token: &str, secret: &str) -> Result<Claims, String> {
     let payload_json = URL_SAFE_NO_PAD
         .decode(parts[1])
         .map_err(|_| "Invalid base64 in payload".to_string())?;
-    let claims: Claims = serde_json::from_slice(&payload_json)
-        .map_err(|e| format!("Invalid claims JSON: {}", e))?;
+    let claims: Claims =
+        serde_json::from_slice(&payload_json).map_err(|e| format!("Invalid claims JSON: {}", e))?;
 
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -145,8 +151,8 @@ mod tests {
 
     #[test]
     fn round_trip_valid_token() {
-        let token = sign_token("user123", "user@example.com", SECRET)
-            .expect("sign_token should succeed");
+        let token =
+            sign_token("user123", "user@example.com", SECRET).expect("sign_token should succeed");
         let claims = verify_token(&token, SECRET).expect("verify_token should succeed");
         assert_eq!(claims.sub, "user123");
         assert_eq!(claims.email, "user@example.com");
@@ -154,16 +160,19 @@ mod tests {
 
     #[test]
     fn rejects_wrong_secret() {
-        let token = sign_token("user123", "user@example.com", SECRET)
-            .expect("sign_token should succeed");
+        let token =
+            sign_token("user123", "user@example.com", SECRET).expect("sign_token should succeed");
         let result = verify_token(&token, "a-completely-different-secret-here!!!!");
-        assert!(result.is_err(), "Should reject token signed with different secret");
+        assert!(
+            result.is_err(),
+            "Should reject token signed with different secret"
+        );
     }
 
     #[test]
     fn rejects_tampered_token() {
-        let token = sign_token("user123", "user@example.com", SECRET)
-            .expect("sign_token should succeed");
+        let token =
+            sign_token("user123", "user@example.com", SECRET).expect("sign_token should succeed");
         // Flip a character in the payload segment
         let parts: Vec<&str> = token.splitn(3, '.').collect();
         let mut modified = parts[1].to_string();

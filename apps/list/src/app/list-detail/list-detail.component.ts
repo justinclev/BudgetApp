@@ -209,7 +209,11 @@ export class ListDetailComponent implements OnInit {
   toggleExpand(itemId: string): void {
     this.expandedItems.update((s) => {
       const n = new Set(s);
-      n.has(itemId) ? n.delete(itemId) : n.add(itemId);
+      if (n.has(itemId)) {
+        n.delete(itemId);
+      } else {
+        n.add(itemId);
+      }
       return n;
     });
   }

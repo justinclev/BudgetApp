@@ -14,8 +14,8 @@ use std::env;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
 
-    let mongo_uri = env::var("MONGO_URI")
-        .map_err(|_| "MONGO_URI environment variable must be set")?;
+    let mongo_uri =
+        env::var("MONGO_URI").map_err(|_| "MONGO_URI environment variable must be set")?;
 
     let client_options = ClientOptions::parse(&mongo_uri).await?;
     let client = Client::with_options(client_options)?;
