@@ -1,59 +1,78 @@
-# List
+# List App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.6.
+Angular 20 application for managing collaborative to-do and shopping lists. Supports drag-and-drop reordering, sub-items, repeating items, and list sharing via shareable tokens.
 
-## Development server
+## Tech Stack
 
-To start a local development server, run:
+- **Angular 20** with standalone components
+- **Angular CDK** — drag-and-drop (`DragDropModule`)
+- **RxJS** — reactive data streams
+- **Karma / Jasmine** — unit testing
 
-```bash
-ng serve
-```
+## Features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Lists** — create and manage multiple named lists per user
+- **List Items** — add, edit, reorder (drag-and-drop), and complete items
+- **Sub-items** — nested checklist items within each list item
+- **Repeating Items** — configure items to recur on a schedule (daily, weekly, etc.)
+- **Sharing** — share lists with other users via a generated token link (`/share/:token`)
+- **Members Panel** — view and manage authorized list members
+- **Auth Guard** — all routes require a valid JWT session
 
-## Code scaffolding
+## Development
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Prerequisites
 
-```bash
-ng generate component component-name
-```
+- Node.js 18+
+- Angular CLI (`npm install -g @angular/cli`)
+- `backend_rust` service running on port 3000
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Install dependencies
 
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### Start dev server
 
 ```bash
-ng e2e
+npm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The app will be available at `http://localhost:4200`.
 
-## Additional Resources
+> **Docker:** When running via `docker-compose`, the app is served on port **4202**.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Available Scripts
+
+| Script          | Description                       |
+| --------------- | --------------------------------- |
+| `npm start`     | Start dev server on port 4200     |
+| `npm run build` | Production build into `dist/`     |
+| `npm test`      | Run unit tests with Karma         |
+| `npm run lint`  | Lint with ESLint + angular-eslint |
+
+## Docker
+
+```bash
+# Development (hot-reload)
+docker compose up frontend-list
+
+# Production image
+docker build -t budget-list .
+```
+
+## Project Structure
+
+```
+src/app/
+├── home/               # Lists overview — create and navigate to lists
+├── list-detail/        # List view with items, sub-items, drag-and-drop
+├── share/              # Accept a share-token invitation
+├── login/              # Login form
+├── guards/             # authGuard — JWT session check
+├── interceptors/       # HTTP interceptors (auth token)
+├── models/             # TypeScript interfaces (UserList, ListItem, SubItem, etc.)
+├── services/           # ListService, AuthService
+└── utils/              # Shared utility functions
+```

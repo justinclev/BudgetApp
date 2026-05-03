@@ -1,59 +1,69 @@
 # Dashboard
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.6.
+Angular 20 application that serves as the authentication entry point for the Budget App suite. Users log in here and are redirected to the appropriate micro-frontend.
 
-## Development server
+## Tech Stack
 
-To start a local development server, run:
+- **Angular 20** with standalone components
+- **RxJS** — reactive data streams
+- **Karma / Jasmine** — unit testing
 
-```bash
-ng serve
-```
+## Features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Login / Logout** — JWT-based authentication flow against the Rust backend
+- **Auth Guard** — protects the home route; redirects unauthenticated users to `/login`
+- **Home** — landing page after successful login
 
-## Code scaffolding
+## Development
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Prerequisites
 
-```bash
-ng generate component component-name
-```
+- Node.js 18+
+- Angular CLI (`npm install -g @angular/cli`)
+- `backend_rust` service running on port 3000
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+### Install dependencies
 
 ```bash
-ng build
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Start dev server
 
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
+The app will be available at `http://localhost:4200`.
 
-For end-to-end (e2e) testing, run:
+> **Docker:** When running via `docker-compose`, this app is the primary entry point served on port **4200**.
+
+## Available Scripts
+
+| Script          | Description                       |
+| --------------- | --------------------------------- |
+| `npm start`     | Start dev server on port 4200     |
+| `npm run build` | Production build into `dist/`     |
+| `npm test`      | Run unit tests with Karma         |
+| `npm run lint`  | Lint with ESLint + angular-eslint |
+
+## Docker
 
 ```bash
-ng e2e
+# Development (hot-reload)
+docker compose up frontend-dashboard
+
+# Production image
+docker build -t budget-dashboard .
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Project Structure
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```
+src/app/
+├── login/          # Login form component
+├── logout/         # Logout handler component
+├── home/           # Protected home page
+├── guards/         # authGuard — JWT session check
+└── services/       # Auth service (login, token storage)
+```
