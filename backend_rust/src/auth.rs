@@ -66,7 +66,7 @@ pub fn sign_token(user_id: &str, email: &str, secret: &str) -> Result<String, St
 
 /// Verify a JWT and return its claims.  Returns `Err` for bad signature,
 /// malformed token, or expiry.
-pub fn verify_token(token: &str, secret: &str) -> Result<Claims, String> {
+pub(crate) fn verify_token(token: &str, secret: &str) -> Result<Claims, String> {
     let parts: Vec<&str> = token.splitn(3, '.').collect();
     if parts.len() != 3 {
         return Err("Malformed token: expected 3 dot-separated parts".into());

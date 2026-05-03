@@ -23,7 +23,7 @@ async fn main() -> std::io::Result<()> {
     // Initialize DB — propagates a meaningful error instead of panicking.
     let app_state = db::init_db().await.map_err(|e| {
         eprintln!("Failed to initialise database: {}", e);
-        std::io::Error::new(std::io::ErrorKind::Other, e.to_string())
+        std::io::Error::other(e.to_string())
     })?;
 
     println!("Server starting on port {}", port);

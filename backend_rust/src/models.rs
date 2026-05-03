@@ -329,12 +329,6 @@ pub struct ReorderItemsRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct RemoveUserRequest {
-    #[serde(rename = "userId")]
-    pub user_id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct UpdateItemRequest {
     pub text: String,
 }
