@@ -6,6 +6,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
+  token: string;
 }
 
 const COOKIE_NAME = 'budget_auth';
@@ -46,6 +47,10 @@ export class AuthService {
 
   getUser(): AuthUser | null {
     return this._user();
+  }
+
+  getToken(): string | null {
+    return this._user()?.token ?? null;
   }
 
   // Refresh signal from cookie (call after navigation if needed).

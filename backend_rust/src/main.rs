@@ -1,3 +1,4 @@
+mod auth;
 mod db;
 mod handlers;
 mod models;
@@ -19,8 +20,11 @@ async fn main() -> std::io::Result<()> {
 
     let port = env::var("PORT").unwrap_or_else(|_| "3000".to_string());
 
-    // Initialize DB
-    let app_state = db::init_db().await;
+    // Initialize DB — propagates a meaningful error instead of panicking.
+    let app_state = db::init_db().await.map_err(|e| {
+        eprintln!("Failed to initialise database: {}", e);
+        std::io::Error::new(std::io::ErrorKind::Other, e.to_string())
+    })?;
 
     println!("Server starting on port {}", port);
 
@@ -28,7 +32,11 @@ async fn main() -> std::io::Result<()> {
         let cors = Cors::default()
             .allow_any_origin()
             .allow_any_method()
-            .allow_any_header()
+            .allowed_headers(vec![
+                actix_web::http::header::AUTHORIZATION,
+                actix_web::http::header::CONTENT_TYPE,
+                actix_web::http::header::ACCEPT,
+            ])
             .max_age(3600);
 
         App::new()
@@ -152,6 +160,7 @@ async fn main() -> std::io::Result<()> {
             .route("/api/users", web::post().to(user_handler::create_user))
             // Auth Routes
             .route("/api/auth/google", web::post().to(user_handler::google_auth))
+            .route("/api/auth/dev-login", web::post().to(user_handler::dev_login))
             // Todo Occurrence Routes
             .route(
                 "/api/todo-occurrences/generate",

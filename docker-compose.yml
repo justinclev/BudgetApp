@@ -15,8 +15,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - MONGO_URI=mongodb+srv://admin:I98gw2zKiEn8iMov@budgetflowdb.anhdnhq.mongodb.net/?appName=BudgetFlowDB
-      - PORT=3000
+      - MONGO_URI=${MONGO_URI}
+      - PORT=${PORT:-3000}
+      - JWT_SECRET=${JWT_SECRET}
+      - DEV_MODE=${DEV_MODE:-false}
     depends_on:
       - mongo
 

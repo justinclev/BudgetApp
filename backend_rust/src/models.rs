@@ -173,6 +173,20 @@ pub struct GoogleAuthRequest {
     pub credential: String,
 }
 
+/// Returned by all auth endpoints.  The `token` is an HS256 JWT; the `user`
+/// is the full user document so the frontend can display profile info.
+#[derive(Debug, Serialize)]
+pub struct AuthResponse {
+    pub token: String,
+    pub user: User,
+}
+
+/// Body for the dev-only /api/auth/dev-login endpoint.
+#[derive(Debug, Deserialize)]
+pub struct DevLoginRequest {
+    pub user_id: String,
+}
+
 // ── List App Models ────────────────────────────────────────────────────────
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

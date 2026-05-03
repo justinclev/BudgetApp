@@ -206,9 +206,9 @@ export class LoginComponent implements AfterViewInit {
     private route: ActivatedRoute,
   ) {}
 
-  private readonly mockUsers = [
-    { id: '507f1f77bcf86cd799439011', email: 'alice@example.com', name: 'Alice' },
-    { id: '507f1f77bcf86cd799439012', email: 'bob@example.com', name: 'Bob' },
+  private readonly devUserIds = [
+    '507f1f77bcf86cd799439011', // Alice
+    '507f1f77bcf86cd799439012', // Bob
   ];
 
   ngAfterViewInit(): void {
@@ -229,9 +229,9 @@ export class LoginComponent implements AfterViewInit {
   handleGoogleCredential(response: any): void {
     this.googleError = null;
     this.authService.loginWithGoogle(response.credential).subscribe({
-      next: (user: any) => {
+      next: (authResponse) => {
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-        this.authService.login(user, returnUrl ?? undefined);
+        this.authService.login(authResponse, returnUrl ?? undefined);
       },
       error: () => {
         this.googleError = 'Google sign-in failed. Please try again.';
@@ -240,7 +240,15 @@ export class LoginComponent implements AfterViewInit {
   }
 
   loginAs(index: number): void {
+    const userId = this.devUserIds[index];
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-    this.authService.login(this.mockUsers[index], returnUrl ?? undefined);
+    this.authService.loginWithDevAccount(userId).subscribe({
+      next: (authResponse) => {
+        this.authService.login(authResponse, returnUrl ?? undefined);
+      },
+      error: () => {
+        this.googleError = 'Dev login failed — is DEV_MODE=true on the backend?';
+      },
+    });
   }
 }

@@ -18,7 +18,7 @@ export class LoginComponent {
   // This component is not used — the auth guard redirects directly to
   // the dashboard login. Kept as a fallback shell only.
   loginWithGoogle(): void {
-    const mockUser = { id: '1', email: 'alice@example.com', name: 'Alice' };
+    const mockUser = { id: '1', email: 'alice@example.com', name: 'Alice', token: '' };
     this.auth.login(mockUser);
     const redirect = this.route.snapshot.queryParamMap.get('redirect');
     this.router.navigateByUrl(redirect ?? '/');

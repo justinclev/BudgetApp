@@ -372,14 +372,18 @@ version = "0.1.0"
 dependencies = [
  "actix-cors",
  "actix-web",
+ "base64 0.21.7",
  "bson",
  "chrono",
  "dotenv",
  "futures",
+ "hmac",
  "mongodb",
  "reqwest",
  "serde",
  "serde_json",
+ "sha2",
+ "tokio",
 ]
 
 [[package]]

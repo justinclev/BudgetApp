@@ -4,6 +4,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
+  token: string;
 }
 
 const COOKIE_NAME = 'budget_auth';
@@ -24,5 +25,9 @@ function readAuthCookie(): AuthUser | null {
 export class AuthService {
   getUser(): AuthUser | null {
     return readAuthCookie();
+  }
+
+  getToken(): string | null {
+    return readAuthCookie()?.token ?? null;
   }
 }

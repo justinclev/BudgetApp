@@ -6,18 +6,26 @@ import { environment } from '../../environments/environment';
 
 const COOKIE_NAME = 'budget_auth';
 
-function readAuthCookie(): any | null {
+interface AuthCookiePayload {
+  id: string;
+  email: string;
+  name: string;
+  token: string;
+}
+
+function readAuthCookie(): AuthCookiePayload | null {
   const match = document.cookie.match(/(?:^|;\s*)budget_auth=([^;]+)/);
   if (!match) return null;
   try {
-    return JSON.parse(decodeURIComponent(match[1]));
+    const raw = JSON.parse(decodeURIComponent(match[1]));
+    return { ...raw, id: raw.id ?? raw._id } as AuthCookiePayload;
   } catch {
     return null;
   }
 }
 
-function writeAuthCookie(user: any): void {
-  document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(user))}; path=/; SameSite=Lax`;
+function writeAuthCookie(payload: AuthCookiePayload): void {
+  document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(payload))}; path=/; SameSite=Lax`;
 }
 
 function clearAuthCookie(): void {
@@ -34,14 +42,24 @@ export class AuthService {
     private http: HttpClient,
   ) {}
 
-  loginWithGoogle(credential: string): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/api/auth/google`, { credential });
+  loginWithGoogle(credential: string): Observable<{ token: string; user: any }> {
+    return this.http.post<{ token: string; user: any }>(`${environment.apiUrl}/api/auth/google`, { credential });
   }
 
-  login(userData: any, returnUrl?: string): void {
-    // Normalize _id → id so all apps can use user.id consistently
-    const normalized = { ...userData, id: userData.id ?? userData._id };
-    writeAuthCookie(normalized);
+  loginWithDevAccount(userId: string): Observable<{ token: string; user: any }> {
+    return this.http.post<{ token: string; user: any }>(`${environment.apiUrl}/api/auth/dev-login`, { user_id: userId });
+  }
+
+  /** Stores the JWT + user profile in the shared cookie and navigates. */
+  login(authResponse: { token: string; user: any }, returnUrl?: string): void {
+    const user = authResponse.user;
+    const payload = {
+      id: user.id ?? user._id,
+      email: user.email,
+      name: user.name,
+      token: authResponse.token,
+    };
+    writeAuthCookie(payload);
     this.isAuthenticatedSignal.set(true);
     if (returnUrl) {
       window.location.href = decodeURIComponent(returnUrl);
@@ -50,13 +68,17 @@ export class AuthService {
     }
   }
 
+  getToken(): string | null {
+    return readAuthCookie()?.token ?? null;
+  }
+
   logout(): void {
     clearAuthCookie();
     this.isAuthenticatedSignal.set(false);
     this.router.navigate(['/login']);
   }
 
-  getUser(): any {
+  getUser(): AuthCookiePayload | null {
     return readAuthCookie();
   }
 }

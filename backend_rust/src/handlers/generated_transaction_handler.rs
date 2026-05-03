@@ -1,5 +1,5 @@
 use crate::db::AppState;
-use crate::models::{Transaction, UserTransactions};
+use crate::models::Transaction;
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use mongodb::bson::doc;
 

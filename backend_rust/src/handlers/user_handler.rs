@@ -2,9 +2,11 @@ use actix_web::{web, HttpResponse, Responder};
 use futures::StreamExt;
 use mongodb::bson::{doc, oid::ObjectId};
 use serde::Deserialize;
+use std::env;
 
+use crate::auth::sign_token;
 use crate::db::AppState;
-use crate::models::{GoogleAuthRequest, User};
+use crate::models::{AuthResponse, DevLoginRequest, GoogleAuthRequest, User};
 
 // ── Google tokeninfo response ─────────────────────────────────────────────────
 #[derive(Debug, Deserialize)]
@@ -132,8 +134,49 @@ pub async fn google_auth(
         .find_one_and_update(filter, update, options)
         .await
     {
-        Ok(Some(user)) => HttpResponse::Ok().json(user),
+        Ok(Some(user)) => {
+            let user_id = user.id.map(|oid| oid.to_hex()).unwrap_or_default();
+            match sign_token(&user_id, &user.email, &data.jwt_secret) {
+                Ok(token) => HttpResponse::Ok().json(AuthResponse { token, user }),
+                Err(e) => HttpResponse::InternalServerError()
+                    .body(format!("Failed to sign token: {}", e)),
+            }
+        }
         Ok(None) => HttpResponse::InternalServerError().body("Upsert returned no document"),
+        Err(e) => HttpResponse::InternalServerError().body(format!("DB error: {}", e)),
+    }
+}
+
+// ── POST /api/auth/dev-login  (DEV_MODE=true only) ────────────────────────
+/// Issues a real JWT for a known dev user by ID.  Only available when the
+/// DEV_MODE environment variable is set to "true".
+pub async fn dev_login(
+    data: web::Data<AppState>,
+    body: web::Json<DevLoginRequest>,
+) -> impl Responder {
+    if env::var("DEV_MODE").as_deref() != Ok("true") {
+        return HttpResponse::NotFound().body("Not found");
+    }
+
+    let object_id = match ObjectId::parse_str(&body.user_id) {
+        Ok(oid) => oid,
+        Err(_) => return HttpResponse::BadRequest().body("Invalid user_id format"),
+    };
+
+    match data
+        .users_collection
+        .find_one(doc! { "_id": object_id }, None)
+        .await
+    {
+        Ok(Some(user)) => {
+            let user_id = user.id.map(|oid| oid.to_hex()).unwrap_or_default();
+            match sign_token(&user_id, &user.email, &data.jwt_secret) {
+                Ok(token) => HttpResponse::Ok().json(AuthResponse { token, user }),
+                Err(e) => HttpResponse::InternalServerError()
+                    .body(format!("Failed to sign token: {}", e)),
+            }
+        }
+        Ok(None) => HttpResponse::NotFound().body("User not found"),
         Err(e) => HttpResponse::InternalServerError().body(format!("DB error: {}", e)),
     }
 }
