@@ -28,8 +28,27 @@ async fn main() -> std::io::Result<()> {
 
     println!("Server starting on port {}", port);
 
-    let allowed_origin = env::var("ALLOWED_ORIGIN").ok();
     let dev_mode = env::var("DEV_MODE").as_deref() == Ok("true");
+
+    // In production (DEV_MODE != "true") ALLOWED_ORIGIN is mandatory so that
+    // the server never silently opens CORS to all origins.
+    let allowed_origin: Option<String> = match env::var("ALLOWED_ORIGIN") {
+        Ok(origin) => Some(origin),
+        Err(_) if dev_mode => {
+            eprintln!(
+                "WARN: ALLOWED_ORIGIN not set — falling back to allow_any_origin() \
+                 because DEV_MODE=true"
+            );
+            None
+        }
+        Err(_) => {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "ALLOWED_ORIGIN environment variable must be set in production. \
+                 Set DEV_MODE=true to bypass this check during local development.",
+            ));
+        }
+    };
 
     HttpServer::new(move || {
         let mut cors = Cors::default()

@@ -44,9 +44,15 @@ pub async fn get_user(data: web::Data<AppState>, path: web::Path<String>) -> imp
         Err(_) => return HttpResponse::BadRequest().body("Invalid ID format"),
     };
 
-    match data.users_collection.find_one(doc! { "_id": object_id }, None).await {
+    match data
+        .users_collection
+        .find_one(doc! { "_id": object_id }, None)
+        .await
+    {
         Ok(Some(user)) => HttpResponse::Ok().json(user),
-        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "message": "User not found" })),
+        Ok(None) => {
+            HttpResponse::NotFound().json(serde_json::json!({ "message": "User not found" }))
+        }
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
 }
@@ -56,9 +62,15 @@ pub async fn create_user(data: web::Data<AppState>, body: web::Json<User>) -> im
     match data.users_collection.insert_one(new_user, None).await {
         Ok(result) => {
             if let Some(new_id) = result.inserted_id.as_object_id() {
-                match data.users_collection.find_one(doc! { "_id": new_id }, None).await {
+                match data
+                    .users_collection
+                    .find_one(doc! { "_id": new_id }, None)
+                    .await
+                {
                     Ok(Some(user)) => HttpResponse::Created().json(user),
-                    _ => HttpResponse::InternalServerError().body("Failed to retrieve created user"),
+                    _ => {
+                        HttpResponse::InternalServerError().body("Failed to retrieve created user")
+                    }
                 }
             } else {
                 HttpResponse::InternalServerError().body("Failed to get inserted ID")
@@ -87,15 +99,13 @@ pub async fn google_auth(
         .unwrap_or_default();
 
     let token_info = match client.get(&verify_url).send().await {
-        Ok(resp) if resp.status().is_success() => {
-            match resp.json::<GoogleTokenInfo>().await {
-                Ok(info) => info,
-                Err(e) => {
-                    return HttpResponse::Unauthorized()
-                        .body(format!("Failed to parse token info: {}", e))
-                }
+        Ok(resp) if resp.status().is_success() => match resp.json::<GoogleTokenInfo>().await {
+            Ok(info) => info,
+            Err(e) => {
+                return HttpResponse::Unauthorized()
+                    .body(format!("Failed to parse token info: {}", e))
             }
-        }
+        },
         Ok(resp) => {
             let status = resp.status();
             return HttpResponse::Unauthorized()
@@ -138,8 +148,9 @@ pub async fn google_auth(
             let user_id = user.id.map(|oid| oid.to_hex()).unwrap_or_default();
             match sign_token(&user_id, &user.email, &data.jwt_secret) {
                 Ok(token) => HttpResponse::Ok().json(AuthResponse { token, user }),
-                Err(e) => HttpResponse::InternalServerError()
-                    .body(format!("Failed to sign token: {}", e)),
+                Err(e) => {
+                    HttpResponse::InternalServerError().body(format!("Failed to sign token: {}", e))
+                }
             }
         }
         Ok(None) => HttpResponse::InternalServerError().body("Upsert returned no document"),
@@ -172,8 +183,9 @@ pub async fn dev_login(
             let user_id = user.id.map(|oid| oid.to_hex()).unwrap_or_default();
             match sign_token(&user_id, &user.email, &data.jwt_secret) {
                 Ok(token) => HttpResponse::Ok().json(AuthResponse { token, user }),
-                Err(e) => HttpResponse::InternalServerError()
-                    .body(format!("Failed to sign token: {}", e)),
+                Err(e) => {
+                    HttpResponse::InternalServerError().body(format!("Failed to sign token: {}", e))
+                }
             }
         }
         Ok(None) => HttpResponse::NotFound().body("User not found"),

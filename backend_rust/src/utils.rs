@@ -153,10 +153,7 @@ mod tests {
 
     #[derive(Deserialize)]
     struct OptionF64Wrapper {
-        #[serde(
-            deserialize_with = "deserialize_option_f64_from_bson_number",
-            default
-        )]
+        #[serde(deserialize_with = "deserialize_option_f64_from_bson_number", default)]
         value: Option<f64>,
     }
 

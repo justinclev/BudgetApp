@@ -2,8 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["main", "master", "Test-Dashboard"]
   pull_request:
+  workflow_dispatch: # allows manual runs from the Actions tab
 
 jobs:
   # ── Rust backend ────────────────────────────────────────────────────────────
