@@ -1,15 +1,9 @@
 use crate::db::AppState;
 use crate::models::{CheckNameResponse, Debt};
+use crate::utils::extract_user_id;
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use futures::StreamExt;
 use mongodb::bson::{doc, oid::ObjectId};
-
-fn extract_user_id(req: &HttpRequest) -> Option<String> {
-    req.headers()
-        .get("X-User-Id")
-        .and_then(|v| v.to_str().ok())
-        .map(|s| s.to_string())
-}
 
 pub async fn get_debts(req: HttpRequest, data: web::Data<AppState>) -> impl Responder {
     let user_id = match extract_user_id(&req) {

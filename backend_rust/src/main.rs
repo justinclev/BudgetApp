@@ -28,9 +28,11 @@ async fn main() -> std::io::Result<()> {
 
     println!("Server starting on port {}", port);
 
+    let allowed_origin = env::var("ALLOWED_ORIGIN").ok();
+    let dev_mode = env::var("DEV_MODE").as_deref() == Ok("true");
+
     HttpServer::new(move || {
-        let cors = Cors::default()
-            .allow_any_origin()
+        let mut cors = Cors::default()
             .allow_any_method()
             .allowed_headers(vec![
                 actix_web::http::header::AUTHORIZATION,
@@ -38,6 +40,10 @@ async fn main() -> std::io::Result<()> {
                 actix_web::http::header::ACCEPT,
             ])
             .max_age(3600);
+        cors = match &allowed_origin {
+            Some(origin) => cors.allowed_origin(origin),
+            None => cors.allow_any_origin(),
+        };
 
         App::new()
             .wrap(cors)
@@ -163,10 +169,16 @@ async fn main() -> std::io::Result<()> {
                 "/api/auth/google",
                 web::post().to(user_handler::google_auth),
             )
-            .route(
-                "/api/auth/dev-login",
-                web::post().to(user_handler::dev_login),
-            )
+            // dev-login is only wired up when DEV_MODE=true so it never
+            // appears in the route table in production builds.
+            .configure(|cfg| {
+                if dev_mode {
+                    cfg.route(
+                        "/api/auth/dev-login",
+                        web::post().to(user_handler::dev_login),
+                    );
+                }
+            })
             // Todo Occurrence Routes
             .route(
                 "/api/todo-occurrences/generate",

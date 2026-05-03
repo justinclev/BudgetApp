@@ -1,15 +1,9 @@
 use crate::db::AppState;
 use crate::models::{CheckNameResponse, RecurringTransaction};
+use crate::utils::extract_user_id;
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use futures::StreamExt;
 use mongodb::bson::{doc, oid::ObjectId};
-
-fn extract_user_id(req: &HttpRequest) -> Option<String> {
-    req.headers()
-        .get("X-User-Id")
-        .and_then(|v| v.to_str().ok())
-        .map(|s| s.to_string())
-}
 
 pub async fn get_transactions(req: HttpRequest, data: web::Data<AppState>) -> impl Responder {
     let user_id = match extract_user_id(&req) {
@@ -160,7 +154,7 @@ pub async fn delete_transaction(
 
     match data
         .transactions_collection
-        .delete_one(doc! { "_id": object_id, "user_id": &user_id }, None)
+        .delete_one(doc! { "_id": object_id, "createdByUserId": &user_id }, None)
         .await
     {
         Ok(result) => {

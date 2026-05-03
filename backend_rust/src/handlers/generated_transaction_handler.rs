@@ -1,14 +1,8 @@
 use crate::db::AppState;
 use crate::models::Transaction;
+use crate::utils::extract_user_id;
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use mongodb::bson::doc;
-
-fn extract_user_id(req: &HttpRequest) -> Option<String> {
-    req.headers()
-        .get("X-User-Id")
-        .and_then(|v| v.to_str().ok())
-        .map(|s| s.to_string())
-}
 
 pub async fn get_generated_transactions(
     req: HttpRequest,

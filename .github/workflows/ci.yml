@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+jobs:
+  # ── Rust backend ────────────────────────────────────────────────────────────
+  rust:
+    name: Rust tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend_rust
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry + build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend_rust/target
+          key: rust-${{ hashFiles('backend_rust/Cargo.lock') }}
+          restore-keys: rust-
+
+      - name: cargo test
+        run: cargo test --locked
+
+  # ── Angular: budget app ─────────────────────────────────────────────────────
+  angular-budget:
+    name: Angular (budget) tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/budget
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/budget/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests (headless Chrome)
+        run: npx ng test --watch=false --browsers=ChromeHeadless
+
+  # ── Angular: list app ───────────────────────────────────────────────────────
+  angular-list:
+    name: Angular (list) tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/list
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/list/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests (headless Chrome)
+        run: npx ng test --watch=false --browsers=ChromeHeadless
+
+  # ── Angular: dashboard app ──────────────────────────────────────────────────
+  angular-dashboard:
+    name: Angular (dashboard) tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/dashboard
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests (headless Chrome)
+        run: npx ng test --watch=false --browsers=ChromeHeadless
+
+  # ── Gate ────────────────────────────────────────────────────────────────────
+  # Single required status check to add to branch protection.
+  all-green:
+    name: All tests passed
+    runs-on: ubuntu-latest
+    needs: [rust, angular-budget, angular-list, angular-dashboard]
+    steps:
+      - run: echo "All jobs passed."

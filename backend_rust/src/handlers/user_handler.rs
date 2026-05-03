@@ -180,3 +180,11 @@ pub async fn dev_login(
         Err(e) => HttpResponse::InternalServerError().body(format!("DB error: {}", e)),
     }
 }
+
+/// Removed from the route table when DEV_MODE is not "true" via .configure().
+/// This function is intentionally unreachable in production; it exists so that
+/// any accidental direct reference produces a clear compile-time artefact.
+#[allow(dead_code)]
+pub async fn dev_login_disabled() -> impl Responder {
+    HttpResponse::NotFound().body("Not found")
+}

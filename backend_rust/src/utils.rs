@@ -104,6 +104,17 @@ where
     }
 }
 
+// ── HTTP helpers ─────────────────────────────────────────────────────────────
+
+/// Extracts the `X-User-Id` header value from an incoming request.
+/// Shared by all handlers that require per-user data scoping.
+pub fn extract_user_id(req: &actix_web::HttpRequest) -> Option<String> {
+    req.headers()
+        .get("X-User-Id")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.to_string())
+}
+
 // ── Tests ──────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
