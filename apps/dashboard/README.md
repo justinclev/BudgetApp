@@ -1,10 +1,10 @@
 # Dashboard
 
-Angular 20 application that serves as the authentication entry point for the Budget App suite. Users log in here and are redirected to the appropriate micro-frontend.
+Angular 21 application that serves as the authentication entry point for the Budget App suite. Users log in here and are redirected to the appropriate micro-frontend.
 
 ## Tech Stack
 
-- **Angular 20** with standalone components
+- **Angular 21** with standalone components
 - **RxJS** — reactive data streams
 - **Karma / Jasmine** — unit testing
 

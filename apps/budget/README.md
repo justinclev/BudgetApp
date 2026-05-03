@@ -1,10 +1,10 @@
 # Budget Frontend
 
-Angular 20 application for personal budget management. Provides views for tracking debts, recurring transactions, and individual transactions, plus a loan comparison calculator.
+Angular 21 application for personal budget management. Provides views for tracking debts, recurring transactions, and individual transactions, plus a loan comparison calculator.
 
 ## Tech Stack
 
-- **Angular 20** with standalone components
+- **Angular 21** with standalone components
 - **Angular Material** — UI component library
 - **RxJS** — reactive data streams
 - **Karma / Jasmine** — unit testing

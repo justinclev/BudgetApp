@@ -335,8 +335,8 @@ export class LoanComparisonService {
 
     // BUILD OVERALL RATING AND RECOMMENDATION
     const highImpactRedFlags = redFlags.filter((f) => f.impact === 'high').length;
-    let overallRating: 'poor' | 'fair' | 'marginal' | 'reasonable' | 'good' = 'fair';
-    let ratingExplanation = '';
+    let overallRating: 'poor' | 'fair' | 'marginal' | 'reasonable' | 'good';
+    let ratingExplanation: string;
 
     if (result.totalCostSavings < 0) {
       overallRating = 'poor';

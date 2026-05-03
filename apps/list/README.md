@@ -1,10 +1,10 @@
 # List App
 
-Angular 20 application for managing collaborative to-do and shopping lists. Supports drag-and-drop reordering, sub-items, repeating items, and list sharing via shareable tokens.
+Angular 21 application for managing collaborative to-do and shopping lists. Supports drag-and-drop reordering, sub-items, repeating items, and list sharing via shareable tokens.
 
 ## Tech Stack
 
-- **Angular 20** with standalone components
+- **Angular 21** with standalone components
 - **Angular CDK** — drag-and-drop (`DragDropModule`)
 - **RxJS** — reactive data streams
 - **Karma / Jasmine** — unit testing
