@@ -162,8 +162,10 @@ export class LoanComparisonService {
       (sum, comparison) => sum + comparison.loanTotalInterest,
       0,
     );
-    const loanScenarioTotalCost =
-      debtComparisons.reduce((sum, comparison) => sum + comparison.loanTotalPaid, 0);
+    const loanScenarioTotalCost = debtComparisons.reduce(
+      (sum, comparison) => sum + comparison.loanTotalPaid,
+      0,
+    );
 
     const totalInterestSavings = currentScenarioTotalInterest - loanScenarioTotalInterest;
     const totalCostSavings = currentScenarioTotalCost - loanScenarioTotalCost;
