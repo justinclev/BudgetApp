@@ -57,7 +57,7 @@ async fn main() -> std::io::Result<()> {
                 actix_web::http::header::AUTHORIZATION,
                 actix_web::http::header::CONTENT_TYPE,
                 actix_web::http::header::ACCEPT,
-                actix_web::http::HeaderName::from_static("x-user-id"),
+                actix_web::http::header::HeaderName::from_static("x-user-id"),
             ])
             .max_age(3600);
         cors = match &allowed_origin {
