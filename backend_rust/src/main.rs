@@ -61,7 +61,7 @@ async fn main() -> std::io::Result<()> {
             ])
             .max_age(3600);
         cors = match &allowed_origin {
-            Some(origin) => cors.allowed_origin(origin),
+            Some(origin) => cors.allowed_origin(origin).supports_credentials(),
             None => cors.allow_any_origin(),
         };
 

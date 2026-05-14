@@ -1,0 +1,12 @@
+{
+  "/api": {
+    "target": "https://budgetapp-ma3x.onrender.com",
+    "secure": false,
+    "changeOrigin": true,
+    "rejectUnauthorized": false,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": "/api"
+    }
+  }
+}

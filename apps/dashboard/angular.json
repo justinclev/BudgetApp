@@ -57,6 +57,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "prod-proxy": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod-proxy.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -69,6 +80,10 @@
             },
             "development": {
               "buildTarget": "dashboard:build:development"
+            },
+            "prod-proxy": {
+              "buildTarget": "dashboard:build:prod-proxy",
+              "proxyConfig": "proxy.conf.prod.json"
             }
           },
           "defaultConfiguration": "development"
