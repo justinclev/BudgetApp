@@ -31,7 +31,7 @@ After startup:
 - List app: http://localhost:4202
 - API: http://localhost:3000
 
-Environment variables are read from the shell or an `.env` file (used by Docker Compose). Important vars include `MONGO_URI`, `JWT_SECRET`, `ALLOWED_ORIGIN`, and `DEV_MODE`.
+Environment variables are read from the shell or an `.env` file (used by Docker Compose). Important vars include `MONGO_URI`, `JWT_SECRET`, `ALLOWED_ORIGIN` / `ALLOWED_ORIGINS`, and `DEV_MODE`.
 
 ## Development (without Docker)
 
