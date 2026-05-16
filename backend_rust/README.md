@@ -42,10 +42,28 @@ Primary REST API for the Budget App, built with Actix-web and MongoDB. Handles a
 | `MONGO_URI`      | Yes        | —       | MongoDB connection string                               |
 | `PORT`           | No         | `3000`  | Port the server listens on                              |
 | `JWT_SECRET`     | Yes        | —       | Secret key for signing JWTs                             |
-| `ALLOWED_ORIGIN` | Production | —       | CORS allowed origin                                     |
+| `ALLOWED_ORIGIN` | Production | —       | Single CORS allowed origin (legacy fallback)            |
+| `ALLOWED_ORIGINS` | Production | —      | Comma-separated exact CORS origins                      |
+| `ALLOWED_ORIGIN_SUFFIXES` | No | —     | Comma-separated origin suffixes (ex: `.vercel.app`)     |
 | `DEV_MODE`       | No         | `false` | Set to `true` to allow any CORS origin (local dev only) |
 
-> In production (`DEV_MODE` is not `true`), `ALLOWED_ORIGIN` **must** be set or the server will refuse to start.
+> In production (`DEV_MODE` is not `true`), you must set at least one of:
+> `ALLOWED_ORIGIN`, `ALLOWED_ORIGINS`, or `ALLOWED_ORIGIN_SUFFIXES`.
+
+Example for Render + Vercel:
+
+```bash
+ALLOWED_ORIGINS=https://your-app.vercel.app,https://your-custom-domain.com
+ALLOWED_ORIGIN_SUFFIXES=.vercel.app
+```
+
+Concrete example for your current deployment:
+
+```bash
+ALLOWED_ORIGINS=https://budget-app-beige-tau.vercel.app
+# Optional if you also use Vercel preview URLs:
+ALLOWED_ORIGIN_SUFFIXES=.vercel.app
+```
 
 ## Development
 

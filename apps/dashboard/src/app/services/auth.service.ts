@@ -43,16 +43,15 @@ export class AuthService {
   ) {}
 
   loginWithGoogle(credential: string): Observable<{ token: string; user: any }> {
-    return this.http.post<{ token: string; user: any }>(`${environment.apiUrl}/api/auth/google`, {
+    return this.http.post<{ token: string; user: any }>(`${environment.apiUrl}/auth/google`, {
       credential,
     });
   }
 
   loginWithDevAccount(userId: string): Observable<{ token: string; user: any }> {
-    return this.http.post<{ token: string; user: any }>(
-      `${environment.apiUrl}/api/auth/dev-login`,
-      { user_id: userId },
-    );
+    return this.http.post<{ token: string; user: any }>(`${environment.apiUrl}/auth/dev-login`, {
+      user_id: userId,
+    });
   }
 
   /** Stores the JWT + user profile in the shared cookie and navigates. */

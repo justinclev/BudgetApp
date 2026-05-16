@@ -14,6 +14,16 @@ use handlers::{
     todo_occurrence_handler, transaction_handler, user_handler,
 };
 
+fn parse_csv_env(key: &str) -> Option<Vec<String>> {
+    env::var(key).ok().map(|raw| {
+        raw.split(',')
+            .map(str::trim)
+            .filter(|value| !value.is_empty())
+            .map(|value| value.to_string())
+            .collect::<Vec<String>>()
+    })
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -30,25 +40,41 @@ async fn main() -> std::io::Result<()> {
 
     let dev_mode = env::var("DEV_MODE").as_deref() == Ok("true");
 
-    // In production (DEV_MODE != "true") ALLOWED_ORIGIN is mandatory so that
+    // In production (DEV_MODE != "true") CORS origins must be explicitly set so
     // the server never silently opens CORS to all origins.
-    let allowed_origin: Option<String> = match env::var("ALLOWED_ORIGIN") {
-        Ok(origin) => Some(origin),
-        Err(_) if dev_mode => {
-            eprintln!(
-                "WARN: ALLOWED_ORIGIN not set — falling back to allow_any_origin() \
-                 because DEV_MODE=true"
-            );
-            None
+    let mut allowed_origins = parse_csv_env("ALLOWED_ORIGINS").unwrap_or_default();
+    if allowed_origins.is_empty() {
+        if let Ok(origin) = env::var("ALLOWED_ORIGIN") {
+            if !origin.trim().is_empty() {
+                allowed_origins.push(origin.trim().to_string());
+            }
         }
-        Err(_) => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                "ALLOWED_ORIGIN environment variable must be set in production. \
-                 Set DEV_MODE=true to bypass this check during local development.",
-            ));
-        }
-    };
+    }
+    let allowed_origin_suffixes = parse_csv_env("ALLOWED_ORIGIN_SUFFIXES").unwrap_or_default();
+
+    if !allowed_origins.is_empty() {
+        println!("CORS exact origins: {}", allowed_origins.join(", "));
+    }
+    if !allowed_origin_suffixes.is_empty() {
+        println!(
+            "CORS origin suffixes: {}",
+            allowed_origin_suffixes.join(", ")
+        );
+    }
+
+    if !dev_mode && allowed_origins.is_empty() && allowed_origin_suffixes.is_empty() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Set CORS origins in production via ALLOWED_ORIGINS (comma-separated), \
+             ALLOWED_ORIGIN (single origin), or ALLOWED_ORIGIN_SUFFIXES.",
+        ));
+    }
+
+    if dev_mode && allowed_origins.is_empty() && allowed_origin_suffixes.is_empty() {
+        eprintln!(
+            "WARN: No CORS origin env vars set — falling back to allow_any_origin() because DEV_MODE=true"
+        );
+    }
 
     HttpServer::new(move || {
         let mut cors = Cors::default()
@@ -57,12 +83,24 @@ async fn main() -> std::io::Result<()> {
                 actix_web::http::header::AUTHORIZATION,
                 actix_web::http::header::CONTENT_TYPE,
                 actix_web::http::header::ACCEPT,
+                actix_web::http::header::HeaderName::from_static("x-user-id"),
             ])
             .max_age(3600);
-        cors = match &allowed_origin {
-            Some(origin) => cors.allowed_origin(origin),
-            None => cors.allow_any_origin(),
-        };
+        if !allowed_origins.is_empty() || !allowed_origin_suffixes.is_empty() {
+            let exact_origins = allowed_origins.clone();
+            let suffixes = allowed_origin_suffixes.clone();
+            cors = cors
+                .allowed_origin_fn(move |origin, _req_head| {
+                    let Ok(origin) = origin.to_str() else {
+                        return false;
+                    };
+                    exact_origins.iter().any(|allowed| allowed == origin)
+                        || suffixes.iter().any(|suffix| origin.ends_with(suffix))
+                })
+                .supports_credentials();
+        } else {
+            cors = cors.allow_any_origin();
+        }
 
         App::new()
             .wrap(cors)
