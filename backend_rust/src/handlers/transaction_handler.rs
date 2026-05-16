@@ -100,12 +100,12 @@ pub async fn update_transaction(
         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
     };
     doc.remove("_id");
-    doc.remove("user_id");
+    doc.remove("createdByUserId");
 
     match data
         .transactions_collection
         .find_one_and_update(
-            doc! { "_id": object_id, "user_id": &user_id },
+            doc! { "_id": object_id, "createdByUserId": &user_id },
             doc! { "$set": doc },
             None,
         )

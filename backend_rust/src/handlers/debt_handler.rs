@@ -98,12 +98,12 @@ pub async fn update_debt(
         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
     };
     doc.remove("_id");
-    doc.remove("user_id");
+    doc.remove("createdByUserId");
 
     match data
         .debts_collection
         .find_one_and_update(
-            doc! { "_id": object_id, "user_id": &user_id },
+            doc! { "_id": object_id, "createdByUserId": &user_id },
             doc! { "$set": doc },
             None,
         )
